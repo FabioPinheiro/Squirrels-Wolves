@@ -1,3 +1,7 @@
+# Folder for auto generated files
+/gen
+.project
+
 # Object files
 *.o
 *.ko
