@@ -6,7 +6,9 @@
 #define SQRL 2
 #define ICE 3
 #define TREE 4
+#define SONT 6
 #define printInt(i) printf("%d\n",i)
+#define calcPos(x, y, worldsize) y + x*worldsize
 
 struct world { 
 	int type; /* Wolf, Squirrel, etc. */ 
@@ -14,30 +16,47 @@ struct world {
  	int starvation_period; 
  };
 
+
 typedef struct world *sworld;
+char printValues(int x){
+	switch(x){
+		case WOLF:
+			return 'w';
+		case SQRL:
+			return 's';
+		case ICE:
+			return 'i';
+		case TREE:
+			return 't';
+		case SONT:
+			return '$';
+		case EPTY:
+			return '-';
+	}
+	return ' ';
+}
 int worldsize = 0, wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 void printMatrix(sworld world){
 	int i,j;
 	for(i=0;i<worldsize;i++){
 		for(j=0;j<worldsize ; j++){
-			printf("%d ",world[i+j*worldsize].type);
+			printf("%c ", printValues(world[i+j*worldsize].type));
 		}
 		printf("\n");
 	}
 }
+
 int addSpecial(char string){
 	switch (string){
-	case 'w':
-		return WOLF;
-	case 's':
-		return SQRL;
-	case 'i':
-		return ICE;
-	case 't':
-		return TREE;
-	default:
-		return EPTY;
-		}
+		case 'w':
+			return WOLF;
+		case 's':
+			return SQRL;
+		case 'i':
+			return ICE;
+		case 't':
+			return TREE;
+			}
 	return EPTY;
 }
 
@@ -47,20 +66,59 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 		exit(2);
 	}
 	int type = addSpecial(chr);
-	my_world[y_cord + x_cord*worldsize].type = type;
+	my_world[calcPos(x_cord, y_cord, worldsize)].type = type;
+	//printf("Pos real %d a pos do define %d\n", y_cord+x_cord*worldsize, calcPos(x_cord, y_cord, worldsize));
 	switch(type){
 		case WOLF:
-			my_world[y_cord + x_cord*worldsize].breeding_period = wolfBP;
-			my_world[y_cord + x_cord*worldsize].starvation_period = wolfStarvP;
+			my_world[calcPos(x_cord, y_cord, worldsize)].breeding_period = wolfBP;
+			my_world[calcPos(x_cord, y_cord, worldsize)].starvation_period = wolfStarvP;
 			break;
 		case SQRL:
-			my_world[y_cord + x_cord*worldsize].breeding_period = sqrlBP;
+			my_world[calcPos(x_cord, y_cord, worldsize)].breeding_period = sqrlBP;
 			break;
 		default:
 			break;
 	}
 
 }
+
+void cleanPos(sworld world, int x, int y){
+	world[calcPos(x,y,worldsize)].type = EPTY;
+	world[calcPos(x,y,worldsize)].breeding_period = 0;
+	world[calcPos(x,y,worldsize)].starvation_period = 0;
+}
+
+
+
+int getPositionType(sworld world, int x, int y){
+	return world[calcPos(x,y,worldsize)].type;
+}
+
+sworld getPositionStructure(sworld world, int x, int y){
+	return &world[calcPos(x,y,worldsize)];
+}
+
+void setPosition(sworld world, int x, int y, int type, int breedingPeriod, int starvationPeriod){
+	world[calcPos(x,y,worldsize)].type = type;
+	world[calcPos(x,y,worldsize)].breeding_period = breedingPeriod;
+	world[calcPos(x,y,worldsize)].starvation_period = starvationPeriod;
+}
+
+void setPositionType(sworld world, int x, int y, int type){
+	world[calcPos(x,y,worldsize)].type = type;
+}
+void setPositionBreeding(sworld world, int x, int y, int breedingPeriod){
+	world[calcPos(x,y,worldsize)].breeding_period = breedingPeriod;
+}
+
+void setPositionStarvation(sworld world, int x, int y, int starvationPeriod){
+	world[calcPos(x,y,worldsize)].starvation_period = starvationPeriod;
+}
+void move(){
+
+}
+
+
 
 int main(int argc, char const *argv[]){  
 	wolfBP = atoi(argv[2]);
