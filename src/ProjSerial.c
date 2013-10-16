@@ -109,13 +109,15 @@ int main(int argc, char const *argv[]){
 		printf("x: %d  y: %d\n", x, y);
 		setType(my_world,x,y,chr);
 	}
-
+	printf("\n\nTHE WORLD:\n\n");
 	printMatrix(my_world);
-	printf("Before \n\n\n\n");
+	printf("\tBefore \n\n\n\n");
 
 	move(my_world,1,0,2,0);
 
 	printMatrix(my_world);
+	printf("\tAfter \n\n\n\n");
+
 	printf("End File :D\n");
 	return 0;
 }
