@@ -1,6 +1,9 @@
+#define MAIN_FILE
+#include "ProjSerial.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "ProjSerial.h"
+#include "Mover.h"
+
 
 #define EPTY 0
 #define WOLF 1
@@ -11,6 +14,7 @@
 #define printInt(i) printf("%d\n",i)
 #define calcPos(x, y, worldsize) y + x*worldsize
 
+int worldsize = 0, wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
 char printValues(int x){
 	switch(x){
@@ -29,7 +33,7 @@ char printValues(int x){
 	}
 	return ' ';
 }
-int worldsize = 0, wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
+
 void printMatrix(sworld world){
 	int i,j;
 	for(i=0;i<worldsize;i++){
@@ -76,41 +80,7 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 }
 
-void cleanPos(sworld world, int x, int y){
-	world[calcPos(x,y,worldsize)].type = EPTY;
-	world[calcPos(x,y,worldsize)].breeding_period = 0;
-	world[calcPos(x,y,worldsize)].starvation_period = 0;
-}
 
-
-
-int getPositionType(sworld world, int x, int y){
-	return world[calcPos(x,y,worldsize)].type;
-}
-
-sworld getPositionStructure(sworld world, int x, int y){
-	return &world[calcPos(x,y,worldsize)];
-}
-
-void setPosition(sworld world, int x, int y, int type, int breedingPeriod, int starvationPeriod){
-	world[calcPos(x,y,worldsize)].type = type;
-	world[calcPos(x,y,worldsize)].breeding_period = breedingPeriod;
-	world[calcPos(x,y,worldsize)].starvation_period = starvationPeriod;
-}
-
-void setPositionType(sworld world, int x, int y, int type){
-	world[calcPos(x,y,worldsize)].type = type;
-}
-void setPositionBreeding(sworld world, int x, int y, int breedingPeriod){
-	world[calcPos(x,y,worldsize)].breeding_period = breedingPeriod;
-}
-
-void setPositionStarvation(sworld world, int x, int y, int starvationPeriod){
-	world[calcPos(x,y,worldsize)].starvation_period = starvationPeriod;
-}
-void move(){
-
-}
 
 
 
@@ -139,6 +109,11 @@ int main(int argc, char const *argv[]){
 		printf("x: %d  y: %d\n", x, y);
 		setType(my_world,x,y,chr);
 	}
+
+	printMatrix(my_world);
+	printf("Before \n\n\n\n");
+
+	move(my_world,1,0,2,0);
 
 	printMatrix(my_world);
 	printf("End File :D\n");

@@ -1,9 +1,15 @@
 #Makefile
 SRC=src/
-CFLAGS=
+CFLAGS=-g
+
 
 serial:
-	gcc $(CFLAGS) -o serial-proj $(SRC)ProjSerial.c
+	gcc $(CFLAGS) -o serial_proj $(SRC)ProjSerial.c $(SRC)Mover.c
 	
 runS:
-	./serial-proj inputs/input 10 12 3 5
+	./serial_proj inputs/input 10 12 3 5
+	
+make all: serial runS
+
+clean:
+	rm serial_proj
