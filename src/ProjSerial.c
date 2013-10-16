@@ -62,7 +62,7 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 }
 
-int main(int argc, char const *argv[]){
+int main(int argc, char const *argv[]){  
 	wolfBP = atoi(argv[2]);
 	sqrlBP = atoi(argv[3]);
 	wolfStarvP = atoi(argv[4]);
