@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "ProjSerial.h"
 
 #define EPTY 0
 #define WOLF 1
@@ -10,14 +11,7 @@
 #define printInt(i) printf("%d\n",i)
 #define calcPos(x, y, worldsize) y + x*worldsize
 
-struct world { 
-	int type; /* Wolf, Squirrel, etc. */ 
- 	int breeding_period; 
- 	int starvation_period; 
- };
 
-
-typedef struct world *sworld;
 char printValues(int x){
 	switch(x){
 		case WOLF:
