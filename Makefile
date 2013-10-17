@@ -11,7 +11,7 @@ runS:
 runSmal:
 	./serial_proj inputs/smalInput 10 12 3 3
 		
-make all: clean serial runSmal
+make all: runSmal serial clean
 
 clean:
 	rm serial_proj

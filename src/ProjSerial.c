@@ -94,7 +94,7 @@ void processEvens(sworld world){
 			goAnimal(world,i);
 		}
 	}
-	debug("processEvens DONE!\n");
+//	debug("processEvens DONE!\n");
 }
 void processOds(sworld world){
 	int i;
