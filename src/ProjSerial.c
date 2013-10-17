@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "Mover.h"
 
-
+#define DEBUG 0
 #define EPTY 0
 #define WOLF 1
 #define SQRL 2
@@ -15,6 +15,12 @@
 #define calcPos(x, y, worldsize) y + x*worldsize
 
 int worldsize = 0, wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
+
+void debug(char * str){
+	if(DEBUG){
+		printf(str);
+	}
+}
 
 char printValues(int x){
 	switch(x){
@@ -80,8 +86,36 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 }
 
+void processEvens(sworld world){
+	int i;
+	debug("processEvens... \n");
+	for(i = 0;i<worldsize*worldsize;i+=2){
+		if(isAnimal(world[i].type)){
+			goAnimal(world,i);
+		}
+	}
+	debug("processEvens DONE!\n");
+}
+void processOds(sworld world){
+	int i;
+	debug("processOds... \n");
+	for(i = 1;i<worldsize*worldsize;i+=2){
+//		printf("i:%d =  %d\n",i, world[i].type);
+		if(isAnimal(world[i].type)){
+			goAnimal(world,i);
+		}
+	}
+	debug("processOds DONE!\n");
+}
 
-
+void processGen(sworld world){
+	int i;
+	debug("processGen... \n");
+	for(i = 0;i<genNum;i++){
+		processEvens(world);
+		processOds(world);
+	}
+}
 
 
 int main(int argc, char const *argv[]){  
@@ -113,7 +147,7 @@ int main(int argc, char const *argv[]){
 	printMatrix(my_world);
 	printf("\tBefore \n\n\n\n");
 
-	move(my_world,1,0,2,0);
+	processGen(my_world);
 
 	printMatrix(my_world);
 	printf("\tAfter \n\n\n\n");
