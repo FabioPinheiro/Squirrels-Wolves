@@ -1,6 +1,7 @@
 # Folder for auto generated files
 /gen
 .project
+.cproject
 
 # Object files
 *.o
