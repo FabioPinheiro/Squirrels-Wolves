@@ -66,6 +66,6 @@ void goAnimal(sworld world, int pos) {
 	int y1, x1;
 	calcCords(pos, &x1, &y1);
 	int y2, x2;
-	calcCords(pos + 1, &x2, &y2);
+	calcCords(++pos, &x2, &y2);
 	move(world, x1, y1, x2, y2);
 }
