@@ -38,15 +38,16 @@ void setPositionStarvation(sworld world, int x, int y, int starvationPeriod) {
 	world[calcPos(x,y,worldsize)].starvation_period = starvationPeriod;
 }
 int isAnimal(int type) {
-	return (type == WOLF || type == SQRL);
+	return (type == WOLF || type == SQRL || type == SONT);
 }
 int isAble(sworld world, int x_from, int y_from) {
 
 	return 1; //TODO: Tem que se ver se é able ou nao!!
 }
 void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
+	//TODO be careful with SONT
 	sworld aux = getPositionStructure(world, x_from, y_from);
-	if (isAnimal(aux->type) && isAble(aux, x_to, y_to)) {
+	if (isAnimal(aux->type) && isAble(aux, x_to, y_to)) { //change to deal with sonts/and position conflits
 		setPosition(world, x_to, y_to, aux->type, aux->breeding_period,
 				aux->starvation_period);
 		cleanPos(world, x_from, y_from);
@@ -62,10 +63,16 @@ void calcCords(int pos, int* x, int* y) {
 //	printf("Pos: %d  x:%d  y:%d\n", pos, aux1, aux2);
 }
 
+int calcMovePos(){ //calc the 
+
+
+	return 0;
+}
+
 void goAnimal(sworld world, int pos) {
-	int y1, x1;
+	int y_init, x_init, y_final, x_final;
 	calcCords(pos, &x1, &y1);
-	int y2, x2;
+	pos = calcMovePos();
 	calcCords(++pos, &x2, &y2);
 	move(world, x1, y1, x2, y2);
 }
