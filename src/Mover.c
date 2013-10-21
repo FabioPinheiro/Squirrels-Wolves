@@ -46,6 +46,10 @@ int isAble(sworld world, int x_from, int y_from) {
 }
 void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 	//TODO be careful with SONT
+	/*
+	If a squirrel/wolf completes a breeding period if he moves it breeds
+
+	*/
 	sworld aux = getPositionStructure(world, x_from, y_from);
 	if (isAnimal(aux->type) && isAble(aux, x_to, y_to)) { //change to deal with sonts/and position conflits
 		setPosition(world, x_to, y_to, aux->type, aux->breeding_period,
@@ -63,16 +67,30 @@ void calcCords(int pos, int* x, int* y) {
 //	printf("Pos: %d  x:%d  y:%d\n", pos, aux1, aux2);
 }
 
-int calcMovePos(){ //calc the 
+int calcMovePos(){ //calc the Next pos
+	/* trees and ice don't move
+	• Number the possible choices starting from 0, clockwise starting from the 12:00 
+		position (i.e. up, right, down, left). Note that only cells that are unoccupied (for 
+		moves) or occupied by squirrels (for wolves to eat), should be numbered. Call the 
+		number of possible cells p. 
+	• Compute the grid cell number of the cell being evaluated. If the cell is at position 
+		(i,j) in the world grid with (0,0) the grid origin, and the grid is of size MxN, the grid 
+		cell number is C = i x N + j .
+	• The cell to select is then determined by C mod p. For example, if there are 3 possible 
+		cells to choose from, say up, down and left, then if C mod p is 0 the selected cell is 
+		up from the current cell, if it is 1 then select down, and if it is 2 then select left.
+	*/
+
+		//TODO numerar posições
 
 
 	return 0;
 }
 
-void goAnimal(sworld world, int pos) {
+void goAnimal(sworld world, int pos, int type) {
 	int y_init, x_init, y_final, x_final;
-	calcCords(pos, &x1, &y1);
+	calcCords(pos, &x_init, &y_init);
 	pos = calcMovePos();
-	calcCords(++pos, &x2, &y2);
-	move(world, x1, y1, x2, y2);
+	calcCords(++pos, &x_final, &y_final);
+	move(world, x_init, y_init, x_final, y_final);
 }

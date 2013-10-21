@@ -91,7 +91,7 @@ void processEvens(sworld world){
 	debug("processEvens... \n");
 	for(i = 0;i<worldsize*worldsize;i+=2){
 		if(isAnimal(world[i].type)){
-			goAnimal(world,i);
+			goAnimal(world,i, world[i].type);
 		}
 	}
 //	debug("processEvens DONE!\n");
@@ -102,7 +102,7 @@ void processOds(sworld world){
 	for(i = 1;i<worldsize*worldsize;i+=2){
 //		printf("i:%d =  %d\n",i, world[i].type);
 		if(isAnimal(world[i].type)){
-			goAnimal(world,i);
+			goAnimal(world,i, world[i].type);
 		}
 	}
 	debug("processOds DONE!\n");

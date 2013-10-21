@@ -27,5 +27,5 @@ void setPositionStarvation(sworld world, int x, int y, int starvationPeriod);
 int isAnimal(int type);
 int isAble(sworld world, int x_from, int y_from);
 void move(sworld world, int x_from, int y_from, int x_to, int y_to);
-void goAnimal(sworld world, int pos);
+void goAnimal(sworld world, int pos, int type);
 #endif /* MOVER_H_ */
