@@ -132,7 +132,7 @@ int calcMovePos(sworld world, int x, int y){ //calc the Next pos
 void goAnimal(sworld world, int pos, int type) {
 	int y_init, x_init, y_final, x_final, posFinal;
 	calcCords(pos, &x_init, &y_init);
-	posFinal = calcMovePos(sworld world,int x_init, int y_init);
+	posFinal = calcMovePos(world,x_init, y_init);
 	calcCords(posFinal, &x_final, &y_final);
 	move(world, x_init, y_init, x_final, y_final);
 }

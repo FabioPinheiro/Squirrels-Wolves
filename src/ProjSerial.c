@@ -18,7 +18,7 @@ int worldsize = 0, wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
 void debug(char * str){
 	if(DEBUG){
-		printf(str);
+		printf("%s",str);
 	}
 }
 
@@ -98,19 +98,19 @@ void processEvens(sworld world){
 }
 void processOds(sworld world){
 	int i;
-	debug("processOds... \n");
+	/*debug("processOds... \n");*/
 	for(i = 1;i<worldsize*worldsize;i+=2){
 //		printf("i:%d =  %d\n",i, world[i].type);
 		if(isAnimal(world[i].type)){
 			goAnimal(world,i, world[i].type);
 		}
 	}
-	debug("processOds DONE!\n");
+	/*debug("processOds DONE!\n");*/
 }
 
 void processGen(sworld world){
 	int i;
-	debug("processGen... \n");
+	/*debug("processGen... \n");*/
 	for(i = 0;i<genNum;i++){
 		processEvens(world);
 		processOds(world);
