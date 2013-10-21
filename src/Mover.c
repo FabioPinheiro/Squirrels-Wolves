@@ -41,8 +41,9 @@ int isAnimal(int type) {
 	return (type == WOLF || type == SQRL || type == SONT);
 }
 int isAble(sworld world, int x_from, int y_from) {
+	//TODO ver se está dentro do quadrado
 
-	return 1; //TODO: Tem que se ver se é able ou nao!!
+	return 1; //TODO: Tem que se ver se é pode ou nao, tanto para esquilos e lobos.
 }
 void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 	//TODO be careful with SONT
@@ -67,7 +68,7 @@ void calcCords(int pos, int* x, int* y) {
 //	printf("Pos: %d  x:%d  y:%d\n", pos, aux1, aux2);
 }
 
-int calcMovePos(){ //calc the Next pos
+int calcMovePos(sworld world, int x, int y){ //calc the Next pos
 	/* trees and ice don't move
 	• Number the possible choices starting from 0, clockwise starting from the 12:00 
 		position (i.e. up, right, down, left). Note that only cells that are unoccupied (for 
@@ -82,15 +83,56 @@ int calcMovePos(){ //calc the Next pos
 	*/
 
 		//TODO numerar posições
+		int numbPossible=0;
+		int vec[POSSIBLE_POS]={0,0,0,0};
+		int ret = 0;
+		/*Pos Up 0*/
+		/*x y+1*/
+		if(isAble(world, x, y+1)){
+			numbPossible++;
+			vec[0]=calcPos(x,y+1,worldsize);
+		}
+		/*Pos Rigth 0*/
+		/*x+1 y*/
+		if(isAble(world, x+1,y)){
+			numbPossible++;
+			vec[1]=calcPos(x+1,y,worldsize);
+		}
+		/*Pos Down 0*/
+		/*x y-1*/
+		if(isAble(world, x,y-1)){
+			numbPossible++;
+			vec[2]=calcPos(x,y-1,worldsize);
+		}
+		/*Pos Left 0*/
+		/*x-1 y*/
+		if(isAble(world, x-1,y)){
+			numbPossible++;
+			vec[3]=calcPos(x-1,y,worldsize);
+		}
+		/*calculating C MOD numbPossible pag 2 enum*/
+		int theChoosenOne = calcPos(x,y,worldsize)%numbPossible;
+		int i;
+		for(i=0; i < POSSIBLE_POS; i++){
+			if(vec[i] != 0){
+				if(theChoosenOne == 0){
+					ret=vec[i];
+				}
+				else{
+					theChoosenOne--;
+				}
+			}
+		}
 
 
-	return 0;
+
+	return ret;
 }
 
 void goAnimal(sworld world, int pos, int type) {
-	int y_init, x_init, y_final, x_final;
+	int y_init, x_init, y_final, x_final, posFinal;
 	calcCords(pos, &x_init, &y_init);
-	pos = calcMovePos();
-	calcCords(++pos, &x_final, &y_final);
+	posFinal = calcMovePos(sworld world,int x_init, int y_init);
+	calcCords(posFinal, &x_final, &y_final);
 	move(world, x_init, y_init, x_final, y_final);
 }
