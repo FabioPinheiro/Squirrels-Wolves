@@ -38,21 +38,23 @@ void setPositionStarvation(sworld world, int x, int y, int starvationPeriod) {
 	world[calcPos(x,y,worldsize)].starvation_period = starvationPeriod;
 }
 int isAnimal(int type) {
-	return (type == WOLF || type == SQRL || type == SONT);
+	int ret = 0;
+	ret = (type == WOLF || type == SQRL || type == SONT);
+	return ret;
 }
 int isAble(sworld world, int x_from, int y_from) {
-	//TODO ver se está dentro do quadrado
+	/*TODO ver se está dentro do quadrado*/
 
-	return 1; //TODO: Tem que se ver se é pode ou nao, tanto para esquilos e lobos.
+	return 1; /*TODO: Tem que se ver se é pode ou nao, tanto para esquilos e lobos.*/
 }
 void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
-	//TODO be careful with SONT
+	/*TODO be careful with SONT*/
 	/*
 	If a squirrel/wolf completes a breeding period if he moves it breeds
 
 	*/
 	sworld aux = getPositionStructure(world, x_from, y_from);
-	if (isAnimal(aux->type) && isAble(aux, x_to, y_to)) { //change to deal with sonts/and position conflits
+	if (isAnimal(aux->type) && isAble(aux, x_to, y_to)) { /*change to deal with sonts/and position conflits*/
 		setPosition(world, x_to, y_to, aux->type, aux->breeding_period,
 				aux->starvation_period);
 		cleanPos(world, x_from, y_from);
@@ -65,10 +67,9 @@ void calcCords(int pos, int* x, int* y) {
 	(*x) = aux1;
 	aux2 = pos - aux1 * worldsize;
 	(*y) = aux2;
-//	printf("Pos: %d  x:%d  y:%d\n", pos, aux1, aux2);
 }
 
-int calcMovePos(sworld world, int x, int y){ //calc the Next pos
+int calcMovePos(sworld world, int x, int y){ /*calc the Next pos*/
 	/* trees and ice don't move
 	• Number the possible choices starting from 0, clockwise starting from the 12:00 
 		position (i.e. up, right, down, left). Note that only cells that are unoccupied (for 
@@ -82,8 +83,10 @@ int calcMovePos(sworld world, int x, int y){ //calc the Next pos
 		up from the current cell, if it is 1 then select down, and if it is 2 then select left.
 	*/
 
-		//TODO numerar posições
+		/*TODO numerar posições*/
+		int i;
 		int numbPossible=0;
+		int theChoosenOne;
 		int vec[POSSIBLE_POS]={0,0,0,0};
 		int ret = 0;
 		/*Pos Up 0*/
@@ -111,8 +114,8 @@ int calcMovePos(sworld world, int x, int y){ //calc the Next pos
 			vec[3]=calcPos(x-1,y,worldsize);
 		}
 		/*calculating C MOD numbPossible pag 2 enum*/
-		int theChoosenOne = calcPos(x,y,worldsize)%numbPossible;
-		int i;
+		theChoosenOne = calcPos(x,y,worldsize)%numbPossible;
+
 		for(i=0; i < POSSIBLE_POS; i++){
 			if(vec[i] != 0){
 				if(theChoosenOne == 0){

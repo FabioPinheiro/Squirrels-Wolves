@@ -1,6 +1,6 @@
 #Makefile
 SRC=src/
-CFLAGS=-g
+CFLAGS=-g -Wall -ansi -pedantic
 
 
 serial:
@@ -11,7 +11,7 @@ runS:
 runSmal:
 	./serial_proj inputs/smalInput 10 12 3 3
 		
-make all: runSmal serial clean
+make all: serial
 
 clean:
-	rm serial_proj
+	rm -f serial_proj
