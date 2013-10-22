@@ -18,6 +18,10 @@ void debug(char * str){
 }
 
 char printValues(int x){
+	/*
+	 * Recives an int that is the internal representation of the types and returns char that is the
+	 * external representation of the same type
+	 */
 	switch(x){
 		case WOLF:
 			return 'w';
