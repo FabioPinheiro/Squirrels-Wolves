@@ -7,6 +7,7 @@
 #define MOVER_H_
 #include "ProjSerial.h"
 #include <stdio.h>
+#include <stdlib.h>
 #define POSSIBLE_POS 4
 /*#define printInt(i) printf("%d\n",i)
 #define calcPos(x, y, worldsize) y + x*worldsize*/

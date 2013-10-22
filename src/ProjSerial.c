@@ -85,21 +85,46 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 }
 
-void processEvens(sworld world){
-	int i;
+void processReds(sworld world){
+	int i,l;
 	debug("processEvens... \n");
-	for(i = 0;i<worldsize*worldsize;i+=2){
-		if(isAnimal(world[i].type)){
-			goAnimal(world,i, world[i].type);
+	for(l=0;l<worldsize;l+=2){
+		for(i = 0;i<worldsize;i+=2){
+			if(isAnimal(world[worldsize*l+i].type)){
+				printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);
+				goAnimal(world,worldsize*l+i, world[worldsize*l+i].type);
+			}
+		}
+	}
+	for(l=1;l<worldsize;l+=2){
+		for(i = 1;i<worldsize;i+=2){
+			if(isAnimal(world[worldsize*l+i].type)){
+				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);
+				goAnimal(world,worldsize*l+i, world[worldsize*l+i].type);
+			}
 		}
 	}
 }
-void processOds(sworld world){
-	int i;
+
+
+void processWhites(sworld world){
+	int i,l;
 	/*debug("processOds... \n");*/
-	for(i = 1;i<worldsize*worldsize;i+=2){
-		if(isAnimal(world[i].type)){
-			goAnimal(world,i, world[i].type);
+	for(l=0;l<worldsize;l+=2){
+		for(i = 1;i<worldsize;i+=2){
+			if(isAnimal(world[worldsize*l+i].type)){
+				printf("Whites 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);
+				goAnimal(world,worldsize*l+i, world[worldsize*l+i].type);
+			}
+		}
+	}
+
+	for(l=1;l<worldsize;l+=2){
+		for(i = 0;i<worldsize;i+=2){
+			if(isAnimal(world[worldsize*l+i].type)){
+				printf("Whites 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);
+				goAnimal(world,worldsize*l+i, world[worldsize*l+i].type);
+			}
 		}
 	}
 	/*debug("processOds DONE!\n");*/
@@ -109,13 +134,16 @@ void processGen(sworld world){
 	int i;
 	/*debug("processGen... \n");*/
 	for(i = 0;i<genNum;i++){
-		processEvens(world);
-		processOds(world);
+		processReds(world);
+		processWhites(world);
+		printf("\n\n Iteração nº %d\n\n",i+1);
+		printMatrix(world);
+		printf("\n\n--------------------------------------\n\n\n");
 	}
 }
 
 
-int main(int argc, char const *argv[]){  
+int main(int argc, char const *argv[]){
 	/****************  DECLARATIONS  ********************/
 	FILE * inputFile;
 	int teste;

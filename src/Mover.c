@@ -40,15 +40,16 @@ void setPositionStarvation(sworld world, int x, int y, int starvationPeriod) {
 int isAnimal(int type) {
 	int ret = 0;
 	ret = (type == WOLF || type == SQRL || type == SONT);
+
 	return ret;
 }
 int isAble(sworld world, int x_from, int y_from) {
 	/*TODO ver se está dentro do quadrado*/
 
-	return 1; /*TODO: Tem que se ver se é pode ou nao, tanto para esquilos e lobos.*/
+	return 1; /*TODO: Tem que se ver se pode ou nao, tanto para esquilos e lobos.*/
 }
 void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
-	/*TODO be careful with SONT*/
+	/*TODO be careful with   SONT*/
 	/*
 	If a squirrel/wolf completes a breeding period if he moves it breeds
 
@@ -135,7 +136,9 @@ int calcMovePos(sworld world, int x, int y){ /*calc the Next pos*/
 void goAnimal(sworld world, int pos, int type) {
 	int y_init, x_init, y_final, x_final, posFinal;
 	calcCords(pos, &x_init, &y_init);
-	posFinal = calcMovePos(world,x_init, y_init);
+	posFinal = (2 < rand()%5)?pos+1:pos+worldsize;/*calcMovePos(world,x_init, y_init);*/
+	posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);
+	printf("posição: %d final: %d\n",pos, posFinal);
 	calcCords(posFinal, &x_final, &y_final);
 	move(world, x_init, y_init, x_final, y_final);
 }
