@@ -6,7 +6,7 @@
 #define SQRL 2
 #define ICE 3
 #define TREE 4
-#define SONT 6 //squirrel on a tree
+#define SONT 6 /*squirrel on a tree*/
 #define printInt(i) printf("%d\n",i)
 #define calcPos(x, y, worldsize) y + x*worldsize
 

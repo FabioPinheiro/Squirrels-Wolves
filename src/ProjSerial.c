@@ -5,12 +5,7 @@
 #include "Mover.h"
 
 #define DEBUG 0
-#define EPTY 0
-#define WOLF 1
-#define SQRL 2
-#define ICE 3
-#define TREE 4
-#define SONT 6
+
 #define printInt(i) printf("%d\n",i)
 #define calcPos(x, y, worldsize) y + x*worldsize
 
@@ -23,6 +18,10 @@ void debug(char * str){
 }
 
 char printValues(int x){
+	/*
+	 * Recives an int that is the internal representation of the types and returns char that is the
+	 * external representation of the same type
+	 */
 	switch(x){
 		case WOLF:
 			return 'w';
@@ -65,13 +64,13 @@ int addSpecial(char string){
 }
 
 void setType(sworld my_world, int x_cord, int y_cord, char chr){
+	int type;
 	if(x_cord > worldsize-1 || y_cord > worldsize-1 || x_cord < 0 || y_cord < 0){
 		printf("Invalid Input!\n");
 		exit(2);
 	}
-	int type = addSpecial(chr);
+	type = addSpecial(chr);
 	my_world[calcPos(x_cord, y_cord, worldsize)].type = type;
-	//printf("Pos real %d a pos do define %d\n", y_cord+x_cord*worldsize, calcPos(x_cord, y_cord, worldsize));
 	switch(type){
 		case WOLF:
 			my_world[calcPos(x_cord, y_cord, worldsize)].breeding_period = wolfBP;
@@ -86,23 +85,46 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 }
 
-void processEvens(sworld world){
-	int i;
+void processReds(sworld world){
+	int i,l;
 	debug("processEvens... \n");
-	for(i = 0;i<worldsize*worldsize;i+=2){
-		if(isAnimal(world[i].type)){
-			goAnimal(world,i, world[i].type);
+	for(l=0;l<worldsize;l+=2){
+		for(i = 0;i<worldsize;i+=2){
+			if(isAnimal(world[worldsize*l+i].type)){
+				printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);
+				goAnimal(world,worldsize*l+i, world[worldsize*l+i].type);
+			}
 		}
 	}
-//	debug("processEvens DONE!\n");
+	for(l=1;l<worldsize;l+=2){
+		for(i = 1;i<worldsize;i+=2){
+			if(isAnimal(world[worldsize*l+i].type)){
+				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);
+				goAnimal(world,worldsize*l+i, world[worldsize*l+i].type);
+			}
+		}
+	}
 }
-void processOds(sworld world){
-	int i;
+
+
+void processWhites(sworld world){
+	int i,l;
 	/*debug("processOds... \n");*/
-	for(i = 1;i<worldsize*worldsize;i+=2){
-//		printf("i:%d =  %d\n",i, world[i].type);
-		if(isAnimal(world[i].type)){
-			goAnimal(world,i, world[i].type);
+	for(l=0;l<worldsize;l+=2){
+		for(i = 1;i<worldsize;i+=2){
+			if(isAnimal(world[worldsize*l+i].type)){
+				printf("Whites 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);
+				goAnimal(world,worldsize*l+i, world[worldsize*l+i].type);
+			}
+		}
+	}
+
+	for(l=1;l<worldsize;l+=2){
+		for(i = 0;i<worldsize;i+=2){
+			if(isAnimal(world[worldsize*l+i].type)){
+				printf("Whites 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);
+				goAnimal(world,worldsize*l+i, world[worldsize*l+i].type);
+			}
 		}
 	}
 	/*debug("processOds DONE!\n");*/
@@ -112,30 +134,45 @@ void processGen(sworld world){
 	int i;
 	/*debug("processGen... \n");*/
 	for(i = 0;i<genNum;i++){
-		processEvens(world);
-		processOds(world);
+		processReds(world);
+		processWhites(world);
+		printf("\n\n Iteração nº %d\n\n",i+1);
+		printMatrix(world);
+		printf("\n\n--------------------------------------\n\n\n");
 	}
 }
 
 
-int main(int argc, char const *argv[]){  
+int main(int argc, char const *argv[]){
+	/****************  DECLARATIONS  ********************/
+	FILE * inputFile;
+	int teste;
+	sworld my_world;
+	/*	READ FILE VARS */
+	int ret=3, x,y;
+	char chr;
+
+	/*******************  CODE  *************************/
 	wolfBP = atoi(argv[2]);
 	sqrlBP = atoi(argv[3]);
 	wolfStarvP = atoi(argv[4]);
 	genNum = atoi(argv[5]);
 
-	FILE * inputFile;
+
 	inputFile = fopen(argv[1],"r");
-	int teste = fscanf(inputFile,"%d", &worldsize);
+	teste = fscanf(inputFile,"%d", &worldsize);
+	if(teste != 1){
+		printf("Input error!\n");
+		exit(-1);
+	}
 	printf("Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n", worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);
-	sworld my_world = (sworld) malloc( worldsize*worldsize*sizeof(sworld));
+	my_world = (sworld) malloc( worldsize*worldsize*sizeof(sworld));
 
 
 	/*
 		READ FILE
 	*/
-	int ret=3, x,y;
-	char chr;
+
 	while(1){
 		ret=fscanf(inputFile,"%d %d %c \n", &x, &y, &chr);
 		if(ret != 3)
