@@ -137,7 +137,7 @@ int main(int argc, char const *argv[]){
 	int ret=3, x,y;
 	char chr;
 	while(1){
-		ret=fscanf(inputFile,"%d %d %s\n", &x, &y, &chr);
+		ret=fscanf(inputFile,"%d %d %c \n", &x, &y, &chr);
 		if(ret != 3)
 			break;
 		printf("x: %d  y: %d\n", x, y);
