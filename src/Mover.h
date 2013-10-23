@@ -21,7 +21,7 @@ void setPositionType(sworld world, int x, int y, int type);
 void setPositionBreeding(sworld world, int x, int y, int breedingPeriod);
 void setPositionStarvation(sworld world, int x, int y, int starvationPeriod);
 int isAnimal(int type);
-int isAble(sworld world, int x_from, int y_from); 	/*0 não se pode mexer / 1 pode-se mexer*/
+int isAble(sworld world, int x_from, int y_from, int type ); 	/*0 não se pode mexer / 1 pode-se mexer*/
 void move(sworld world, int x_from, int y_from, int x_to, int y_to);
 void goAnimal(sworld world, int pos, int type);
 #endif /* MOVER_H_ */

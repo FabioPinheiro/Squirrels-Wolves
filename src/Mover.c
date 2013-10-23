@@ -43,22 +43,33 @@ int isAnimal(int type) {
 
 	return ret;
 }
-int isAble(sworld world, int x_from, int y_from) {
+int isAble(sworld world, int x_from, int y_from, int type) {
 	/*0 não se pode mexer
 	1 pode-se mexer
 	 */
 	/*TODO ver se está dentro do quadrado*/
+
+	int positionType = world[calcPos(x_from, y_from, worldsize)].type;
 	if(x_from < 0 || y_from < 0 || x_from > worldsize*worldsize || y_from > worldsize*worldsize){
-		return 0; //fora do quadrado
+		return 0; /*fora do quadrado*/
 	}
 
-	// check esquilos
-
-
-	//check lobos
-
+	/* check lobos */
+	if(type == WOLF){
+		if(positionType == EPTY || positionType == SQRL || positionType == WOLF ){ /*empty or squirrel or wolf*/
+		return 1;
+		}
+	}
+	else{/*check esquilos SQRT e SONT*/
+		if(positionType != ICE && positionType != WOLF ){ /*if not ice or wolf */
+		return 1;
+		}
+	}
 	
-	return 1; 
+
+
+	return 0; 
+}
 void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 	/*TODO be careful with   SONT*/
 	/*
@@ -66,7 +77,7 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 
 	*/
 	sworld aux = getPositionStructure(world, x_from, y_from);
-	if (isAnimal(aux->type) && isAble(aux, x_to, y_to)) { /*change to deal with sonts/and position conflits*/
+	if (isAnimal(aux->type) ) { /*change to deal with sonts/and position conflits*/
 		setPosition(world, x_to, y_to, aux->type, aux->breeding_period,
 				aux->starvation_period);
 		cleanPos(world, x_from, y_from);
@@ -81,7 +92,7 @@ void calcCords(int pos, int* x, int* y) {
 	(*y) = aux2;
 }
 
-int calcMovePos(sworld world, int x, int y){ /*calc the Next pos*/
+int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 	/* trees and ice don't move
 	• Number the possible choices starting from 0, clockwise starting from the 12:00 
 		position (i.e. up, right, down, left). Note that only cells that are unoccupied (for 
@@ -103,25 +114,25 @@ int calcMovePos(sworld world, int x, int y){ /*calc the Next pos*/
 		int ret = 0;
 		/*Pos Up 0*/
 		/*(x-1)*worldsize y*/
-		if(isAble(world, (x-1)*worldsize, y)){
+		if(isAble(world, (x-1)*worldsize, y, type)){
 			numbPossible++;
 			vec[0]=calcPos(x,y+1,worldsize);
 		}
 		/*Pos Rigth 0*/
 		/*x y+1*/
-		if(isAble(world, x,y+1)){
+		if(isAble(world, x,y+1, type)){
 			numbPossible++;
 			vec[1]=calcPos(x+1,y,worldsize);
 		}
 		/*Pos Down 0*/
 		/*(x+1)*worldsize y*/
-		if(isAble(world, (x+1)*worldsize,y)){
+		if(isAble(world, (x+1)*worldsize,y, type)){
 			numbPossible++;
 			vec[2]=calcPos(x,y-1,worldsize);
 		}
 		/*Pos Left 0*/
 		/*x y-1*/
-		if(isAble(world, x,y-1)){
+		if(isAble(world, x,y-1, type)){
 			numbPossible++;
 			vec[3]=calcPos(x-1,y,worldsize);
 		}
