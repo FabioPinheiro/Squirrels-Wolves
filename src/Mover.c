@@ -91,26 +91,26 @@ int calcMovePos(sworld world, int x, int y){ /*calc the Next pos*/
 		int vec[POSSIBLE_POS]={0,0,0,0};
 		int ret = 0;
 		/*Pos Up 0*/
-		/*x y+1*/
-		if(isAble(world, x, y+1)){
+		/*(x-1)*worldsize y*/
+		if(isAble(world, (x-1)*worldsize, y)){
 			numbPossible++;
 			vec[0]=calcPos(x,y+1,worldsize);
 		}
 		/*Pos Rigth 0*/
-		/*x+1 y*/
-		if(isAble(world, x+1,y)){
+		/*x y+1*/
+		if(isAble(world, x,y+1)){
 			numbPossible++;
 			vec[1]=calcPos(x+1,y,worldsize);
 		}
 		/*Pos Down 0*/
-		/*x y-1*/
-		if(isAble(world, x,y-1)){
+		/*(x+1)*worldsize y*/
+		if(isAble(world, (x+1)*worldsize,y)){
 			numbPossible++;
 			vec[2]=calcPos(x,y-1,worldsize);
 		}
 		/*Pos Left 0*/
-		/*x-1 y*/
-		if(isAble(world, x-1,y)){
+		/*x y-1*/
+		if(isAble(world, x,y-1)){
 			numbPossible++;
 			vec[3]=calcPos(x-1,y,worldsize);
 		}
