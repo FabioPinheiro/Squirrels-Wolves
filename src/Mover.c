@@ -44,10 +44,21 @@ int isAnimal(int type) {
 	return ret;
 }
 int isAble(sworld world, int x_from, int y_from) {
+	/*0 não se pode mexer
+	1 pode-se mexer
+	 */
 	/*TODO ver se está dentro do quadrado*/
+	if(x_from < 0 || y_from < 0 || x_from > worldsize*worldsize || y_from > worldsize*worldsize){
+		return 0; //fora do quadrado
+	}
 
-	return 1; /*TODO: Tem que se ver se pode ou nao, tanto para esquilos e lobos.*/
-}
+	// check esquilos
+
+
+	//check lobos
+
+	
+	return 1; 
 void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 	/*TODO be careful with   SONT*/
 	/*
