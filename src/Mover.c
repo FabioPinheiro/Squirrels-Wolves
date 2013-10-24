@@ -116,25 +116,25 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		/*(x-1)*worldsize y*/
 		if(isAble(world, (x-1)*worldsize, y, type)){
 			numbPossible++;
-			vec[0]=calcPos(x,y+1,worldsize);
+			vec[0]=calcPos((x-1)*worldsize ,y,worldsize);
 		}
 		/*Pos Rigth 0*/
 		/*x y+1*/
 		if(isAble(world, x,y+1, type)){
 			numbPossible++;
-			vec[1]=calcPos(x+1,y,worldsize);
+			vec[1]=calcPos(x,y+1,worldsize);
 		}
 		/*Pos Down 0*/
 		/*(x+1)*worldsize y*/
 		if(isAble(world, (x+1)*worldsize,y, type)){
 			numbPossible++;
-			vec[2]=calcPos(x,y-1,worldsize);
+			vec[2]=calcPos((x+1)*worldsize ,y,worldsize);
 		}
 		/*Pos Left 0*/
 		/*x y-1*/
 		if(isAble(world, x,y-1, type)){
 			numbPossible++;
-			vec[3]=calcPos(x-1,y,worldsize);
+			vec[3]=calcPos(x,y-1,worldsize);
 		}
 		/*calculating C MOD numbPossible pag 2 enum*/
 		theChoosenOne = calcPos(x,y,worldsize)%numbPossible;
