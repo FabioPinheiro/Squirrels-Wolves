@@ -211,6 +211,8 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		}
 
 		/*calculating C MOD numbPossible pag 2 enum*/
+		if(numbPossible == 0)
+			return -1;
 		nPos=calcPos(x,y,worldsize);
 		theChoosenOne = nPos%numbPossible;
 		printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d calcPos(x,y,worldsize)MODnumbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible, calcPos(x,y,worldsize)%numbPossible);
@@ -237,6 +239,8 @@ void goAnimal(sworld world, int pos, int type) {
 	calcCords(pos, &x_init, &y_init);
 	posFinal =/* (2 < rand()%5)?pos+1:pos+worldsize;*/calcMovePos(world,x_init, y_init,type);
 	/*posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);*/
+	if(posFinal<0)
+		return;
 	printf("posição: %d final: %d\n",pos, posFinal);
 	calcCords(posFinal, &x_final, &y_final);
 	move(world, x_init, y_init, x_final, y_final);
