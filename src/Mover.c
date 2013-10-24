@@ -144,7 +144,7 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		int i;
 		int numbPossible=0;
 		int theChoosenOne;
-		int vec[POSSIBLE_POS]={0,0,0,0};
+		int vec[POSSIBLE_POS]={-1,-1,-1,-1};
 		int ret = 0;
 		/*Pos Up 0*/
 		/*(x-1)*worldsize y*/
@@ -172,9 +172,10 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		}
 		/*calculating C MOD numbPossible pag 2 enum*/
 		theChoosenOne = calcPos(x,y,worldsize)%numbPossible;
-
+		printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible);
+		printf("[%d , %d , %d , %d]\n",vec[0],vec[1],vec[2],vec[3]);
 		for(i=0; i < POSSIBLE_POS; i++){
-			if(vec[i] != 0){
+			if(vec[i] != -1){
 				if(theChoosenOne == 0){
 					ret=vec[i];
 				}
