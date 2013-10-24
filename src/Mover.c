@@ -182,9 +182,9 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		int ret = 0;
 		/*Pos Up 0*/
 		/*(x-1)*worldsize y*/
-		if(isAble(world, (x-1), y, type)){
+		if(isAble(world, (x+1), y, type)){
 			numbPossible++;
-			vec[0]=calcPos((x-1) ,y,worldsize);
+			vec[0]=calcPos((x+1) ,y,worldsize);
 		}
 		/*Pos Rigth 0*/
 		/*x y+1*/
@@ -194,9 +194,9 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		}
 		/*Pos Down 0*/
 		/*(x+1)*worldsize y*/
-		if(isAble(world, (x+1),y, type)){
+		if(isAble(world, (x-1),y, type)){
 			numbPossible++;
-			vec[2]=calcPos((x+1),y,worldsize);
+			vec[2]=calcPos((x-1),y,worldsize);
 		}
 		/*Pos Left 0*/
 		/*x y-1*/
