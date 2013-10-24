@@ -47,18 +47,15 @@ int isAnimal(int type) {
 
 	return ret;
 }
-int isAble(sworld world, int x_from, int y_from, int type) {
+int isAble(sworld world, int x_pos, int y_pos, int type) {
 	/*0 não se pode mexer
 	1 pode-se mexer
 	 */
 	/*TODO ver se está dentro do quadrado*/
 
-	int positionType = world[calcPos(x_from, y_from, worldsize)].type;
+	int positionType = world[calcPos(x_pos, y_pos, worldsize)].type;
 
-	if(calcPos(x_from,y_from,worldsize) < 0 || calcPos(x_from,y_from,worldsize) >= worldsize*worldsize){
-		return 0;
-	}
-	if(x_from < 0 || y_from < 0 || x_from >= worldsize || y_from >= worldsize){
+	if(x_pos < 0 || y_pos < 0 || x_pos >= worldsize || y_pos >= worldsize){
 		return 0; /*fora do quadrado*/
 	}
 
@@ -183,7 +180,7 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 	*/
 
 		/*TODO numerar posições*/
-		int i;
+		int i, nPos;
 		int numbPossible=0;
 		int theChoosenOne;
 		int vec[POSSIBLE_POS]={-1,-1,-1,-1};
@@ -214,8 +211,9 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		}
 
 		/*calculating C MOD numbPossible pag 2 enum*/
-		theChoosenOne = calcPos(x,y,worldsize)%numbPossible;
-		printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible);
+		nPos=calcPos(x,y,worldsize);
+		theChoosenOne = nPos%numbPossible;
+		printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d calcPos(x,y,worldsize)MODnumbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible, calcPos(x,y,worldsize)%numbPossible);
 		printf("[%d , %d , %d , %d]\n\n",vec[0],vec[1],vec[2],vec[3]);
 		for(i=0; i < POSSIBLE_POS; i++){
 			if(vec[i] != -1){
