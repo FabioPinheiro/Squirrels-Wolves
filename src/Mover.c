@@ -114,9 +114,9 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		int ret = 0;
 		/*Pos Up 0*/
 		/*(x-1)*worldsize y*/
-		if(isAble(world, (x-1)*worldsize, y, type)){
+		if(isAble(world, (x-1), y, type)){
 			numbPossible++;
-			vec[0]=calcPos((x-1)*worldsize ,y,worldsize);
+			vec[0]=calcPos((x-1) ,y,worldsize);
 		}
 		/*Pos Rigth 0*/
 		/*x y+1*/
@@ -126,9 +126,9 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		}
 		/*Pos Down 0*/
 		/*(x+1)*worldsize y*/
-		if(isAble(world, (x+1)*worldsize,y, type)){
+		if(isAble(world, (x+1),y, type)){
 			numbPossible++;
-			vec[2]=calcPos((x+1)*worldsize ,y,worldsize);
+			vec[2]=calcPos((x+1),y,worldsize);
 		}
 		/*Pos Left 0*/
 		/*x y-1*/
@@ -158,8 +158,8 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 void goAnimal(sworld world, int pos, int type) {
 	int y_init, x_init, y_final, x_final, posFinal;
 	calcCords(pos, &x_init, &y_init);
-	posFinal = (2 < rand()%5)?pos+1:pos+worldsize;/*calcMovePos(world,x_init, y_init);*/
-	posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);
+	posFinal =/* (2 < rand()%5)?pos+1:pos+worldsize;*/calcMovePos(world,x_init, y_init,type);
+	/*posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);*/
 	printf("posição: %d final: %d\n",pos, posFinal);
 	calcCords(posFinal, &x_final, &y_final);
 	move(world, x_init, y_init, x_final, y_final);
