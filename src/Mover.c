@@ -50,7 +50,11 @@ int isAble(sworld world, int x_from, int y_from, int type) {
 	/*TODO ver se está dentro do quadrado*/
 
 	int positionType = world[calcPos(x_from, y_from, worldsize)].type;
-	if(x_from < 0 || y_from < 0 || x_from > worldsize*worldsize || y_from > worldsize*worldsize){
+
+	if(calcPos(x_from,y_from,worldsize) < 0 || calcPos(x_from,y_from,worldsize) >= worldsize*worldsize){
+		return 0;
+	}
+	if(x_from < 0 || y_from < 0 || x_from >= worldsize || y_from >= worldsize){
 		return 0; /*fora do quadrado*/
 	}
 
@@ -180,38 +184,40 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		int theChoosenOne;
 		int vec[POSSIBLE_POS]={-1,-1,-1,-1};
 		int ret = 0;
+		/*Pos Left 0*/
+		/*x y-1*/
+		if(isAble(world, x,y-1, type)){
+			numbPossible++;
+			vec[0]=calcPos(x,y-1,worldsize);
+		}
 		/*Pos Up 0*/
 		/*(x-1)*worldsize y*/
 		if(isAble(world, (x+1), y, type)){
 			numbPossible++;
-			vec[0]=calcPos((x+1) ,y,worldsize);
+			vec[1]=calcPos((x+1) ,y,worldsize);
 		}
 		/*Pos Rigth 0*/
 		/*x y+1*/
 		if(isAble(world, x,y+1, type)){
 			numbPossible++;
-			vec[1]=calcPos(x,y+1,worldsize);
+			vec[2]=calcPos(x,y+1,worldsize);
 		}
 		/*Pos Down 0*/
 		/*(x+1)*worldsize y*/
 		if(isAble(world, (x-1),y, type)){
 			numbPossible++;
-			vec[2]=calcPos((x-1),y,worldsize);
+			vec[3]=calcPos((x-1),y,worldsize);
 		}
-		/*Pos Left 0*/
-		/*x y-1*/
-		if(isAble(world, x,y-1, type)){
-			numbPossible++;
-			vec[3]=calcPos(x,y-1,worldsize);
-		}
+
 		/*calculating C MOD numbPossible pag 2 enum*/
 		theChoosenOne = calcPos(x,y,worldsize)%numbPossible;
 		printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible);
-		printf("[%d , %d , %d , %d]\n",vec[0],vec[1],vec[2],vec[3]);
+		printf("[%d , %d , %d , %d]\n\n",vec[0],vec[1],vec[2],vec[3]);
 		for(i=0; i < POSSIBLE_POS; i++){
 			if(vec[i] != -1){
 				if(theChoosenOne == 0){
 					ret=vec[i];
+					return ret;
 				}
 				else{
 					theChoosenOne--;

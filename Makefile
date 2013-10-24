@@ -9,7 +9,7 @@ serial:
 runS:
 	./serial_proj inputs/input 10 12 3 1
 runSmal:
-	./serial_proj inputs/smalInput 10 12 3 2
+	./serial_proj inputs/smalInput 10 12 3 4
 runF:
 	gcc $(CFLAGS) -o fabio_open_file_test1 $(SRC)fabio_open_file_test1.c;
 	./fabio_open_file_test1 inputs/input
