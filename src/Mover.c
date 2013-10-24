@@ -74,12 +74,46 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 	/*TODO be careful with   SONT*/
 	/*
 	If a squirrel/wolf completes a breeding period if he moves it breeds
-
+	Handle colissions
 	*/
 	sworld aux = getPositionStructure(world, x_from, y_from);
-	if (isAnimal(aux->type) ) { /*change to deal with sonts/and position conflits*/
-		setPosition(world, x_to, y_to, aux->type, aux->breeding_period,
-				aux->starvation_period);
+	sworld finalPos = getPositionStructure(world, x_to, y_to);
+	if(aux->type != WOLF || aux->starvation_period != 0){ /*still healthy*/
+		if(isAnimal(finalPos->type)) {
+			/*COLISIONS*/
+			/*WOLF vs SQRL*/
+
+			/*WOLF vs WOLF */
+
+			/*SQRL vs SQRL*/
+
+			setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+		}
+		else{
+			setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+		}
+
+
+		if(aux->breeding_period == 0){
+		/*we have a litle baby!*/
+			/*
+				wolfBP, sqrlBP, wolfStarvP
+			*/
+			if(aux->type == WOLF){
+				aux->breeding_period = wolfBP;
+				aux->starvation_period = wolfStarvP;
+			}
+			else{
+				aux->breeding_period = sqrlBP;
+			}
+			
+		}
+		else{
+			cleanPos(world, x_from, y_from);
+		}
+	}
+	else{
+		/*is dead :(*/
 		cleanPos(world, x_from, y_from);
 	}
 }
