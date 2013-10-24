@@ -39,13 +39,23 @@ char printValues(int x){
 	return ' ';
 }
 
-void printMatrix(sworld world){
+void printMatrix(sworld world){ /*print para teste*/
 	int i,j;
 	for(i=0;i<worldsize;i++){
 		for(j=0;j<worldsize ; j++){
 			printf("%c ", printValues(world[i+j*worldsize].type));
 		}
 		printf("\n");
+	}
+}
+
+void printMatrixOutPut(sworld world){ /*output para Avaliacao*/
+	int i, j;
+		for(i=0;i<worldsize;i++){
+		for(j=0;j<worldsize ; j++){
+			if(world[i+j*worldsize].type != EPTY)
+				printf("%d %d %c\n", i, j,printValues(world[i+j*worldsize].type));
+		}
 	}
 }
 

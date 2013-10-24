@@ -22,5 +22,5 @@ typedef struct world *sworld;
 
 
 extern int worldsize, wolfBP, sqrlBP, wolfStarvP, genNum;
-
+void printMatrixOutPut(sworld world);
 #endif /* PROJ_SERIAL_H */
