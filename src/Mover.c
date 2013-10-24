@@ -140,6 +140,7 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 				wolfBP, sqrlBP, wolfStarvP
 			*/
 			finalPos->breeding_period = wolfBP;
+			
 			if(aux->type == WOLF){
 				aux->breeding_period = wolfBP;
 				aux->starvation_period = wolfStarvP;
