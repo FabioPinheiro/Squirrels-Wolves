@@ -65,13 +65,12 @@ void printMatrixOutFile(sworld world, char* name) { /*output para Avaliacao*/
 	out = fopen(name, "w");
 	for (i = 0; i < worldsize; i++) {
 		for (j = 0; j < worldsize; j++) {
-			if (world[i + j * worldsize].type > EPTY
-					&& world[i + j * worldsize].type <= SONT)
-				fprintf(out, "%d %d %c\n", i, j,
+			if (world[i + j * worldsize].type > EPTY && world[i + j * worldsize].type <= SONT)
+				fprintf(out,"%d %d %c\n", i, j,
 						printValues(world[i + j * worldsize].type));
 		}
 	}
-	fclose(out);
+	fclose (out);
 }
 
 int addSpecial(char string) {
@@ -165,6 +164,7 @@ void processGen(sworld world) {
 	/*debug("processGen... \n");*/
 	for (i = 0; i < genNum; i++) {
 		/*handle the breeding and starvation updates once each generation */
+#pragma omp parallel for
 		for (j = 0; j < worldsize * worldsize; j++) {
 			if (isAnimal(world[j].type)) {
 				world[j].breeding_period--;
@@ -172,8 +172,17 @@ void processGen(sworld world) {
 					world[j].starvation_period--;
 			}
 		}
-		processReds(world);
-		processWhites(world);
+/*#pragma omp sections
+		{
+#pragma omp section
+			{*/
+				processReds(world);
+/*			}
+#pragma omp section
+			{*/
+				processWhites(world);
+/*			}
+		}*/
 		printf("\n\n Iteração nº %d\n\n", i + 1);
 		printMatrix(world);
 		printf("\n\n--------------------------------------\n\n\n");
@@ -217,7 +226,7 @@ int main(int argc, char const *argv[]) {
 		printf("x: %d  y: %d\n", x, y);
 		setType(my_world, x, y, chr);
 	}
-	fclose(inputFile);
+	fclose (inputFile);
 	printf("\n\nTHE WORLD:\n\n");
 	printMatrix(my_world);
 	printf("\tBefore \n\n\n\n");
@@ -226,7 +235,7 @@ int main(int argc, char const *argv[]) {
 
 	printMatrix(my_world);
 	printf("\tAfter \n\n\n\n");
-	printMatrixOutFile(my_world, argv[6]);
+	printMatrixOutFile(my_world,argv[6]);
 	printf("End File :D\n");
 	return 0;
 }
