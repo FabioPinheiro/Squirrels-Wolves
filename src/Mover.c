@@ -130,6 +130,7 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 			}
 			/*setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);*/
 		}
+
 		else{
 			setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
 		}
@@ -141,12 +142,15 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 			/*
 				wolfBP, sqrlBP, wolfStarvP
 			*/
+			finalPos->breeding_period = wolfBP;
 			if(aux->type == WOLF){
 				aux->breeding_period = wolfBP;
 				aux->starvation_period = wolfStarvP;
+				finalPos->breeding_period = wolfBP;
 			}
 			else{
 				aux->breeding_period = sqrlBP;
+				finalPos->breeding_period = sqrlBP;
 			}
 			
 		}
