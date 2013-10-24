@@ -1,7 +1,11 @@
 #include "Mover.h"
 
 void cleanPos(sworld world, int x, int y) {
-	world[calcPos(x,y,worldsize)].type = EPTY;
+	if(world[calcPos(x,y,worldsize)].type!=SONT)
+		world[calcPos(x,y,worldsize)].type = EPTY;
+	else
+		world[calcPos(x,y,worldsize)].type = TREE;
+
 	world[calcPos(x,y,worldsize)].breeding_period = 0;
 	world[calcPos(x,y,worldsize)].starvation_period = 0;
 }
