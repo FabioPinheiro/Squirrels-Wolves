@@ -22,7 +22,10 @@ char printValues(int x) {
 	 * Recives an int that is the internal representation of the types and returns char that is the
 	 * external representation of the same type
 	 */
-	switch (x) {
+	char str[2];
+	sprintf(str, "%d", x);
+	/*printf("COISAS: type: %d str: %s  atoi(str): %d\n",x,str,atoi(str));*/
+	switch (atoi(str)) {
 	case WOLF:
 		return 'w';
 	case SQRL:
@@ -35,8 +38,10 @@ char printValues(int x) {
 		return '$';
 	case EPTY:
 		return '-';
+	default:
+		return ' ';
 	}
-	return '?';
+	return ' ';
 }
 
 void printMatrix(sworld world) { /*print para teste*/

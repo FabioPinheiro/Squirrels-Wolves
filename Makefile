@@ -3,8 +3,10 @@ SRC=src/
 PARALLEL_CFLAGS=-g -Wall -ansi -pedantic -fopenmp
 SERIAL_CFLAGS=-g -Wall -ansi -pedantic
 
+make all: parallel serial
+
 parallel:
-	gcc $(PARALLEL_CFLAGS) -o parallel_proj $(SRC)ProjSerial.c $(SRC)Mover.c
+	gcc $(PARALLEL_CFLAGS) -o parallel_proj $(SRC)ProjParallel.c $(SRC)Mover.c
 serial:
 	gcc $(SERIAL_CFLAGS) -o serial_proj $(SRC)ProjSerial.c $(SRC)Mover.c
 
@@ -21,8 +23,6 @@ runF:
 	gcc $(CFLAGS) -o fabio_open_file_test1 $(SRC)fabio_open_file_test1.c;
 	./fabio_open_file_test1 inputs/input
 	rm fabio_open_file_test1
-	
-make all: parallel serial
 
 cleanS:
 	rm -f serial_proj
