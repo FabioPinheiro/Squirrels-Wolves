@@ -11,14 +11,14 @@ serial:
 	gcc $(SERIAL_CFLAGS) -o serial_proj $(SRC)ProjSerial.c $(SRC)Mover.c
 
 runP:
-	./parallel_proj inputs/input 10 12 10 4 POutput
+	./parallel_proj inputs/input 10 12 10 4 POutput.out
 runSmalP:
-	./parallel_proj inputs/smalInput 10 12 10 1 PSmalOutput
+	./parallel_proj inputs/smalInput 10 12 10 1 PSmalOutput.out
 		
 runS:
-	./serial_proj inputs/input 10 12 10 4 SOutput
+	./serial_proj inputs/input 10 12 10 4 SOutput.out
 runSmal:
-	./serial_proj inputs/smalInput 10 12 10 1 SmalOutput
+	./serial_proj inputs/smalInput 10 12 10 1 SmalOutput.out
 runF:
 	gcc $(CFLAGS) -o fabio_open_file_test1 $(SRC)fabio_open_file_test1.c;
 	./fabio_open_file_test1 inputs/input
@@ -29,4 +29,6 @@ cleanS:
 cleanP:
 	rm -f parallel_proj
 clean:
-	rm -f serial_proj
+	rm -f serial_proj parallel_proj
+cleanA:
+	rm -f *proj *.out
