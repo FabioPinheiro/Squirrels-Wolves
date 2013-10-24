@@ -141,9 +141,17 @@ void processWhites(sworld world){
 }
 
 void processGen(sworld world){
-	int i;
+	int i,j;
 	/*debug("processGen... \n");*/
 	for(i = 0;i<genNum;i++){
+		/*handle the breeding and starvation updates once each generation */
+		for(j=0;j<worldsize*worldsize; j++){
+			if(isAnimal(world[j].type){
+				world[j].breeding_period -= 1;
+				if(world[j].type == WOLF)
+					world[j].starvation_period -=1;
+			}
+		}
 		processReds(world);
 		processWhites(world);
 		printf("\n\n Iteração nº %d\n\n",i+1);
