@@ -78,22 +78,56 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 	*/
 	sworld aux = getPositionStructure(world, x_from, y_from);
 	sworld finalPos = getPositionStructure(world, x_to, y_to);
-	if(aux->type != WOLF || aux->starvation_period != 0){ /*still healthy*/
+	int star, breed;
+
+	if(aux->type != WOLF || aux->starvation_period != 0){ /*still healthy we don't like weak wolfs*/
 		if(isAnimal(finalPos->type)) {
+			star = aux->starvation_period - finalPos->starvation_period;
+			breed = aux->breeding_period - finalPos->breeding_period;
 			/*COLISIONS*/
-			/*WOLF vs SQRL*/
-
 			/*WOLF vs WOLF */
-
-			/*SQRL vs SQRL*/
-
-			setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+			if(finalPos->type == WOLF){
+				if(aux->type == WOLF){
+					
+					if(star != 0){
+						if(star > 0)
+							setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+					}
+					else{
+						if(breed > 0)
+							setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+					}
+				}
+				else{
+					/* We have a suicidal SQRL muahahahahah!!!
+						SQRL vs WOLF
+					*/
+					finalPos->starvation_period = wolfStarvP;
+						
+				}
+			}
+			else{
+				/*WOLF vs SQRL*/
+				if(aux->type == WOLF){
+					setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+					finalPos->starvation_period = wolfStarvP;
+				}
+				/*SQRL vs SQRL*/
+				else{
+					if (breed > 0)
+					{
+						setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+					}
+				}
+			}
+			/*setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);*/
 		}
 		else{
 			setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
 		}
 
 
+		/*Let's see if we have any suprises*/
 		if(aux->breeding_period == 0){
 		/*we have a litle baby!*/
 			/*
