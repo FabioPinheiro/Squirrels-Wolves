@@ -204,7 +204,7 @@ int main(int argc, char const *argv[]) {
 	printf(
 			"Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
 			worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);
-	my_world = (sworld) malloc(worldsize * worldsize * sizeof(sworld));
+	my_world = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
 
 	/*
 	 READ FILE

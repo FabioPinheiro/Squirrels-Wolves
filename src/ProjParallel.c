@@ -202,6 +202,7 @@ int main(int argc, char const *argv[]) {
 	/*	READ FILE VARS */
 	int ret = 3, x, y;
 	char chr;
+	float start, end;
 
 	/*******************  CODE  *************************/
 	wolfBP = atoi(argv[2]);
@@ -218,7 +219,7 @@ int main(int argc, char const *argv[]) {
 	printf(
 			"Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
 			worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);
-	my_world = (sworld) malloc(worldsize * worldsize * sizeof(sworld));
+	my_world = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
 
 	/*
 	 READ FILE
@@ -236,11 +237,14 @@ int main(int argc, char const *argv[]) {
 	printMatrix(my_world);
 	printf("\tBefore \n\n\n\n");
 
+	start = omp_get_wtime();
 	processGen(my_world);
+	end = omp_get_wtime();
 
 	printMatrix(my_world);
 	printf("\tAfter \n\n\n\n");
 	printMatrixOutFile(my_world,argv[6]);
+	printf("DEMOROU:       ->  %f  <-", end-start);
 	printf("End File :D\n");
 	return 0;
 }

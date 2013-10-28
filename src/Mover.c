@@ -218,6 +218,33 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 			vec[3]=calcPos((x-1),y,worldsize);
 		}
 
+		/* Matrix do rafael 
+	UP
+		if(isAble(world, x-1,y, type)){
+			numbPossible++;
+			vec[0]=calcPos(x-1,y,worldsize);
+		}
+		Rigth
+		/*(x-1)*worldsize y
+		if(isAble(world, x, y+1, type)){
+			numbPossible++;
+			vec[1]=calcPos(x ,y+1,worldsize);
+		}
+Down
+		/*x y+1
+		if(isAble(world, x+1,y, type)){
+			numbPossible++;
+			vec[2]=calcPos(x+1,y,worldsize);
+		}
+	Left
+		/*(x+1)*worldsize y
+		if(isAble(world, x,y-1, type)){
+			numbPossible++;
+			vec[3]=calcPos(x,y-1,worldsize);
+		}
+
+		*/
+
 		/*calculating C MOD numbPossible pag 2 enum*/
 		if(numbPossible == 0)
 			return -1;

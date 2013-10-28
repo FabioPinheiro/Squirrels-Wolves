@@ -10,11 +10,13 @@ parallel:
 serial:
 	gcc $(SERIAL_CFLAGS) -o serial_proj $(SRC)ProjSerial.c $(SRC)Mover.c
 
+#Paralelo
 runP:
 	./parallel_proj inputs/input 10 12 10 4 POutput.out
 runSmalP:
 	./parallel_proj inputs/smalInput 10 12 10 1 PSmalOutput.out
-		
+	
+#Em serie		
 runS:
 	./serial_proj inputs/input 10 12 10 4 SOutput.out
 runSmal:
