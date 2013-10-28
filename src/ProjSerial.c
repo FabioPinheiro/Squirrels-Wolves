@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Mover.h"
-
+#include <omp.h>
 #define DEBUG 0
 
 #define printInt(i) printf("%d\n",i)

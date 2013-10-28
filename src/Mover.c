@@ -52,11 +52,12 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 	1 pode-se mexer
 	 */
 	/*TODO ver se está dentro do quadrado*/
+	int positionType;
 	
 	if(x_pos < 0 || y_pos < 0 || x_pos >= worldsize || y_pos >= worldsize){
 		return 0; /*fora do quadrado*/
 	}
-	int positionType = world[calcPos(x_pos, y_pos, worldsize)].type;
+	positionType = world[calcPos(x_pos, y_pos, worldsize)].type;
 
 	
 
@@ -229,19 +230,19 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 			vec[0]=calcPos(x-1,y,worldsize);
 		}
 		Rigth
-		/*(x-1)*worldsize y
+
 		if(isAble(world, x, y+1, type)){
 			numbPossible++;
 			vec[1]=calcPos(x ,y+1,worldsize);
 		}
 Down
-		/*x y+1
+	
 		if(isAble(world, x+1,y, type)){
 			numbPossible++;
 			vec[2]=calcPos(x+1,y,worldsize);
 		}
 	Left
-		/*(x+1)*worldsize y
+	
 		if(isAble(world, x,y-1, type)){
 			numbPossible++;
 			vec[3]=calcPos(x,y-1,worldsize);
