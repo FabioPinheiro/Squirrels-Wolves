@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Mover.h"
-#include <omp.h>
 
 #define DEBUG 0
 
