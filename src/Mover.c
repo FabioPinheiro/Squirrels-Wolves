@@ -93,7 +93,7 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 			/*WOLF vs WOLF */
 			if(finalPos->type == WOLF){
 				if(aux->type == WOLF){
-					
+					printf("MORREU!\n");
 					if(star != 0){
 						if(star > 0)
 							setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
@@ -107,6 +107,7 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 					/* We have a suicidal SQRL muahahahahah!!!
 						SQRL vs WOLF
 					*/
+					printf("MORREU!\n");
 					finalPos->starvation_period = wolfStarvP;
 						
 				}
@@ -114,11 +115,13 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 			else{
 				/*WOLF vs SQRL*/
 				if(aux->type == WOLF){
+					printf("MORREU!\n");
 					setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
 					finalPos->starvation_period = wolfStarvP;
 				}
 				/*SQRL vs SQRL*/
 				else{
+					printf("MORREU!\n");
 					if (breed > 0)
 					{
 						setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
@@ -247,8 +250,8 @@ Down
 			return -1;
 		nPos=calcPos(x,y,worldsize);
 		theChoosenOne = nPos%numbPossible;
-		printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d calcPos(x,y,worldsize)MODnumbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible, calcPos(x,y,worldsize)%numbPossible);
-		printf("[%d , %d , %d , %d]\n\n",vec[0],vec[1],vec[2],vec[3]);
+		/*printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d calcPos(x,y,worldsize)MODnumbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible, calcPos(x,y,worldsize)%numbPossible);
+		printf("[%d , %d , %d , %d]\n\n",vec[0],vec[1],vec[2],vec[3]);*/
 		for(i=0; i < POSSIBLE_POS; i++){
 			if(vec[i] != -1){
 				if(theChoosenOne == 0){
@@ -273,7 +276,7 @@ void goAnimal(sworld world, int pos, int type) {
 	/*posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);*/
 	if(posFinal<0)
 		return;
-	printf("posição: %d final: %d\n",pos, posFinal);
+/*	printf("posição: %d final: %d\n",pos, posFinal);*/
 	calcCords(posFinal, &x_final, &y_final);
 	move(world, x_init, y_init, x_final, y_final);
 }
