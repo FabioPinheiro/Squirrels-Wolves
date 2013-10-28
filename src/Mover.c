@@ -218,7 +218,7 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 			vec[3]=calcPos((x-1),y,worldsize);
 		}
 
-		/* Matrix do rafael
+		/* Matrix do rafael 
 	UP
 		if(isAble(world, x-1,y, type)){
 			numbPossible++;
