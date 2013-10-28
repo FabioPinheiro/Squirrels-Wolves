@@ -52,12 +52,13 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 	1 pode-se mexer
 	 */
 	/*TODO ver se está dentro do quadrado*/
-
-	int positionType = world[calcPos(x_pos, y_pos, worldsize)].type;
-
+	
 	if(x_pos < 0 || y_pos < 0 || x_pos >= worldsize || y_pos >= worldsize){
 		return 0; /*fora do quadrado*/
 	}
+	int positionType = world[calcPos(x_pos, y_pos, worldsize)].type;
+
+	
 
 	/* check lobos */
 	if(type == WOLF){
@@ -207,6 +208,7 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		}
 		/*Pos Rigth 0*/
 		/*x y+1*/
+
 		if(isAble(world, x,y+1, type)){
 			numbPossible++;
 			vec[2]=calcPos(x,y+1,worldsize);
@@ -214,7 +216,9 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		/*Pos Down 0*/
 		/*(x+1)*worldsize y*/
 		if(isAble(world, (x-1),y, type)){
+
 			numbPossible++;
+
 			vec[3]=calcPos((x-1),y,worldsize);
 		}
 
@@ -272,10 +276,12 @@ Down
 void goAnimal(sworld world, int pos, int type) {
 	int y_init, x_init, y_final, x_final, posFinal;
 	calcCords(pos, &x_init, &y_init);
+
 	posFinal =/* (2 < rand()%5)?pos+1:pos+worldsize;*/calcMovePos(world,x_init, y_init,type);
 	/*posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);*/
 	if(posFinal<0)
 		return;
+
 /*	printf("posição: %d final: %d\n",pos, posFinal);*/
 	calcCords(posFinal, &x_final, &y_final);
 	move(world, x_init, y_init, x_final, y_final);

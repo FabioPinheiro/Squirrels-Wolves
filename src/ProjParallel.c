@@ -202,7 +202,7 @@ int main(int argc, char const *argv[]) {
 	/*	READ FILE VARS */
 	int ret = 3, x, y;
 	char chr;
-	float start, end; 
+	double start, end; 
 
 	/*******************  CODE  *************************/
 	wolfBP = atoi(argv[2]);
