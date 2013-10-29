@@ -1,8 +1,7 @@
 #!/bin/bash
-n=10
-i=0
-FILENAME="inputShelltest"
-echo rm $FILENAME
+n=3000
+FILENAME="input3000"
+rm $FILENAME
 
 echo "$n" >> "$FILENAME"
 for (( h = 0; h < "$n"; h++ ));
@@ -11,17 +10,16 @@ do
 	do
 		if ((h+j%11 == 0)); then
 			#statements tree
-			echo "$h $j 't'" >> "$FILENAME";
-		elif (( h+j%17== 0)); then
+			echo "$h $j t" >> "$FILENAME";
+		elif ((h+j%17== 0)); then
 			#statements ice
-			echo "$h $j 'i'" >> "$FILENAME";
-		elif ((j%3 == 0)); then
+			echo "$h $j i" >> "$FILENAME";
+		elif ((j%11 == 0)); then
 			#statements wolf
-			echo "$h $j 'w'" >> "$FILENAME";
-		elif ((j%2 == 0)); then
+			echo "$h $j w" >> "$FILENAME";
+		elif ((j%7 == 0)); then
 			#statements squirrel
-			echo "$h $j 's'" >> "$FILENAME";
+			echo "$h $j s" >> "$FILENAME";
 		fi
-		
 	done;
 done
