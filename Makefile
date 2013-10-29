@@ -15,7 +15,7 @@ utils:
 
 #Paralelo
 runP:
-	./parallel_proj inputs/input 10 12 10 4 POutput.out
+	./parallel_proj inputs/input 2 2 12 10 POutput.out
 runSmalP:
 	./parallel_proj inputs/smalInput 10 12 10 1 PSmalOutput.out
 runUP:
@@ -23,10 +23,10 @@ runUP:
 	
 #Em serie		
 runS:
-	./serial_proj inputs/input 10 12 10 4 SOutput.out
+	./serial_proj inputs/input 2 2 12 10 SOutput.out
 runSmal:
 	./serial_proj inputs/smalInput 10 12 10 1 SmalOutput.out
-runUS:
+runUSutils:
 	./utils SOutput.out
 runF:
 	gcc $(CFLAGS) -o fabio_open_file_test1 $(SRC)fabio_open_file_test1.c;

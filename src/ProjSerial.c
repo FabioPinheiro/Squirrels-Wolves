@@ -73,10 +73,10 @@ void printMatrixOutFile(sworld world, char* name) { /*output para Avaliacao*/
 	}
 	fclose(out);
 }
-void printTimeOutFile(double time, char* name) {
+void printTimeOutFile(double time) {
 	FILE *out;
-	out = fopen(name, "a");
-	fprintf(out,"%f\n",time);
+	out = fopen("timeOut.out", "a");
+	fprintf(out,"S %f\n",time);
 	fclose (out);
 }
 int addSpecial(char string) {
@@ -233,7 +233,7 @@ int main(int argc, char const *argv[]) {
 	printMatrixOutPut(my_world);
 /*	printMatrix(my_world);
 	printf("\tAfter \n\n\n\n");*/
-	printTimeOutFile(end-start,argv[6]);
+	printTimeOutFile(end-start);
 	printf("Serie DEMOROU:       ->  %f  <-", end-start);
 	printf("End File :D\n");
 	return 0;
