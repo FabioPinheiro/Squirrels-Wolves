@@ -123,7 +123,6 @@ void processReds(sworld world) {
 	for (l = 0; l < worldsize; l += 2) {
 		for (i = 0; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
-				/*printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
 				goAnimal(world, worldsize * l + i,
 						world[worldsize * l + i].type);
 			}
@@ -132,7 +131,6 @@ void processReds(sworld world) {
 	for (l = 1; l < worldsize; l += 2) {
 		for (i = 1; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
-				/*				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
 				goAnimal(world, worldsize * l + i,
 						world[worldsize * l + i].type);
 			}
@@ -146,7 +144,6 @@ void processWhites(sworld world) {
 	for (l = 0; l < worldsize; l += 2) {
 		for (i = 1; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
-				/*				printf("Whites 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
 				goAnimal(world, worldsize * l + i,
 						world[worldsize * l + i].type);
 			}
@@ -156,7 +153,6 @@ void processWhites(sworld world) {
 	for (l = 1; l < worldsize; l += 2) {
 		for (i = 0; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
-				/*			printf("Whites 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
 				goAnimal(world, worldsize * l + i,
 						world[worldsize * l + i].type);
 			}
@@ -179,9 +175,9 @@ void processGen(sworld world) {
 		}
 		processReds(world);
 		processWhites(world);
-		printf("\n\n Iteração nº %d\n\n", i + 1);
-/*		printMatrix(world);*/
-		printf("\n\n--------------------------------------\n\n\n");
+/*		printf("\n\n Iteração nº %d\n\n", i + 1);
+		printMatrix(world);
+		printf("\n\n--------------------------------------\n\n\n");*/
 	}
 }
 
@@ -207,9 +203,9 @@ int main(int argc, char const *argv[]) {
 		printf("Input error!\n");
 		exit(-1);
 	}
-	printf(
+/*	printf(
 			"Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
-			worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);
+			worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);*/
 	my_world = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
 
 	/*
@@ -220,7 +216,7 @@ int main(int argc, char const *argv[]) {
 		ret = fscanf(inputFile, "%d %d %c \n", &x, &y, &chr);
 		if (ret != 3)
 			break;
-		printf("x: %d  y: %d\n", x, y);
+		/*printf("x: %d  y: %d\n", x, y);*/
 		setType(my_world, x, y, chr);
 	}
 	fclose(inputFile);
@@ -230,11 +226,10 @@ int main(int argc, char const *argv[]) {
 	start = omp_get_wtime();
 	processGen(my_world);
 	end = omp_get_wtime();
-	printMatrixOutPut(my_world);
+/*	printMatrixOutPut(my_world);*/
 /*	printMatrix(my_world);
 	printf("\tAfter \n\n\n\n");*/
 	printTimeOutFile(end-start);
-	printf("Serie DEMOROU:       ->  %f  <-", end-start);
-	printf("End File :D\n");
+/*	printf("Serie DEMOROU:       ->  %f  <-", end-start);*/
 	return 0;
 }

@@ -11,7 +11,7 @@
 #define calcPos(x, y, worldsize) y + x*worldsize
 
 int worldsize = 0, wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
-
+int threads = 0;
 void debug(char * str) {
 	if (DEBUG) {
 		printf("%s", str);
@@ -124,96 +124,93 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr) {
 
 }
 
-void processReds(sworld world) {
+void processEvenReds(sworld world) {
 	int i, l;
 	/*	debug("processEvens... \n");*/
-#pragma omp parallel
-
-#pragma omp sections
-	{
-#pragma omp section
-		{
-			for (l = 0; l < worldsize; l += 2) {
-				for (i = 0; i < worldsize; i += 2) {
-					if (isAnimal(world[worldsize * l + i].type)) {
-						/*printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
-						goAnimal(world, worldsize * l + i,
-								world[worldsize * l + i].type);
-					}
-				}
-			}
-		}
-#pragma omp section
-		{
-			for (l = 1; l < worldsize; l += 2) {
-				for (i = 1; i < worldsize; i += 2) {
-					if (isAnimal(world[worldsize * l + i].type)) {
-						/*				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
-						goAnimal(world, worldsize * l + i,
-								world[worldsize * l + i].type);
-					}
-				}
+	for (l = 0; l < worldsize; l += 2) {
+		for (i = 0; i < worldsize; i += 2) {
+			if (isAnimal(world[worldsize * l + i].type)) {
+				/*printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
+				goAnimal(world, worldsize * l + i,
+						world[worldsize * l + i].type);
 			}
 		}
 	}
-#pragma omp barrier
+}
+void processOddReds(sworld world) {
+	int i, l;
+	for (l = 1; l < worldsize; l += 2) {
+		for (i = 1; i < worldsize; i += 2) {
+			if (isAnimal(world[worldsize * l + i].type)) {
+				/*				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
+				goAnimal(world, worldsize * l + i,
+						world[worldsize * l + i].type);
+			}
+		}
+	}
 }
 
-void processWhites(sworld world) {
+void processEvenWhites(sworld world) {
 	int i, l;
 	/*debug("processOds... \n");*/
-#pragma omp parallel
 
-#pragma omp sections
-	{
-#pragma omp section
-		{
-			for (l = 0; l < worldsize; l += 2) {
-				for (i = 1; i < worldsize; i += 2) {
-					if (isAnimal(world[worldsize * l + i].type)) {
-						/*				printf("Whites 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
-						goAnimal(world, worldsize * l + i,
-								world[worldsize * l + i].type);
-					}
-				}
-			}
-		}
-#pragma omp section
-		{
-			for (l = 1; l < worldsize; l += 2) {
-				for (i = 0; i < worldsize; i += 2) {
-					if (isAnimal(world[worldsize * l + i].type)) {
-						/*			printf("Whites 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
-						goAnimal(world, worldsize * l + i,
-								world[worldsize * l + i].type);
-					}
-				}
+	for (l = 0; l < worldsize; l += 2) {
+		for (i = 1; i < worldsize; i += 2) {
+			if (isAnimal(world[worldsize * l + i].type)) {
+				goAnimal(world, worldsize * l + i,
+						world[worldsize * l + i].type);
 			}
 		}
 	}
-#pragma omp barrier
-	/*debug("processOds DONE!\n");*/
+}
+void processOddWhites(sworld world) {
+	int i, l;
+	for (l = 1; l < worldsize; l += 2) {
+		for (i = 0; i < worldsize; i += 2) {
+			if (isAnimal(world[worldsize * l + i].type)) {
+				goAnimal(world, worldsize * l + i,
+						world[worldsize * l + i].type);
+			}
+		}
+	}
 }
 
 void processGen(sworld world) {
 	int i, j;
+	/*	#pragma omp parallel*/
 	/*debug("processGen... \n");*/
 	for (i = 0; i < genNum; i++) {
 		/*handle the breeding and starvation updates once each generation */
 #pragma omp parallel for
 		for (j = 0; j < worldsize * worldsize; j++) {
+
 			if (isAnimal(world[j].type)) {
 				world[j].breeding_period--;
 				if (world[j].type == WOLF)
 					world[j].starvation_period--;
 			}
 		}
+#pragma omp parallel num_threads (2)
+		{
+#pragma omp sections
+			{
+				threads = omp_get_num_threads();
+#pragma omp section
+				processEvenReds(world);
+#pragma omp section
+				processOddReds(world);
+			}
+#pragma omp sections
+			{
 
-		processReds(world);
-
-		processWhites(world);
-		printf("\n\n Iteração nº %d\n\n", i + 1);
-		/*		printMatrix(world);
+#pragma omp section
+				processEvenWhites(world);
+#pragma omp section
+				processOddWhites(world);
+			}
+		}
+		/*printf("\n\n Iteração nº %d\n\n", i + 1);
+		 printMatrix(world);
 		 printf("\n\n--------------------------------------\n\n\n");*/
 	}
 }
@@ -240,9 +237,9 @@ int main(int argc, char const *argv[]) {
 		printf("Input error!\n");
 		exit(-1);
 	}
-	printf(
-			"Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
-			worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);
+	/*printf(
+	 "Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
+	 worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);*/
 	my_world = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
 
 	/*
@@ -253,23 +250,23 @@ int main(int argc, char const *argv[]) {
 		ret = fscanf(inputFile, "%d %d %c \n", &x, &y, &chr);
 		if (ret != 3)
 			break;
-		printf("x: %d  y: %d\n", x, y);
+		/*printf("x: %d  y: %d\n", x, y);*/
 		setType(my_world, x, y, chr);
 	}
 	fclose(inputFile);
-	printf("\n\nTHE WORLD:\n\n");
-	printMatrixOutPut(my_world);
-	printf("\tBefore \n\n\n\n");
+	/*	printf("\n\nTHE WORLD:\n\n");
+	 printMatrixOutPut(my_world);
+	 printf("\tBefore \n\n\n\n");*/
 
 	start = omp_get_wtime();
 	processGen(my_world);
 	end = omp_get_wtime();
 
-	/*printMatrix(my_world);*/
-	printf("\tAfter \n\n\n\n");
-	printMatrixOutPut(my_world);
+	/*printMatrix(my_world);
+	 printf("\tAfter \n\n\n\n");
+	 printMatrixOutPut(my_world);*/
 	printTimeOutFile(end - start);
-	printf("Parallel DEMOROU:       ->  %f  <-", end - start);
-	printf("End File :D\n");
+	/*	printf("Parallel DEMOROU:       ->  %f  <-\n", end - start);*/
+	printf("End File THREADS: %d:D\n", threads);
 	return 0;
 }

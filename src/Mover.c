@@ -95,7 +95,6 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 			/*WOLF vs WOLF */
 			if(finalPos->type == WOLF){
 				if(aux->type == WOLF){
-					printf("MORREU!\n");
 					if(star != 0){
 						if(star > 0)
 							setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
@@ -109,7 +108,6 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 					/* We have a suicidal SQRL muahahahahah!!!
 						SQRL vs WOLF
 					*/
-					printf("MORREU!\n");
 					finalPos->starvation_period = wolfStarvP;
 						
 				}
@@ -117,13 +115,11 @@ void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
 			else{
 				/*WOLF vs SQRL*/
 				if(aux->type == WOLF){
-					printf("MORREU!\n");
 					setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
 					finalPos->starvation_period = wolfStarvP;
 				}
 				/*SQRL vs SQRL*/
 				else{
-					printf("MORREU!\n");
 					if (breed > 0)
 					{
 						setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
