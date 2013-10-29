@@ -73,7 +73,12 @@ void printMatrixOutFile(sworld world, char* name) { /*output para Avaliacao*/
 	}
 	fclose(out);
 }
-
+void printTimeOutFile(double time, char* name) {
+	FILE *out;
+	out = fopen(name, "a");
+	fprintf(out,"%f\n",time);
+	fclose (out);
+}
 int addSpecial(char string) {
 	switch (string) {
 	case 'w':
@@ -175,7 +180,7 @@ void processGen(sworld world) {
 		processReds(world);
 		processWhites(world);
 		printf("\n\n Iteração nº %d\n\n", i + 1);
-		printMatrix(world);
+/*		printMatrix(world);*/
 		printf("\n\n--------------------------------------\n\n\n");
 	}
 }
@@ -188,6 +193,7 @@ int main(int argc, char const *argv[]) {
 	/*	READ FILE VARS */
 	int ret = 3, x, y;
 	char chr;
+	double start, end;
 
 	/*******************  CODE  *************************/
 	wolfBP = atoi(argv[2]);
@@ -218,15 +224,17 @@ int main(int argc, char const *argv[]) {
 		setType(my_world, x, y, chr);
 	}
 	fclose(inputFile);
-	printf("\n\nTHE WORLD:\n\n");
+	/*printf("\n\nTHE WORLD:\n\n");
 	printMatrix(my_world);
-	printf("\tBefore \n\n\n\n");
-
+	printf("\tBefore \n\n\n\n");*/
+	start = omp_get_wtime();
 	processGen(my_world);
-
-	printMatrix(my_world);
-	printf("\tAfter \n\n\n\n");
-	printMatrixOutFile(my_world, argv[6]);
+	end = omp_get_wtime();
+	printMatrixOutPut(my_world);
+/*	printMatrix(my_world);
+	printf("\tAfter \n\n\n\n");*/
+	printTimeOutFile(end-start,argv[6]);
+	printf("Serie DEMOROU:       ->  %f  <-", end-start);
 	printf("End File :D\n");
 	return 0;
 }
