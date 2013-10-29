@@ -3,6 +3,7 @@ n=3000
 FILENAME="input3000"
 rm $FILENAME
 
+
 echo "$n" >> "$FILENAME"
 for (( h = 0; h < "$n"; h++ ));
 do
