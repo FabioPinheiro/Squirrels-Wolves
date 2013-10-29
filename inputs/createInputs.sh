@@ -1,6 +1,6 @@
 #!/bin/bash
-n=3000
-FILENAME="input3000"
+n=500
+FILENAME="input500"
 rm $FILENAME
 
 
