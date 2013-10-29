@@ -1,11 +1,24 @@
-#!/bin/sh
-n=1000
-
-echo "$n" > inputShell
-for (( h = 0; h < 10; h++ ));
+#!/bin/bash
+n=100
+i=0
+echo "$n" > inputShell100
+for (( h = 0; h < 100; h++ ));
 do
-	for((j=0;j<1000;j++));
+	for((j=0;j<100;j++));
 	do
-		printf "%d %d %c\n" "$h $j t" >> inputShell;
+		if ((h+j%11 == 0)); then
+			#statements tree
+			echo "$h $j 't'" >> inputShell100;
+		elif (( h+j%17== 0)); then
+			#statements ice
+			echo "$h $j 'i'" >> inputShell100;
+		elif ((j%3 == 0)); then
+			#statements wolf
+			echo "$h $j 'w'" >> inputShell100;
+		elif ((j%2 == 0)); then
+			#statements squirrel
+			echo "$h $j 's'" >> inputShell100;
+		fi
+		
 	done;
 done
