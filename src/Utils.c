@@ -1,32 +1,42 @@
-
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char const *argv[]) {
 	/****************  DECLARATIONS  ********************/
 	FILE * inputFile;
 	int teste,ret;
-	double TOTAL, aux, cont;
-
-	cont=0;
+	double TOTALP,TOTALS, aux, contP, contS;
+	char type;
+	TOTALP=0.0;
+	TOTALS=0.0;
+	contP=0.0;
+	contS=0.0;
 	inputFile = fopen(argv[1], "r");
-	teste = fscanf(inputFile, "%d", &worldsize);
-	if (teste != 1) {
-		printf("Input error!\n");
-		exit(-1);
-	}
+
 	/*
 	 READ FILE
 	 */
 
 	while (1) {
-		ret = fscanf(inputFile, "%f\n", &aux);
-		TOTAL+=aux;
-		cont++;
-		if (ret != 1)
+		ret = fscanf(inputFile, "%c %lf\n", &type, &aux);
+		if (ret != 2)
 			break;
+		if (type == 'P'){
+			TOTALP+=aux;
+			contP++;
+		}
+		else{
+			TOTALS+=aux;
+			contS++;
+		}
+
+
+
 	}
 	fclose (inputFile);
 
-	printf("%s DEMOROU:       TOTAL ->  %f    MEDIA-> %f ",argv[1], TOTAL, TOTAL/cont);
-	printf("End File :D\n");
+	printf("PARALELO DEMOROU:       TOTAL ->  %f    MEDIA-> %f \n", TOTALP, TOTALP/contP);
+	printf("SERIE DEMOROU:       TOTAL ->  %f    MEDIA-> %f \n", TOTALS, TOTALS/contS);
+	printf("SPEEDUP: %f \n", (TOTALS/contS)/(TOTALP/contP));
 	return 0;
 }

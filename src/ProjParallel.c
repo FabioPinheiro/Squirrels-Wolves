@@ -71,18 +71,19 @@ void printMatrixOutFile(sworld world, char* name) { /*output para Avaliacao*/
 	out = fopen(name, "w");
 	for (i = 0; i < worldsize; i++) {
 		for (j = 0; j < worldsize; j++) {
-			if (world[i + j * worldsize].type > EPTY && world[i + j * worldsize].type <= SONT)
-				fprintf(out,"%d %d %c\n", i, j,
+			if (world[i + j * worldsize].type > EPTY
+					&& world[i + j * worldsize].type <= SONT)
+				fprintf(out, "%d %d %c\n", i, j,
 						printValues(world[i + j * worldsize].type));
 		}
 	}
-	fclose (out);
+	fclose(out);
 }
-void printTimeOutFile(double time, char* name) {
+void printTimeOutFile(double time) {
 	FILE *out;
-	out = fopen(name, "a");
-	fprintf(out,"%f\n",time);
-	fclose (out);
+	out = fopen("timeOut.out", "a");
+	fprintf(out, "P %f\n", time);
+	fclose(out);
 }
 
 int addSpecial(char string) {
@@ -125,49 +126,72 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr) {
 
 void processReds(sworld world) {
 	int i, l;
-	debug("processEvens... \n");
-	for (l = 0; l < worldsize; l += 2) {
-		for (i = 0; i < worldsize; i += 2) {
-			if (isAnimal(world[worldsize * l + i].type)) {
-				/*printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
-				goAnimal(world, worldsize * l + i,
-						world[worldsize * l + i].type);
+	/*	debug("processEvens... \n");*/
+#pragma omp parallel
+
+#pragma omp sections
+	{
+#pragma omp section
+		{
+			for (l = 0; l < worldsize; l += 2) {
+				for (i = 0; i < worldsize; i += 2) {
+					if (isAnimal(world[worldsize * l + i].type)) {
+						/*printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
+						goAnimal(world, worldsize * l + i,
+								world[worldsize * l + i].type);
+					}
+				}
+			}
+		}
+#pragma omp section
+		{
+			for (l = 1; l < worldsize; l += 2) {
+				for (i = 1; i < worldsize; i += 2) {
+					if (isAnimal(world[worldsize * l + i].type)) {
+						/*				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
+						goAnimal(world, worldsize * l + i,
+								world[worldsize * l + i].type);
+					}
+				}
 			}
 		}
 	}
-	for (l = 1; l < worldsize; l += 2) {
-		for (i = 1; i < worldsize; i += 2) {
-			if (isAnimal(world[worldsize * l + i].type)) {
-				/*				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
-				goAnimal(world, worldsize * l + i,
-						world[worldsize * l + i].type);
-			}
-		}
-	}
+#pragma omp barrier
 }
 
 void processWhites(sworld world) {
 	int i, l;
 	/*debug("processOds... \n");*/
-	for (l = 0; l < worldsize; l += 2) {
-		for (i = 1; i < worldsize; i += 2) {
-			if (isAnimal(world[worldsize * l + i].type)) {
-				/*				printf("Whites 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
-				goAnimal(world, worldsize * l + i,
-						world[worldsize * l + i].type);
-			}
-		}
-	}
+#pragma omp parallel
 
-	for (l = 1; l < worldsize; l += 2) {
-		for (i = 0; i < worldsize; i += 2) {
-			if (isAnimal(world[worldsize * l + i].type)) {
-				/*			printf("Whites 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
-				goAnimal(world, worldsize * l + i,
-						world[worldsize * l + i].type);
+#pragma omp sections
+	{
+#pragma omp section
+		{
+			for (l = 0; l < worldsize; l += 2) {
+				for (i = 1; i < worldsize; i += 2) {
+					if (isAnimal(world[worldsize * l + i].type)) {
+						/*				printf("Whites 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
+						goAnimal(world, worldsize * l + i,
+								world[worldsize * l + i].type);
+					}
+				}
+			}
+		}
+#pragma omp section
+		{
+			for (l = 1; l < worldsize; l += 2) {
+				for (i = 0; i < worldsize; i += 2) {
+					if (isAnimal(world[worldsize * l + i].type)) {
+						/*			printf("Whites 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
+						goAnimal(world, worldsize * l + i,
+								world[worldsize * l + i].type);
+					}
+				}
 			}
 		}
 	}
+#pragma omp barrier
 	/*debug("processOds DONE!\n");*/
 }
 
@@ -185,20 +209,12 @@ void processGen(sworld world) {
 			}
 		}
 
-#pragma omp sections
-		{
-#pragma omp section
-			{
-				processReds(world);
-			}
-#pragma omp section
-			{
-				processWhites(world);
-			}
-		}
+		processReds(world);
+
+		processWhites(world);
 		printf("\n\n Iteração nº %d\n\n", i + 1);
-/*		printMatrix(world);
-		printf("\n\n--------------------------------------\n\n\n");*/
+		/*		printMatrix(world);
+		 printf("\n\n--------------------------------------\n\n\n");*/
 	}
 }
 
@@ -240,7 +256,7 @@ int main(int argc, char const *argv[]) {
 		printf("x: %d  y: %d\n", x, y);
 		setType(my_world, x, y, chr);
 	}
-	fclose (inputFile);
+	fclose(inputFile);
 	printf("\n\nTHE WORLD:\n\n");
 	printMatrixOutPut(my_world);
 	printf("\tBefore \n\n\n\n");
@@ -252,8 +268,8 @@ int main(int argc, char const *argv[]) {
 	/*printMatrix(my_world);*/
 	printf("\tAfter \n\n\n\n");
 	printMatrixOutPut(my_world);
-	printTimeOutFile(end-start,argv[6]);
-	printf("Parallel DEMOROU:       ->  %f  <-", end-start);
+	printTimeOutFile(end - start);
+	printf("Parallel DEMOROU:       ->  %f  <-", end - start);
 	printf("End File :D\n");
 	return 0;
 }
