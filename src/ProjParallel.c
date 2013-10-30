@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "Mover.h"
 #include <omp.h>
+#include <string.h>
 
 #define DEBUG 0
 
@@ -152,40 +153,40 @@ void processOddReds(sworld world) {
 	}
 }
 
-void processRed(sworld world){
+void processRed(sworld worldRead, sworld worldWrite){
 	int l, index;
 	#pragma omp parallel for private (index)
 	for (l = 0; l < worldsize*worldsize ; l +=2*worldsize){
 		for (index = l; index < l + worldsize; index +=2){
-			if (isAnimal(world[index].type)) {
-				goAnimal(world, index, world[index].type);
+			if (isAnimal(worldRead[index].type)) {
+				goAnimal(worldWrite, index, worldRead[index].type);
 			}
 		}
 	  
 		if(l + 2*worldsize <= worldsize * worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = 1+l+ worldsize; index < l + 2*worldsize; index +=2){
-				if (isAnimal(world[index].type)) {
-					goAnimal(world, index, world[index].type);
+				if (isAnimal(worldRead[index].type)) {
+					goAnimal(worldWrite, index, worldRead[index].type);
 			}
 	    }
 	  }
 	}
 }
 
-void processBlack(sworld world){
+void processBlack(sworld worldRead, sworld worldWrite){
 	int l, index;
 	#pragma omp parallel for private (index)
 	for (l = 0; l < worldsize*worldsize ; l +=2*worldsize){
 		for (index = 1+ l; index < l + worldsize; index +=2){
-			if (isAnimal(world[index].type)) {
-				goAnimal(world, index, world[index].type);
+			if (isAnimal(worldRead[index].type)) {
+				goAnimal(worldWrite, index, worldRead[index].type);
 			}
 		}
 	  
 		if(l + 2*worldsize <= worldsize * worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = l + worldsize; index < l + 2*worldsize; index +=2){
-				if (isAnimal(world[index].type)) {
-					goAnimal(world, index, world[index].type);
+				if (isAnimal(worldRead[index].type)) {
+					goAnimal(worldWrite, index, worldRead[index].type);
 			}
 	    }
 	  }
@@ -219,22 +220,28 @@ void processOddWhites(sworld world) {
 	}
 }
 
-void processGen(sworld world) {
+void processGen(sworld my_world1, sworld my_world2) {
 	int i, j;
+	sworld my_worldAUX;
 	/*	#pragma omp parallel*/
 	/*debug("processGen... \n");*/
 	for (i = 0; i < genNum; i++) {
 		/*handle the breeding and starvation updates once each generation */
-#pragma omp parallel for
+		my_worldAUX = my_world1;
+		my_world1 = my_world2;
+		my_world2 = my_worldAUX;
+		#pragma omp parallel for
 		for (j = 0; j < worldsize * worldsize; j++) {
 
-			if (isAnimal(world[j].type)) {
-				world[j].breeding_period--;
-				if (world[j].type == WOLF)
-					world[j].starvation_period--;
+			if (isAnimal(my_world1[j].type)) {
+				my_world1[j].breeding_period--;
+				if (my_world1[j].type == WOLF)
+					my_world1[j].starvation_period--;
 			}
 		}
-#pragma omp parallel num_threads (2)
+		processRed(my_world1,my_world2);
+		processBlack(my_world1,my_world2);
+/*#pragma omp parallel num_threads (2)
 		{
 #pragma omp sections
 			{
@@ -252,7 +259,7 @@ void processGen(sworld world) {
 #pragma omp section
 				processOddWhites(world);
 			}
-		}
+		}*/
 		/*printf("\n\n Iteração nº %d\n\n", i + 1);
 		 printMatrix(world);
 		 printf("\n\n--------------------------------------\n\n\n");*/
@@ -263,7 +270,7 @@ int main(int argc, char const *argv[]) {
 	/****************  DECLARATIONS  ********************/
 	FILE * inputFile;
 	int teste;
-	sworld my_world;
+	sworld my_world, my_world2;
 	/*	READ FILE VARS */
 	int ret = 3, x, y;
 	char chr;
@@ -285,7 +292,8 @@ int main(int argc, char const *argv[]) {
 	 "Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
 	 worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);*/
 	my_world = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
-
+	my_world2 = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
+	
 	/*
 	 READ FILE
 	 */
@@ -301,9 +309,9 @@ int main(int argc, char const *argv[]) {
 	/*	printf("\n\nTHE WORLD:\n\n");
 	 printMatrixOutPut(my_world);
 	 printf("\tBefore \n\n\n\n");*/
-
+	memcpy( my_world2, my_world, worldsize * worldsize * sizeof(struct world));
 	start = omp_get_wtime();
-	processGen(my_world);
+	processGen(my_world,my_world2);
 	end = omp_get_wtime();
 
 	/*printMatrix(my_world);
