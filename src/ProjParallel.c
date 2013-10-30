@@ -153,7 +153,7 @@ void processOddReds(sworld world) {
 	}
 }
 
-void processRed(sworld worldRead, sworld worldWrite){
+void processReds(sworld worldRead, sworld worldWrite){
 	int l, index;
 	#pragma omp parallel for private (index)
 	for (l = 0; l < worldsize*worldsize ; l +=2*worldsize){
@@ -173,7 +173,7 @@ void processRed(sworld worldRead, sworld worldWrite){
 	}
 }
 
-void processBlack(sworld worldRead, sworld worldWrite){
+void processBlacks(sworld worldRead, sworld worldWrite){
 	int l, index;
 	#pragma omp parallel for private (index)
 	for (l = 0; l < worldsize*worldsize ; l +=2*worldsize){
@@ -220,7 +220,7 @@ void processOddWhites(sworld world) {
 	}
 }
 
-void processGen(sworld my_world1, sworld my_world2) {
+sworld processGen(sworld my_world1, sworld my_world2) {
 	int i, j;
 	sworld my_worldAUX;
 	/*	#pragma omp parallel*/
@@ -239,8 +239,8 @@ void processGen(sworld my_world1, sworld my_world2) {
 					my_world1[j].starvation_period--;
 			}
 		}
-		processRed(my_world1,my_world2);
-		processBlack(my_world1,my_world2);
+		processReds(my_world1,my_world2);
+		processBlacks(my_world1,my_world2);
 /*#pragma omp parallel num_threads (2)
 		{
 #pragma omp sections
@@ -264,13 +264,14 @@ void processGen(sworld my_world1, sworld my_world2) {
 		 printMatrix(world);
 		 printf("\n\n--------------------------------------\n\n\n");*/
 	}
+	return my_world2;
 }
 
 int main(int argc, char const *argv[]) {
 	/****************  DECLARATIONS  ********************/
 	FILE * inputFile;
 	int teste;
-	sworld my_world, my_world2;
+	sworld my_world1, my_world2;
 	/*	READ FILE VARS */
 	int ret = 3, x, y;
 	char chr;
@@ -291,7 +292,7 @@ int main(int argc, char const *argv[]) {
 	/*printf(
 	 "Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
 	 worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);*/
-	my_world = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
+	my_world1 = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
 	my_world2 = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
 	
 	/*
@@ -303,20 +304,20 @@ int main(int argc, char const *argv[]) {
 		if (ret != 3)
 			break;
 		/*printf("x: %d  y: %d\n", x, y);*/
-		setType(my_world, x, y, chr);
+		setType(my_world1, x, y, chr);
 	}
 	fclose(inputFile);
 	/*	printf("\n\nTHE WORLD:\n\n");
 	 printMatrixOutPut(my_world);
 	 printf("\tBefore \n\n\n\n");*/
-	memcpy( my_world2, my_world, worldsize * worldsize * sizeof(struct world));
+	memcpy( my_world2, my_world1, worldsize * worldsize * sizeof(struct world));
 	start = omp_get_wtime();
-	processGen(my_world,my_world2);
+	my_world1= processGen(my_world1,my_world2);
 	end = omp_get_wtime();
 
 	/*printMatrix(my_world);
-	 printf("\tAfter \n\n\n\n");
-	 printMatrixOutPut(my_world);*/
+	 printf("\tAfter \n\n\n\n");*/
+	 printMatrixOutPut(my_world1);
 	printTimeOutFile(end - start);
 	/*	printf("Parallel DEMOROU:       ->  %f  <-\n", end - start);*/
 	printf("End File THREADS: %d:D\n", threads);
