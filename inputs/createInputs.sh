@@ -1,6 +1,8 @@
 #!/bin/bash
-n=500
-FILENAME="input500"
+
+#Change N to define the dimension of the matrix.
+n=5000
+FILENAME="input$n"
 rm $FILENAME
 
 

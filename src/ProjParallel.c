@@ -127,6 +127,7 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr) {
 void processEvenReds(sworld world) {
 	int i, l;
 	/*	debug("processEvens... \n");*/
+	#pragma omp parallel for
 	for (l = 0; l < worldsize; l += 2) {
 		for (i = 0; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
@@ -139,6 +140,7 @@ void processEvenReds(sworld world) {
 }
 void processOddReds(sworld world) {
 	int i, l;
+	#pragma omp parallel for
 	for (l = 1; l < worldsize; l += 2) {
 		for (i = 1; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
@@ -150,10 +152,51 @@ void processOddReds(sworld world) {
 	}
 }
 
+void processRed(sworld world){
+	int l, index;
+	#pragma omp parallel for private (index)
+	for (l = 0; l < worldsize*worldsize ; l +=2*worldsize){
+		for (index = l; index < l + worldsize; index +=2){
+			if (isAnimal(world[index].type)) {
+				goAnimal(world, index, world[index].type);
+			}
+		}
+	  
+		if(l + 2*worldsize <= worldsize * worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+			for(index = 1+l+ worldsize; index < l + 2*worldsize; index +=2){
+				if (isAnimal(world[index].type)) {
+					goAnimal(world, index, world[index].type);
+			}
+	    }
+	  }
+	}
+}
+
+void processBlack(sworld world){
+	int l, index;
+	#pragma omp parallel for private (index)
+	for (l = 0; l < worldsize*worldsize ; l +=2*worldsize){
+		for (index = 1+ l; index < l + worldsize; index +=2){
+			if (isAnimal(world[index].type)) {
+				goAnimal(world, index, world[index].type);
+			}
+		}
+	  
+		if(l + 2*worldsize <= worldsize * worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+			for(index = l + worldsize; index < l + 2*worldsize; index +=2){
+				if (isAnimal(world[index].type)) {
+					goAnimal(world, index, world[index].type);
+			}
+	    }
+	  }
+	}
+}
+
+
 void processEvenWhites(sworld world) {
 	int i, l;
 	/*debug("processOds... \n");*/
-
+#pragma omp parallel for
 	for (l = 0; l < worldsize; l += 2) {
 		for (i = 1; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
@@ -165,6 +208,7 @@ void processEvenWhites(sworld world) {
 }
 void processOddWhites(sworld world) {
 	int i, l;
+	#pragma omp parallel for
 	for (l = 1; l < worldsize; l += 2) {
 		for (i = 0; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {

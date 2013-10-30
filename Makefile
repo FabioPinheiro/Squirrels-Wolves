@@ -26,8 +26,8 @@ runS:
 	./serial_proj inputs/input3000 2 2 12 200 SOutput.out
 runSmal:
 	./serial_proj inputs/smalInput 10 12 10 1 SmalOutput.out
-runUSutils:
-	./utils SOutput.out
+runUtils:
+	./utils timeOut.out
 runF:
 	gcc $(CFLAGS) -o fabio_open_file_test1 $(SRC)fabio_open_file_test1.c;
 	./fabio_open_file_test1 inputs/input
