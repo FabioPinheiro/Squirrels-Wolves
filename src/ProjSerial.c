@@ -235,7 +235,7 @@ int main(int argc, char const *argv[]) {
 	start = omp_get_wtime();
 	my_world1=  processGen(my_world1,my_world2);
 	end = omp_get_wtime();
-	printMatrixOutPut(my_world1);
+	 printMatrixOutFile(my_world1, "SerialOut.out");
 /*	printMatrix(my_world);
 	printf("\tAfter \n\n\n\n");*/
 	printTimeOutFile(end-start);

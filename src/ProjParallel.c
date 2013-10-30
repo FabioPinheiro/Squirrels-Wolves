@@ -317,7 +317,7 @@ int main(int argc, char const *argv[]) {
 
 	/*printMatrix(my_world);
 	 printf("\tAfter \n\n\n\n");*/
-	 printMatrixOutPut(my_world1);
+	 printMatrixOutFile(my_world1, "ParallelOut.out");
 	printTimeOutFile(end - start);
 	/*	printf("Parallel DEMOROU:       ->  %f  <-\n", end - start);*/
 	printf("End File THREADS: %d:D\n", threads);
