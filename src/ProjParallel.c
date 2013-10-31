@@ -19,6 +19,16 @@ void debug(char * str) {
 	}
 }
 
+void sworldTreeCpy(sworld worldCpyTo, sworld worldCpyFrom, int worldsize){
+	int i, j;
+	for (i = 0; i < worldsize; i++) {
+		for (j = 0; j < worldsize; j++) {
+			if (worldCpyFrom[i + j * worldsize].type == TREE)
+				worldCpyTo[i + j * worldsize].type = TREE;
+		}
+	}
+}
+
 char printValues(int x) {
 	/*
 	 * Recives an int that is the internal representation of the types and returns char that is the
@@ -124,15 +134,15 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr) {
 	}
 
 }
-
+/*
 void processEvenReds(sworld world) {
 	int i, l;
-	/*	debug("processEvens... \n");*/
+	//	debug("processEvens... \n");/
 	#pragma omp parallel for
 	for (l = 0; l < worldsize; l += 2) {
 		for (i = 0; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
-				/*printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
+				//printf("Reds 1 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);/
 				goAnimal(world, worldsize * l + i,
 						world[worldsize * l + i].type);
 			}
@@ -145,13 +155,13 @@ void processOddReds(sworld world) {
 	for (l = 1; l < worldsize; l += 2) {
 		for (i = 1; i < worldsize; i += 2) {
 			if (isAnimal(world[worldsize * l + i].type)) {
-				/*				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);*/
+				//				printf("Reds 2 worldsize*l+i: %d   -  i:%d   -  l:%d\n",worldsize*l+i,i,l);/
 				goAnimal(world, worldsize * l + i,
 						world[worldsize * l + i].type);
 			}
 		}
 	}
-}
+}*/
 
 void processReds(sworld worldRead, sworld worldWrite){
 	int l, index;
@@ -159,14 +169,14 @@ void processReds(sworld worldRead, sworld worldWrite){
 	for (l = 0; l < worldsize*worldsize ; l +=2*worldsize){
 		for (index = l; index < l + worldsize; index +=2){
 			if (isAnimal(worldRead[index].type)) {
-				goAnimal(worldWrite, index, worldRead[index].type);
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 			}
 		}
 	  
 		if(l + 2*worldsize <= worldsize * worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = 1+l+ worldsize; index < l + 2*worldsize; index +=2){
 				if (isAnimal(worldRead[index].type)) {
-					goAnimal(worldWrite, index, worldRead[index].type);
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 			}
 	    }
 	  }
@@ -179,24 +189,24 @@ void processBlacks(sworld worldRead, sworld worldWrite){
 	for (l = 0; l < worldsize*worldsize ; l +=2*worldsize){
 		for (index = 1+ l; index < l + worldsize; index +=2){
 			if (isAnimal(worldRead[index].type)) {
-				goAnimal(worldWrite, index, worldRead[index].type);
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 			}
 		}
 	  
 		if(l + 2*worldsize <= worldsize * worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = l + worldsize; index < l + 2*worldsize; index +=2){
 				if (isAnimal(worldRead[index].type)) {
-					goAnimal(worldWrite, index, worldRead[index].type);
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 			}
 	    }
 	  }
 	}
 }
 
-
+/*
 void processEvenWhites(sworld world) {
 	int i, l;
-	/*debug("processOds... \n");*/
+	//debug("processOds... \n");/
 #pragma omp parallel for
 	for (l = 0; l < worldsize; l += 2) {
 		for (i = 1; i < worldsize; i += 2) {
@@ -218,7 +228,7 @@ void processOddWhites(sworld world) {
 			}
 		}
 	}
-}
+}*/
 
 sworld processGen(sworld my_world1, sworld my_world2) {
 	int i, j;
@@ -292,8 +302,8 @@ int main(int argc, char const *argv[]) {
 	/*printf(
 	 "Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
 	 worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);*/
-	my_world1 = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
-	my_world2 = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
+	my_world1 = (sworld) calloc(worldsize * worldsize, sizeof(struct world));
+	my_world2 = (sworld) calloc(worldsize * worldsize, sizeof(struct world));
 	
 	/*
 	 READ FILE
@@ -310,7 +320,7 @@ int main(int argc, char const *argv[]) {
 	/*	printf("\n\nTHE WORLD:\n\n");
 	 printMatrixOutPut(my_world);
 	 printf("\tBefore \n\n\n\n");*/
-	memcpy( my_world2, my_world1, worldsize * worldsize * sizeof(struct world));
+	sworldTreeCpy( my_world2, my_world1, worldsize);
 	start = omp_get_wtime();
 	my_world1= processGen(my_world1,my_world2);
 	end = omp_get_wtime();

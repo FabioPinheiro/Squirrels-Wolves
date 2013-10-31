@@ -77,7 +77,7 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 
 	return 0; 
 }
-void move(sworld world, int x_from, int y_from, int x_to, int y_to) {
+void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, int y_to){
 	/*TODO be careful with   SONT*/
 	/*
 	If a squirrel/wolf completes a breeding period if he moves it breeds
@@ -269,17 +269,16 @@ Down
 
 	return ret;
 }
-
-void goAnimal(sworld world, int pos, int type) {
+void goAnimal(sworld world_init, sworld world_final, int pos, int type){
 	int y_init, x_init, y_final, x_final, posFinal;
 	calcCords(pos, &x_init, &y_init);
 
-	posFinal =/* (2 < rand()%5)?pos+1:pos+worldsize;*/calcMovePos(world,x_init, y_init,type);
+	posFinal =/* (2 < rand()%5)?pos+1:pos+worldsize;*/calcMovePos(world_init, x_init, y_init,type);
 	/*posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);*/
 	if(posFinal<0)
 		return;
 
 /*	printf("posição: %d final: %d\n",pos, posFinal);*/
 	calcCords(posFinal, &x_final, &y_final);
-	move(world, x_init, y_init, x_final, y_final);
+	move(world_init, x_init, y_init, world_final, x_final, y_final);
 }

@@ -19,6 +19,16 @@ void debug(char * str) {
 	}
 }
 
+void sworldTreeCpy(sworld worldCpyTo, sworld worldCpyFrom, int worldsize){
+	int i, j;
+	for (i = 0; i < worldsize; i++) {
+		for (j = 0; j < worldsize; j++) {
+			if (worldCpyFrom[i + j * worldsize].type == TREE)
+				worldCpyTo[i + j * worldsize].type = TREE;
+		}
+	}
+}
+
 char printValues(int x) {
 	/*
 	 * Recives an int that is the internal representation of the types and returns char that is the
@@ -125,7 +135,7 @@ void processReds(sworld worldRead, sworld worldWrite) {
 	for (l = 0; l < worldsize; l += 2) {
 		for (i = 0; i < worldsize; i += 2) {
 			if (isAnimal(worldRead[worldsize * l + i].type)) {
-				goAnimal(worldWrite, worldsize * l + i,
+				goAnimal(worldRead, worldWrite, worldsize * l + i,
 						worldRead[worldsize * l + i].type);
 			}
 		}
@@ -133,7 +143,7 @@ void processReds(sworld worldRead, sworld worldWrite) {
 	for (l = 1; l < worldsize; l += 2) {
 		for (i = 1; i < worldsize; i += 2) {
 			if (isAnimal(worldRead[worldsize * l + i].type)) {
-				goAnimal(worldWrite, worldsize * l + i,
+				goAnimal(worldRead, worldWrite, worldsize * l + i,
 						worldRead[worldsize * l + i].type);
 			}
 		}
@@ -146,7 +156,7 @@ void processBlacks(sworld worldRead, sworld worldWrite) {
 	for (l = 0; l < worldsize; l += 2) {
 		for (i = 1; i < worldsize; i += 2) {
 			if (isAnimal(worldRead[worldsize * l + i].type)) {
-				goAnimal(worldWrite, worldsize * l + i,
+				goAnimal(worldRead, worldWrite,  worldsize * l + i,
 						worldRead[worldsize * l + i].type);
 			}
 		}
@@ -155,7 +165,7 @@ void processBlacks(sworld worldRead, sworld worldWrite) {
 	for (l = 1; l < worldsize; l += 2) {
 		for (i = 0; i < worldsize; i += 2) {
 			if (isAnimal(worldRead[worldsize * l + i].type)) {
-				goAnimal(worldWrite, worldsize * l + i,
+				goAnimal(worldRead, worldWrite, worldsize * l + i,
 						worldRead[worldsize * l + i].type);
 			}
 		}
@@ -213,8 +223,8 @@ int main(int argc, char const *argv[]) {
 /*	printf(
 			"Tamanho: %d\nwolfBP = %d, sqrlBP = %d, wolfStarvP = %d, genNum = %d\n",
 			worldsize, wolfBP, sqrlBP, wolfStarvP, genNum);*/
-	my_world1 = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
-	my_world2 = (sworld) malloc(worldsize * worldsize * sizeof(struct world));
+	my_world1 = (sworld) calloc(worldsize * worldsize, sizeof(struct world));
+	my_world2 = (sworld) calloc(worldsize * worldsize, sizeof(struct world));
 
 	/*
 	 READ FILE
@@ -231,7 +241,7 @@ int main(int argc, char const *argv[]) {
 	/*printf("\n\nTHE WORLD:\n\n");
 	printMatrix(my_world);
 	printf("\tBefore \n\n\n\n");*/
-	memcpy( my_world2, my_world1, worldsize * worldsize * sizeof(struct world));
+	sworldTreeCpy( my_world2, my_world1, worldsize);
 	start = omp_get_wtime();
 	my_world1=  processGen(my_world1,my_world2);
 	end = omp_get_wtime();
