@@ -119,20 +119,19 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 					if(aux->type == WES)
 						finalPos->breeding_period = wolfStarvP;
 					finalPos->type = WES;
-					/*Apagar esquilo da nova posiçao na matrix antiga (pos +1)*/
-						
+
 				}
 			}
 			else{
 				/*WOLF vs SQRL*/
 				if(aux->type == WOLF){
 					setPosition(world_to, x_to, y_to, WES, aux->breeding_period,aux->starvation_period);
-
+					cleanPos(world_from, x_to, y_to);
 					/*Apagar esquilo da nova posiçao na matrix antiga (pos +1)*/
 				}
 				if(aux->type == WES){
 					setPosition(world_to, x_to, y_to, WES, aux->breeding_period,wolfStarvP);
-
+					cleanPos(world_from, x_to, y_to);
 					/*Apagar esquilo da nova posiçao na matrix antiga (pos +1)*/
 				}
 				/*SQRL vs SQRL*/
