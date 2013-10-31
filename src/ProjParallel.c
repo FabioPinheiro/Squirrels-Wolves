@@ -42,6 +42,8 @@ char printValues(int x) {
 	switch (atoi(str)) {
 	case WOLF:
 		return 'w';
+	case WES:
+		return 'w';
 	case SQRL:
 		return 's';
 	case ICE:
