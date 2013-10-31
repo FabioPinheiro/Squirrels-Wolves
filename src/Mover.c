@@ -170,7 +170,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 				finalPos->breeding_period = wolfBP;
 /*mete o breeding period do wolf ao inicial no novo mundo*/
 				if(aux->type == WES)
-					setPosition(world_to, x_to, y_to, WOLF, finalPos->breeding_period,wolfStravP);
+					setPosition(world_to, x_to, y_to, WOLF, finalPos->breeding_period,wolfStarvP);
 				setPosition(world_to, x_from, y_from, WOLF, aux->breeding_period,aux->starvation_period);  /*new baby here*/
 			
 			}
