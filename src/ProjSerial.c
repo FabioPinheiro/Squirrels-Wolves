@@ -39,6 +39,8 @@ char printValues(int x) {
 	switch (x) {
 	case WOLF:
 		return 'w';
+	case WES:
+		return 'w';
 	case SQRL:
 		return 's';
 	case ICE:
