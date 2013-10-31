@@ -322,7 +322,7 @@ int main(int argc, char const *argv[]) {
 	/*	printf("\n\nTHE WORLD:\n\n");
 	 printMatrixOutPut(my_world);
 	 printf("\tBefore \n\n\n\n");*/
-	sworldTreeCpy( my_world2, my_world1, worldsize);
+	sworldTreeIceCpy( my_world2, my_world1, worldsize);
 	start = omp_get_wtime();
 	my_world1= processGen(my_world1,my_world2);
 	end = omp_get_wtime();
