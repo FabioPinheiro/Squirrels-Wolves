@@ -43,7 +43,7 @@ void setPositionStarvation(sworld world, int x, int y, int starvationPeriod) {
 }
 int isAnimal(int type) {
 	int ret = 0;
-	ret = (type == WOLF || type == SQRL || type == SONT);
+	ret = (type == WOLF || type == WES || type == SQRL || type == SONT);
 
 	return ret;
 }
@@ -62,19 +62,16 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 	
 
 	/* check lobos */
-	if(type == WOLF){
-		if(positionType == EPTY || positionType == SQRL || positionType == WOLF ){ /*empty or squirrel or wolf*/
+	if(type == WOLF ||type == WES ){
+		if(positionType == EPTY || positionType == SQRL){ /*empty or squirrel or wolf*/
 		return 1;
 		}
 	}
 	else{/*check esquilos SQRT e SONT*/
-		if(positionType != ICE && positionType != WOLF ){ /*if not ice or wolf */
+		if(positionType != ICE && positionType != WOLF && positionType != WES){ /*if not ice or wolf */
 		return 1;
 		}
 	}
-	
-
-
 	return 0; 
 }
 void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, int y_to){
@@ -83,8 +80,8 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 	If a squirrel/wolf completes a breeding period if he moves it breeds
 	Handle colissions
 	*/
-	sworld aux = getPositionStructure(world, x_from, y_from);
-	sworld finalPos = getPositionStructure(world, x_to, y_to);
+	sworld aux = getPositionStructure(world_from, x_from, y_from);
+	sworld finalPos = getPositionStructure(world_to, x_to, y_to);
 	int star, breed;
 
 	if(aux->type != WOLF || aux->starvation_period != 0){ /*still healthy we don't like weak wolfs*/
@@ -94,35 +91,55 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 			/*COLISIONS*/
 			/*WOLF vs WOLF */
 			if(finalPos->type == WOLF){
-				if(aux->type == WOLF){
+				if(aux->type == WOLF ){
 					if(star != 0){
 						if(star > 0)
-							setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+							setPosition(world_to, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
 					}
 					else{
 						if(breed > 0)
-							setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+							setPosition(world_to, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
 					}
 				}
+				if(aux->type == WES  ){
+					if(star != 0){
+						if(star > 0)
+							setPosition(world_to, x_to, y_to, WOLF, aux->breeding_period,wolfStarvP);
+					}
+					else{
+						if(breed > 0)
+							setPosition(world_to, x_to, y_to, WOLF, aux->breeding_period,wolfStarvP);
+					}
+				}
+				
 				else{
 					/* We have a suicidal SQRL muahahahahah!!!
-						SQRL vs WOLF
+						SQRL vs WOLF wolf eating a squirrel
 					*/
-					finalPos->starvation_period = wolfStarvP;
+					if(aux->type == WES)
+						finalPos->breeding_period = wolfStarvP;
+					finalPos->type = WES;
+					/*Apagar esquilo da nova posiçao na matrix antiga (pos +1)*/
 						
 				}
 			}
 			else{
 				/*WOLF vs SQRL*/
 				if(aux->type == WOLF){
-					setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
-					finalPos->starvation_period = wolfStarvP;
+					setPosition(world_to, x_to, y_to, WES, aux->breeding_period,aux->starvation_period);
+
+					/*Apagar esquilo da nova posiçao na matrix antiga (pos +1)*/
+				}
+				if(aux->type == WES){
+					setPosition(world_to, x_to, y_to, WES, aux->breeding_period,wolfStarvP);
+
+					/*Apagar esquilo da nova posiçao na matrix antiga (pos +1)*/
 				}
 				/*SQRL vs SQRL*/
 				else{
 					if (breed > 0)
 					{
-						setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+						setPosition(world_to, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
 					}
 				}
 			}
@@ -130,7 +147,13 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 		}
 
 		else{
-			setPosition(world, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+			if(aux->type == WES)
+					setPosition(world_to, x_to, y_to, WOLF, aux->breeding_period,aux->wolfStravP);
+			else{
+			setPosition(world_to, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
+			}
+			
+
 		}
 
 
@@ -140,26 +163,35 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 			/*
 				wolfBP, sqrlBP, wolfStarvP
 			*/
-			finalPos->breeding_period = wolfBP;
+			/*finalPos->breeding_period = wolfBP;*/
 			
-			if(aux->type == WOLF){
+			if(aux->type == WOLF ||aux->type == WES){
 				aux->breeding_period = wolfBP;
 				aux->starvation_period = wolfStarvP;
 				finalPos->breeding_period = wolfBP;
+/*mete o breeding period do wolf ao inicial no novo mundo*/
+				if(aux->type == WES)
+					setPosition(world_to, x_to, y_to, WOLF, finalPos->breeding_period,finalPos->wolfStravP);
+				setPosition(world_to, x_from, y_from, WOLF, aux->breeding_period,aux->starvation_period);  /*new baby here*/
+			
 			}
 			else{
 				aux->breeding_period = sqrlBP;
-				finalPos->breeding_period = sqrlBP;
+				finalPos->breeding_period = sqrlBP; /*mete o breeding period do squirrel ao inicial no novo mundo*/
+				setPosition(world_to, x_from, y_from, aux->type, aux->breeding_period,aux->starvation_period); /*new baby here*/
 			}
 			
 		}
-		else{
-			cleanPos(world, x_from, y_from);
+		else{/*mexeu-se  limpa-se mundos*/
+			cleanPos(world_from, x_from, y_from);
+			cleanPos(world_to, x_from, y_from);
 		}
 	}
 	else{
-		/*is dead :(*/
-		cleanPos(world, x_from, y_from);
+		/*is dead :( Limpar nos 2 mundos
+*/
+		cleanPos(world_from, x_from, y_from);
+		cleanPos(world_to, x_from, y_from);
 	}
 }
 
