@@ -21,12 +21,12 @@ struct strAnimal {
 typedef struct strWorld *sWorld;
 struct strWorld {
 	int type; /* ICE, TREE*/
-	sAnimal pinha;
+	sAnimal beast;
  };
 
 sWorld myWorld
 
-extern int worldsize, wolfBP, sqrlBP, wolfStarvP, genNum;
+extern int worldsize, wolfBP, sqrlBP, wolfStarvP, genNum, day = 0;
 
 void printMatrixOutPut(){} //TODO
 #endif FABIO_INTERFACE_H
@@ -35,7 +35,21 @@ void printMatrixOutPut(){} //TODO
 #define FABIO_FILE_IO_H
 #endif FABIO_FILE_IO_H
 /*************************************************************************/
-
+#ifndef FABIO_BEAST_H
+#define FABIO_BEAST_H
+sAnimal newBeast(int type){
+	sAnimal a = (sAnimal) calloc(1, sizeof(struct strWorld));
+	a.type = type;
+	a.child = 0;
+	a.diedata = 0;
+	a.update = 0;
+	a.next = NULL;
+	return a;
+}
+void deleteBeast(sAnimal a){
+	free(a);
+}
+#endif FABIO_BEAST_H
 /*************************************************************************/
 #ifndef FABIO_WROLD_F_H
 #define FABIO_WROLD_F_H
@@ -46,11 +60,10 @@ void printMatrixOutPut(){} //TODO
 	aux2 = pos - aux1 * worldsize;
 	(*y) = aux2;
 }*/
-void calcCordsPOS(int* pos, int x, int y) {
-	*pos = y * worldsize + x
+int calcCordsPOS( int x, int y) {
+	return y * worldsize + x
 }
 void setType(int x, int y, char chr){
-	int type;
 	if (x_cord > worldsize - 1 || y_cord > worldsize - 1 || x_cord < 0
 			|| y_cord < 0) {
 		printf("Invalid Input!\n");
@@ -58,24 +71,25 @@ void setType(int x, int y, char chr){
 	}
 	switch (chr) {
 		case 'w':
-			setNewBeast(x,y,WOLF)
+			return setNewBeast(x,y,WOLF);
 			break;
 		case 's':
-			setNewBeast(x,y,SQRL)
-			type = SQRL;
+			return setNewBeast(x,y,SQRL);
 			break;
 		case 'i':
-			setLand(x,y,ICE)
-			type = ICE;
+			return setLand(x,y,ICE);
 			break;
 		case 't':
-			setLand(x,y,TREE)
-			type = TREE;
+			return setLand(x,y,TREE);
 			break;
 	}
 }
-void setLand(int x, int y, int type);
-void setNewBeast(int x, int y, int type);
+void setLand(int x, int y, int type){
+	myWorld[calcCordsPOS(x,y)].type = type;
+}
+void setNewBeast(int x, int y, int type){
+	myWorld[calcCordsPOS(x,y)].beast = newBeast(type);
+}
 #endif FABIO_WROLD_F_H
 
 /*************************************************************************/
