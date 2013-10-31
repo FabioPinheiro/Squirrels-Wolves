@@ -147,7 +147,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 
 		else{
 			if(aux->type == WES)
-					setPosition(world_to, x_to, y_to, WOLF, aux->breeding_period,wolfStravP);
+					setPosition(world_to, x_to, y_to, WOLF, aux->breeding_period, wolfStarvP);
 			else{
 			setPosition(world_to, x_to, y_to, aux->type, aux->breeding_period,aux->starvation_period);
 			}
