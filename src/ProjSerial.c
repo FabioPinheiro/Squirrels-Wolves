@@ -19,12 +19,14 @@ void debug(char * str) {
 	}
 }
 
-void sworldTreeCpy(sworld worldCpyTo, sworld worldCpyFrom, int worldsize){
+void sworldTreeIceCpy(sworld worldCpyTo, sworld worldCpyFrom, int worldsize){
 	int i, j;
 	for (i = 0; i < worldsize; i++) {
 		for (j = 0; j < worldsize; j++) {
 			if (worldCpyFrom[i + j * worldsize].type == TREE)
 				worldCpyTo[i + j * worldsize].type = TREE;
+			if (worldCpyFrom[i + j * worldsize].type == ICE)
+				worldCpyTo[i + j * worldsize].type = ICE;
 		}
 	}
 }
