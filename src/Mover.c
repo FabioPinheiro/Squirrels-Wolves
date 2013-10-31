@@ -90,7 +90,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 			breed = aux->breeding_period - finalPos->breeding_period;
 			/*COLISIONS*/
 			/*WOLF vs WOLF */
-			if(finalPos->type == WOLF){
+			if(finalPos->type == WOLF || finalPos->type == WES){
 				if(aux->type == WOLF ){
 					if(star != 0){
 						if(star > 0)
