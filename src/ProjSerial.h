@@ -6,8 +6,8 @@
 #define SQRL 2
 #define ICE 3
 #define TREE 4
+#define WES 5 /*a wold eating a squirrel*/
 #define SONT 6 /*squirrel on a tree*/
-#define WES 7 /*a wold eating a squirrel*/
 #define printInt(i) printf("%d\n",i)
 #define calcPos(x, y, worldsize) y + x*worldsize
 

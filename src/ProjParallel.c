@@ -20,15 +20,21 @@ void debug(char * str) {
 }
 
 void sworldTreeIceCpy(sworld worldCpyTo, sworld worldCpyFrom, int worldsize){
-	int i, j;
-	for (i = 0; i < worldsize; i++) {
+	int i;
+	for (i = 0; i < worldsize * worldsize; i++) {
+		if (worldCpyFrom[i].type == TREE)
+			worldCpyTo[i].type = TREE;
+		if (worldCpyFrom[i].type == ICE)
+			worldCpyTo[i].type = ICE;
+	}
+	/*for (i = 0; i < worldsize; i++) {
 		for (j = 0; j < worldsize; j++) {
 			if (worldCpyFrom[i + j * worldsize].type == TREE)
 				worldCpyTo[i + j * worldsize].type = TREE;
 			if (worldCpyFrom[i + j * worldsize].type == ICE)
 				worldCpyTo[i + j * worldsize].type = ICE;
 		}
-	}
+	}*/
 }
 
 char printValues(int x) {
@@ -88,7 +94,7 @@ void printMatrixOutFile(sworld world, char* name) { /*output para Avaliacao*/
 		for (j = 0; j < worldsize; j++) {
 			if (world[i + j * worldsize].type > EPTY
 					&& world[i + j * worldsize].type <= SONT)
-				fprintf(out, "%d %d %c\n", i, j,
+				fprintf(out, "%d %d %c\n", j, i,
 						printValues(world[i + j * worldsize].type));
 		}
 	}
@@ -249,12 +255,30 @@ sworld processGen(sworld my_world1, sworld my_world2) {
 
 			if (isAnimal(my_world1[j].type)) {
 				my_world1[j].breeding_period--;
-				if (my_world1[j].type == WOLF)
+				if (my_world1[j].type == WOLF){
 					my_world1[j].starvation_period--;
+					if(my_world1[j].starvation_period == 0){
+					my_world1[j].type = EPTY;
+					my_world1[j].breeding_period = 0;
+					my_world1[j].starvation_period = 0;
+					}
+					  
+				}
 			}
 		}
 		processReds(my_world1,my_world2);
+		/*printf("\n\n 1 Iteração/2 nº %d\n\n", i + 1);
+		printMatrix(my_world2);
+		printf("\n\n||||||||||||||||||||||||||||||||||||||\n\n\n");
+		printMatrix(my_world1);
+		printf("\n\n--------------------------------------\n\n\n");*/
+		
 		processBlacks(my_world1,my_world2);
+		/*printf("\n\n 1 Iteração nº %d\n\n", i + 1);
+		printMatrix(my_world2);
+		printf("\n\n||||||||||||||||||||||||||||||||||||||\n\n\n");
+		printMatrix(my_world1);
+		printf("\n\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n\n\n");*/
 /*#pragma omp parallel num_threads (2)
 		{
 #pragma omp sections
@@ -274,9 +298,6 @@ sworld processGen(sworld my_world1, sworld my_world2) {
 				processOddWhites(world);
 			}
 		}*/
-		/*printf("\n\n Iteração nº %d\n\n", i + 1);
-		 printMatrix(world);
-		 printf("\n\n--------------------------------------\n\n\n");*/
 	}
 	return my_world2;
 }
@@ -317,12 +338,12 @@ int main(int argc, char const *argv[]) {
 		ret = fscanf(inputFile, "%d %d %c \n", &x, &y, &chr);
 		if (ret != 3)
 			break;
-		/*printf("x: %d  y: %d\n", x, y);*/
+		/*printf("x: %d  y: %d chr: %c\n", x, y, chr);*/
 		setType(my_world1, x, y, chr);
 	}
 	fclose(inputFile);
-	/*	printf("\n\nTHE WORLD:\n\n");
-	 printMatrixOutPut(my_world);
+	/*printf("\n\nTHE WORLD:\n\n");
+	 printMatrix(my_world1);
 	 printf("\tBefore \n\n\n\n");*/
 	sworldTreeIceCpy( my_world2, my_world1, worldsize);
 	start = omp_get_wtime();

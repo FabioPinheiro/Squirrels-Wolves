@@ -82,15 +82,26 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 	*/
 	sworld aux = getPositionStructure(world_from, x_from, y_from);
 	sworld finalPos = getPositionStructure(world_to, x_to, y_to);
+	int toAnimalType;
 	int star, breed;
-
+	sworld finalAuxPos = getPositionStructure(world_from, x_to, y_to);
+	if(isAnimal(finalPos->type)){
+	    toAnimalType=finalPos->type;
+	    star = aux->starvation_period - finalPos->starvation_period;
+	    breed = aux->breeding_period - finalPos->breeding_period;
+	}
+	else{
+	  toAnimalType=finalAuxPos->type;
+	  star = aux->starvation_period - finalAuxPos->starvation_period;
+	  breed = aux->breeding_period - finalAuxPos->breeding_period;
+	}
 	if(aux->type != WOLF || aux->starvation_period != 0){ /*still healthy we don't like weak wolfs*/
-		if(isAnimal(finalPos->type)) {
-			star = aux->starvation_period - finalPos->starvation_period;
-			breed = aux->breeding_period - finalPos->breeding_period;
+		if(toAnimalType){
+			/*Começa Movimento*/
+
 			/*COLISIONS*/
 			/*WOLF vs WOLF */
-			if(finalPos->type == WOLF || finalPos->type == WES){
+			if(toAnimalType == WOLF || toAnimalType == WES){
 				if(aux->type == WOLF ){
 					if(star != 0){
 						if(star > 0)
@@ -116,9 +127,17 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 					/* We have a suicidal SQRL muahahahahah!!!
 						SQRL vs WOLF wolf eating a squirrel
 					*/
-					if(aux->type == WES)
-						finalPos->breeding_period = wolfStarvP;
-					finalPos->type = WES;
+					if(isAnimal(finalPos->type)){
+					  if(finalPos->type == WES)
+						  setPosition(world_to, x_to, y_to, WES, finalPos->breeding_period,wolfStarvP);
+					  setPosition(world_to, x_to, y_to, WES, finalPos->breeding_period,finalPos->starvation_period);
+					}
+					else{
+					if(finalAuxPos->type == WES)
+						setPosition(world_to, x_to, y_to, WES, finalAuxPos->breeding_period,wolfStarvP);
+					setPosition(world_to, x_to, y_to, WES, finalAuxPos->breeding_period,finalAuxPos->starvation_period);
+					}
+					
 
 				}
 			}
@@ -154,6 +173,8 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 			
 
 		}
+		
+		/*Acabou Movimento*/
 
 
 		/*Let's see if we have any suprises*/
