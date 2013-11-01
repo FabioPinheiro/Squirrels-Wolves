@@ -63,7 +63,9 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 
 	/* check lobos */
 	if(type == WOLF ||type == WES ){
-		if(positionType == EPTY || positionType == SQRL){ /*empty or squirrel or wolf*/
+		if(positionType == SQRL)
+			return 2;
+		if(positionType == EPTY){ /*empty or squirrel or wolf*/
 		return 1;
 		}
 	}
