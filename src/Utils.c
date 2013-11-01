@@ -4,6 +4,7 @@
 int main(int argc, char const *argv[]) {
 	/****************  DECLARATIONS  ********************/
 	FILE * inputFile;
+	FILE * outputFile;
 	int teste,ret;
 	double TOTALP,TOTALS, aux, contP, contS;
 	char type;
@@ -12,7 +13,7 @@ int main(int argc, char const *argv[]) {
 	contP=0.0;
 	contS=0.0;
 	inputFile = fopen(argv[1], "r");
-
+	outputfile = fopen("tempos.out", "a");
 	/*
 	 READ FILE
 	 */
@@ -34,9 +35,9 @@ int main(int argc, char const *argv[]) {
 
 	}
 	fclose (inputFile);
-
+	fprintf(outputfile, "%lf\n", TOTALS/TOTALP);
 	printf("PARALELO DEMOROU:       TOTAL ->  %f    MEDIA-> %f \n", TOTALP, TOTALP/contP);
 	printf("SERIE DEMOROU:       TOTAL ->  %f    MEDIA-> %f \n", TOTALS, TOTALS/contS);
-	printf("SPEEDUP: %f \n", (TOTALS/contS)/(TOTALP/contP));
+	printf("SPEEDUP: %f \n", TOTALS/TOTALP);
 	return 0;
 }
