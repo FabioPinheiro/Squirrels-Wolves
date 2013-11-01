@@ -95,8 +95,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 	  star = aux->starvation_period - finalAuxPos->starvation_period;
 	  breed = aux->breeding_period - finalAuxPos->breeding_period;
 	}
-	if(aux->type != WOLF || aux->starvation_period != 0){ /*still healthy we don't like weak wolfs*/
-		if(toAnimalType){
+	if(toAnimalType){
 			/*Começa Movimento*/
 
 			/*COLISIONS*/
@@ -206,13 +205,6 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 			cleanPos(world_from, x_from, y_from);
 			cleanPos(world_to, x_from, y_from);
 		}
-	}
-	else{
-		/*is dead :( Limpar nos 2 mundos
-*/
-		cleanPos(world_from, x_from, y_from);
-		cleanPos(world_to, x_from, y_from);
-	}
 }
 
 void calcCords(int pos, int* x, int* y) {
