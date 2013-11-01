@@ -15,7 +15,7 @@ utils:
 
 #Paralelo
 runP:
-	./parallel_proj inputs/input3000 2 2 12 200 POutput.out
+	./parallel_proj inputs/input40 2 2 12 10 POutput.out
 runSmalP:
 	./parallel_proj inputs/smalInput 10 12 10 1 PSmalOutput.out
 runUP:
@@ -23,7 +23,7 @@ runUP:
 	
 #Em serie		
 runS:
-	./serial_proj inputs/input3000 2 2 12 200 SOutput.out
+	./serial_proj inputs/input40 2 2 12 10 SOutput.out
 runSmal:
 	./serial_proj inputs/smalInput 10 12 10 1 SmalOutput.out
 runUtils:

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Change N to define the dimension of the matrix.
-n=5000
+n=40
 FILENAME="input$n"
 rm $FILENAME
 
