@@ -140,7 +140,7 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr) {
 }
 
 void processReds(sworld worldRead, sworld worldWrite) {
-	int i, l, index;
+	int l, index;
 	debug("processEvens... \n");
 
 	for (l = 0; l < worldsize * worldsize; l += 2 * worldsize) {
@@ -180,7 +180,7 @@ void processReds(sworld worldRead, sworld worldWrite) {
 }
 
 void processBlacks(sworld worldRead, sworld worldWrite) {
-	int i, l, index;
+	int l, index;
 	/*debug("processOds... \n");*/
 	for (l = 0; l < worldsize * worldsize; l += 2 * worldsize) {
 		for (index = 1 + l; index < l + worldsize; index += 2) {
