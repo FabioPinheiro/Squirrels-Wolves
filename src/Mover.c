@@ -63,7 +63,9 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 
 	/* check lobos */
 	if(type == WOLF ||type == WES ){
-		if(positionType == EPTY || positionType == SQRL){ /*empty or squirrel or wolf*/
+		if(positionType == SQRL)
+			return 2;
+		if(positionType == EPTY){ /*empty or squirrel or wolf*/
 		return 1;
 		}
 	}
@@ -234,9 +236,12 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		int numbPossible=0;
 		int theChoosenOne;
 		int vec[POSSIBLE_POS]={-1,-1,-1,-1};
+		int vecWolf[POSSIBLE_POS]={-1,-1,-1,-1};
 		int ret = 0;
+		int numbPossibleWolf=0;
 		/*Pos Left 0*/
 		/*x y-1*/
+
 		if(isAble(world, x,y-1, type)){
 			numbPossible++;
 			vec[0]=calcPos(x,y-1,worldsize);
@@ -261,6 +266,51 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 			numbPossible++;
 
 			vec[3]=calcPos((x-1),y,worldsize);
+		}
+
+		if(type== WOLF || type==WES){
+			if(isAble(world, x,y-1, type)){
+				if(isAble(world, x,y-1, type)==2){
+					numbPossibleWolf++;
+				}
+				numbPossible++;
+				vec[0]=calcPos(x,y-1,worldsize);
+				vecWolf[0]=calcPos(x,y-1,worldsize);
+			}
+			/*Pos Up 0*/
+			/*(x-1)*worldsize y*/
+			if(isAble(world, (x+1), y, type)){
+				if(isAble(world, (x+1), y, type)==2){
+					numbPossibleWolf++;
+
+				}
+				numbPossible++;
+				vec[1]=calcPos((x+1) ,y,worldsize);
+				vecWolf[1]=calcPos((x+1) ,y,worldsize);
+			}
+			/*Pos Rigth 0*/
+			/*x y+1*/
+
+			if(isAble(world, x,y+1, type)){
+				if(isAble(world, x,y+1, type)==2){
+					numbPossibleWolf++;
+				}
+				numbPossible++;
+				vec[2]=calcPos(x,y+1,worldsize);
+				vecWolf[2]=calcPos(x,y+1,worldsize);
+			}
+			/*Pos Down 0*/
+			/*(x+1)*worldsize y*/
+			if(isAble(world, (x-1),y, type)){
+				if(isAble(world, (x-1),y, type)==2){
+					numbPossibleWolf++;
+
+				}
+				numbPossible++;
+
+				vec[3]=calcPos((x-1),y,worldsize);
+				vecWolf[3]=calcPos((x-1),y,worldsize);
+			}
 		}
 
 		/* Matrix do rafael 
@@ -297,14 +347,43 @@ Down
 		theChoosenOne = nPos%numbPossible;
 		/*printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d calcPos(x,y,worldsize)MODnumbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible, calcPos(x,y,worldsize)%numbPossible);
 		printf("[%d , %d , %d , %d]\n\n",vec[0],vec[1],vec[2],vec[3]);*/
-		for(i=0; i < POSSIBLE_POS; i++){
-			if(vec[i] != -1){
-				if(theChoosenOne == 0){
-					ret=vec[i];
-					return ret;
+		if(type == WOLF || type==WES)
+			if(numbPossibleWolf>0){
+				for(i=0; i < POSSIBLE_POS; i++){
+				if(vecWolf[i] != -1){
+					if(theChoosenOne == 0){
+						ret=vecWolf[i];
+						return ret;
+					}
+					else{
+						theChoosenOne--;
+					}
 				}
-				else{
-					theChoosenOne--;
+				}
+			}
+			else{
+				for(i=0; i < POSSIBLE_POS; i++){
+				if(vec[i] != -1){
+					if(theChoosenOne == 0){
+						ret=vec[i];
+						return ret;
+					}
+					else{
+						theChoosenOne--;
+					}
+				}
+			}
+			}
+		else{
+			for(i=0; i < POSSIBLE_POS; i++){
+				if(vec[i] != -1){
+					if(theChoosenOne == 0){
+						ret=vec[i];
+						return ret;
+					}
+					else{
+						theChoosenOne--;
+					}
 				}
 			}
 		}
