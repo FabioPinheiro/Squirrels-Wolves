@@ -252,22 +252,20 @@ sworld processGen(sworld my_world1, sworld my_world2) {
 		my_world2 = my_worldAUX;
 		#pragma omp parallel for
 		for (j = 0; j < worldsize * worldsize; j++) {
-
 			if (isAnimal(my_world1[j].type)) {
 				my_world1[j].breeding_period--;
-				if (my_world1[j].type == WOLF){
+				if (my_world1[j].type == WOLF) {
 					my_world1[j].starvation_period--;
-					if(my_world1[j].starvation_period == 0){
+					if (my_world1[j].starvation_period == 0) {
 						my_world1[j].type = EPTY;
 						my_world1[j].breeding_period = 0;
 						my_world1[j].starvation_period = 0;
 					}
 				}
-			if (my_world1[j].type == WES){
-				my_world1[j].type = WOLF;
-				my_world1[j].starvation_period=wolfStarvP-1;
+				if (my_world1[j].type == WES) {
+					my_world1[j].type = WOLF;
+					my_world1[j].starvation_period = wolfStarvP - 1;
 				}
-
 			}
 		}
 		processReds(my_world1,my_world2);
