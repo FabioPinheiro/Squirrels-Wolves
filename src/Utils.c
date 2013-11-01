@@ -13,7 +13,7 @@ int main(int argc, char const *argv[]) {
 	contP=0.0;
 	contS=0.0;
 	inputFile = fopen(argv[1], "r");
-	outputfile = fopen("tempos.out", "a");
+	outputFile = fopen("tempos.db", "a");
 	/*
 	 READ FILE
 	 */
@@ -30,12 +30,9 @@ int main(int argc, char const *argv[]) {
 			TOTALS+=aux;
 			contS++;
 		}
-
-
-
 	}
 	fclose (inputFile);
-	fprintf(outputfile, "%lf\n", TOTALS/TOTALP);
+	fprintf(outputFile, "%lf\n", TOTALS/TOTALP);
 	printf("PARALELO DEMOROU:       TOTAL ->  %f    MEDIA-> %f \n", TOTALP, TOTALP/contP);
 	printf("SERIE DEMOROU:       TOTAL ->  %f    MEDIA-> %f \n", TOTALS, TOTALS/contS);
 	printf("SPEEDUP: %f \n", TOTALS/TOTALP);

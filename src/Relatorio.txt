@@ -1,0 +1,14 @@
+
+You also must submit a short report about the results (1-2 pages) that explains: 
+	
+	what decomposition was used;
+	how was load balancing done; 
+	what are the performance results, and are they what you expected
+
+A matriz foi dividida primeiro pela cor das casas, e depois por colunas, em que sao processadas por pares.
+Primeiro os pares impares, ou seja as colunas 0 e 1, 4 e 5, 8 e 9, e depois os restantes.
+Isto para nao haver conflitos entre as fronteiras dos pares de colunas. Por isso cada posição
+pode ser tratada individualemte sem restrições.
+
+Estavamos a espera de um speedup de pelo menos 2 com quatro threads.
+
