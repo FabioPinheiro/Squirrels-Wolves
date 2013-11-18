@@ -2,7 +2,7 @@
 make cleanA
 make all;
 make utils;
-n=4;
+n=1;
 
 OMP_NUM_THREADS=$n;
 echo $n;
