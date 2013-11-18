@@ -1,0 +1,9 @@
+universe = parallel
+executable = /usr/sbin/ompiwrapper.sh
+arguments = /mnt/nimbus/pool/CPD/groups/6/LAB-MPI/sendRcv 1000000000
+log = /mnt/nimbus/pool/CPD/groups/6/LAB-MPI/outputs/log
+output = /mnt/nimbus/pool/CPD/groups/6/LAB-MPI/outputs/out
+error = /mnt/nimbus/pool/CPD/groups/6/LAB-MPI/outputs/err
+machine_count = 15
+getenv = True
+queue
