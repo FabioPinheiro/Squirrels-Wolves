@@ -77,15 +77,35 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 	return 0;
 }
 
-void moveWOLFs(){
-
+void moveWOLFs(sworld world_from, sworld world_to, sworld animalAux, sworld animalAuxTo){
+	if(animalAuxTo->type == WOLF || WES){
+		//todo
+	}
+	else{
+		if(animalAuxTo->type == SQRL){
+			//todo
+		}
+		else{
+			printf("[BUG] the gosths apear :s");
+		}
+	}
 
 }
-void moveSQRLs(){
-
+void moveSQRLs(sworld world_from, sworld world_to, sworld animalAux, sworld animalAuxTo){
+	if(animalAuxTo->type == WOLF || WES){
+		//todo
+	}
+	else{
+		if(animalAuxTo->type == SQRL || animalAuxTo->type == SONT){
+			//todo
+		}
+		else{
+			printf("[BUG] the gosths apear :s");
+		}
+	}
 
 }
-void checkBabies(swrold world_from, swrold, world_to, sworld animalAux){
+void checkBabies(sworld world_from, sworld, world_to, sworld animalAux){
 	/*AnimalAux ja está na nova posiçao*/
 	/*se sim cria o bebe*/
 	if(animalAux->breeding_period == 0){
@@ -161,15 +181,23 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 	/*Ha animal na casa de destino*/
 		/* WOLFS vs WOLFS*/
 		/* WOLFS vs SQRLS*/
-	moveWOLFs();
+	fromAnimalType = fromAuxPos->type;
+	if(fromAnimalType == WOLF || fromAnimalType == WES){
+		moveWOLFs();
+		checkBabies();
+	}
 		/*SQRLs vs SQRLs*/
 		/*SQRLs vs WOLFS*/
-	moveSQRLs();
+	else{
+		if(fromAnimalType ==SQRL || fromAnimalType == SONT){
+			moveSQRLs();
+			checkBabies();
+		}
+		else{
+			printf("[BUG] We have am huge Error we have gosths in our MAP RUN RUN");
+		}
 
 	/*Trata do breeding period: Ve se há filhotes! se não limpa o tabuleiro pois o animal mexeu-se*/
-	checkBabies();
-
-
 
 }
 
