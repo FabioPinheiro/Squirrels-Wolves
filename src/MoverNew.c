@@ -96,17 +96,43 @@ void checkBabies(){
 }
 
 void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, int y_to){
-	/*TODO be careful with   SONT*/
+	/*TODO be careful with   SONT&WES*/
 	/*
 	If a squirrel/wolf completes a breeding period if he moves it breeds
 	Handle colissions
 	*/
-	int fromAnimalType, toAnimalType, starFrom, breedFrom, starTo, breedTo;
+	int fromAnimalType, toAnimalType,
+	starFrom, breedFrom,
+	starTo, breedTo;
 	sworld fromAuxPos = getPositionStructure(world_from, x_from, y_from);
 	sworld toAuxPos = getPositionStructure(world_from, x_to, y_to);
 	sworld toPos = getPositionStructure(world_to, x_to, y_to);
 
-	/*Não há animal na casa de destino*/
+	/* Ve qual é o tipo de animal para qual se está a mover,
+	 * ve primeiro no mapa  (possivelmente) actualizado e so depois no antigo*/
+	if(isAnimal(toPos->type)){
+		toAnimalType = toPos->type;
+		breedTo = toPos->breeding_period;
+		starTo = toPos->starvation_period;
+	}
+	else{
+		if(isAnimal(toAuxPos->type)){
+			toAnimalType = toAuxPos->type;
+			breedTo = toAuxPos->breeding_period;
+			starTo = toAuxPos->starvation_period;
+		}
+		else{
+			/*Não há animal na casa de destino*/
+			/*check type and then move*/
+
+
+			/*check if they have babies*/
+			checkBabies();
+			return;
+
+		}
+	}
+
 
 	/*Ha animal na casa de destino*/
 		/* WOLFS vs WOLFS*/
