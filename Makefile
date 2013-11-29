@@ -5,9 +5,13 @@ SERIAL_CFLAGS=-g -Wall -ansi -pedantic -fopenmp
 DISTRIBUTED_CFLAGS=-g -Wall -ansi -pedantic -fopenmp
 DISTRIBUTED&PARALLEL_CFLAGS=-g -Wall -ansi -pedantic -fopenmp
 
+make allTeste: testeP testeS distributed
 make all: parallel serial distributed
-teste:
+testeP:
 	gcc $(PARALLEL_CFLAGS) -o parallel_proj $(SRC)ProjParallel.c $(SRC)MoverNew.c
+testeS:
+	gcc $(PARALLEL_CFLAGS) -o serial_proj $(SRC)ProjSerial.c $(SRC)MoverNew.c
+	
 parallel:
 	gcc $(PARALLEL_CFLAGS) -o parallel_proj $(SRC)ProjParallel.c $(SRC)Mover.c
 serial:
@@ -22,7 +26,7 @@ utils:
 
 #Paralelo
 runP:
-	./parallel_proj inputs/input1000 2 2 6 100 POutput.out
+	./parallel_proj inputs/input1000 2 2 6 200 POutput.out
 runSmalP:
 	./parallel_proj inputs/smalInput 10 12 10 1 PSmalOutput.out
 runUP:
@@ -30,7 +34,7 @@ runUP:
 	
 #Em serie		
 runS:
-	./serial_proj inputs/input1000 2 2 6 100 SOutput.out
+	./serial_proj inputs/input1000 2 2 6 200 SOutput.out
 runSmal:
 	./serial_proj inputs/smalInput 10 12 10 1 SmalOutput.out
 

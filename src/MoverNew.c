@@ -74,6 +74,33 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 	return 0;
 }
 
+void cleanWorldPos(sworld world_from, sworld world_to, int x_from, int y_from){
+	cleanPos(world_from, x_from, y_from);
+	cleanPos(world_to, x_from, y_from);
+}
+
+void checkBabies(sworld world_from, sworld world_to, sworld animalAux, int x_from, int y_from) {
+	/*AnimalAux ja está na nova posiçao*/
+	/*se sim cria o bebe*/
+	if (animalAux->breeding_period == 0) {
+		sworld newAnimal = getPositionStructure(world_from, x_from, y_from);
+		/*ver se é SQRL WOLF e WES */
+		if (animalAux->type == WOLF || animalAux->type == WES) {
+			newAnimal->breeding_period = wolfBP;
+			newAnimal->starvation_period = wolfStarvP;
+			if (animalAux->type == WES) {
+				animalAux->breeding_period = wolfBP;
+				animalAux->starvation_period = wolfStarvP;
+			} else {
+				animalAux->breeding_period = wolfBP;
+			}
+		} else {
+			newAnimal->breeding_period = sqrlBP;
+			animalAux->breeding_period = sqrlBP;
+		}
+	}
+}
+
 void moveWOLFs(sworld world_from, sworld world_to, sworld animalAuxFrom,
 		sworld animalAuxTo, int x_from, int y_from, int x_to, int y_to) {
 	if (animalAuxTo->type == WOLF || WES) {
@@ -113,7 +140,7 @@ void moveWOLFs(sworld world_from, sworld world_to, sworld animalAuxFrom,
 			}
 		}
 
-	} else {
+	} else { /*WOLF VS SQRL*/
 		if (animalAuxTo->type == SQRL) {
 			if (animalAuxFrom->type == WES) {
 				setPosition(world_to, x_to, y_to, WES, animalAuxFrom->breeding_period,
@@ -122,11 +149,14 @@ void moveWOLFs(sworld world_from, sworld world_to, sworld animalAuxFrom,
 				setPosition(world_to, x_to, y_to, WES, animalAuxFrom->breeding_period,
 						animalAuxFrom->starvation_period);
 			}
-			cleanPos(world_from, x_to, y_to); /*Come o esquilo e limpa a posição*/
+			/*cleanPos(world_from, x_to, y_to);*/ /*Come o esquilo e limpa a posição*/
 		} else {
 			printf("[BUG] the gosths apear in moveWolf world to :s");
 		}
 	}
+	checkBabies(world_from,world_to,animalAuxFrom, x_from, y_from);
+	cleanWorldPos(world_from, world_to, x_from,y_from);
+
 }
 void moveSQRLs(sworld world_from, sworld world_to, sworld animalAuxFrom,
 		sworld animalAuxTo, int x_from, int y_from, int x_to, int y_to) {
@@ -139,17 +169,16 @@ void moveSQRLs(sworld world_from, sworld world_to, sworld animalAuxFrom,
 			setPosition(world_to, x_to, y_to, WES, animalAuxTo->breeding_period,
 					animalAuxTo->starvation_period);
 		}
-		/*cleanPos(world_from, x_to, y_to);*/ /*o esquilo é comido e limpa a posição*/
-		cleanPos(world_from, x_from, y_from);
+	/*	cleanPos(world_from, x_to, y_to); *//*o esquilo é comido e limpa a posição*/ /*?*/
 	} else {
 		if (animalAuxTo->type == SQRL || animalAuxTo->type == SONT) {
 			/*Breeding Maior*/
 			if(animalAuxFrom->breeding_period > animalAuxTo->breeding_period){
-				setPosition(world_to, x_to, y_to, animalAuxTo->type, animalAuxTo->breeding_period,animalAuxTo->starvation_period);
+				setPosition(world_to, x_to, y_to, animalAuxTo->type, animalAuxFrom->breeding_period,animalAuxFrom->starvation_period); /*to type pq pode ser SONT*/
 			}
 			else{
 				if(animalAuxFrom->breeding_period <= animalAuxTo->breeding_period){
-					setPosition(world_to, x_to, y_to, animalAuxTo->type, animalAuxFrom->breeding_period,animalAuxFrom->starvation_period);
+					setPosition(world_to, x_to, y_to, animalAuxTo->type, animalAuxTo->breeding_period,animalAuxTo->starvation_period); /*to type pq pode ser SONT*/
 				}
 				else{
 					printf("BUG stupid BUG");
@@ -160,33 +189,10 @@ void moveSQRLs(sworld world_from, sworld world_to, sworld animalAuxFrom,
 			printf("[BUG] the gosths apear in MoveSQRL ToMatrix :s");
 		}
 	}
+	checkBabies(world_from,world_to,animalAuxFrom, x_from, y_from);
+	cleanWorldPos(world_from, world_to, x_from,y_from);
 }
-void checkBabies(sworld world_from, sworld world_to, sworld animalAux, int x_from, int y_from) {
-	/*AnimalAux ja está na nova posiçao*/
-	/*se sim cria o bebe*/
-	if (animalAux->breeding_period == 0) {
-		sworld newAnimal = getPositionStructure(world_from, x_from, y_from);
-		/*ver se é SQRL WOLF e WES */
-		if (animalAux->type == WOLF || animalAux->type == WES) {
-			newAnimal->breeding_period = wolfBP;
-			newAnimal->starvation_period = wolfStarvP;
-			if (animalAux->type == WES) {
-				animalAux->breeding_period = wolfBP;
-				animalAux->starvation_period = wolfStarvP;
-			} else {
-				animalAux->breeding_period = wolfBP;
-			}
-		} else {
-			newAnimal->breeding_period = sqrlBP;
-			animalAux->breeding_period = sqrlBP;
-		}
-	} else {
-		/*limpa a posiçao do mapa*/
-		cleanPos(world_from, x_from, y_from);
-		cleanPos(world_to, x_from, y_from);
-	}
 
-}
 
 void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 		int y_to) {
@@ -221,6 +227,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 
 			/*check if they have babies*/
 			checkBabies(world_from, world_to, toAuxPos, x_from, y_from);
+			cleanWorldPos(world_from, world_to, x_from, y_from);
 			return;
 		}
 	}
@@ -230,21 +237,18 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 	fromAnimalType = fromAuxPos->type;
 	if (fromAnimalType == WOLF || fromAnimalType == WES) {
 		moveWOLFs(world_from, world_to,fromAuxPos, toAnimal, x_from, y_from, x_to, y_to);
-		checkBabies(world_from, world_to, toAuxPos, x_from, y_from);
+		/*checkBabies(world_from, world_to, toAuxPos, x_from, y_from);*/
 	}
 	/*SQRLs vs SQRLs*/
 	/*SQRLs vs WOLFS*/
 	else {
 		if (fromAnimalType == SQRL || fromAnimalType == SONT) {
 			moveSQRLs(world_from, world_to,fromAuxPos, toAnimal, x_from, y_from, x_to, y_to);
-			checkBabies(world_from, world_to, toAuxPos, x_from, y_from);
+			/*checkBabies(world_from, world_to, toAuxPos, x_from, y_from);*/
 		} else {
 			printf(
 					"[BUG] We have am huge Error we have gosths in our MAP RUN RUN");
 		}
-
-		/*Trata do breeding period: Ve se há filhotes! se não limpa o tabuleiro pois o animal mexeu-se*/
-
 	}
 }
 
