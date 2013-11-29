@@ -2,10 +2,7 @@
 make cleanA
 make all;
 make utils;
-n=1;
-
-OMP_NUM_THREADS=$n;
-echo $n;
+echo $OMP_NUM_THREADS;
 for((i=0;i<1;i++)); do make runP; done
 
 for((i=0;i<1;i++)); do make runS; done
@@ -17,3 +14,4 @@ if diff ParallelOut.out SerialOut.out > diff.out; then
 else
     echo "Fail See diff.out"
 fi
+echo $OMP_NUM_THREADS;
