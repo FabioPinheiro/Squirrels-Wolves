@@ -74,8 +74,8 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 	return 0;
 }
 
-void moveWOLFs(sworld world_from, sworld world_to, sworld animalAux,
-		sworld animalAuxTo) {
+void moveWOLFs(sworld world_from, sworld world_to, sworld animalAuxFrom,
+		sworld animalAuxTo, int x_from, int y_from, int x_to, int y_to) {
 	if (animalAuxTo->type == WOLF || WES) {
 		int type;
 		if(animalAuxTo->type == WES){
@@ -115,12 +115,12 @@ void moveWOLFs(sworld world_from, sworld world_to, sworld animalAux,
 
 	} else {
 		if (animalAuxTo->type == SQRL) {
-			if (animalAuxTo->type == WES) {
-				setPosition(world_to, x_to, y_to, WES, aux->breeding_period,
+			if (animalAuxFrom->type == WES) {
+				setPosition(world_to, x_to, y_to, WES, animalAuxFrom->breeding_period,
 						wolfStarvP);
 			} else {
-				setPosition(world_to, x_to, y_to, WES, aux->breeding_period,
-						aux->starvation_period);
+				setPosition(world_to, x_to, y_to, WES, animalAuxFrom->breeding_period,
+						animalAuxFrom->starvation_period);
 			}
 			cleanPos(world_from, x_to, y_to); /*Come o esquilo e limpa a posição*/
 		} else {
@@ -128,18 +128,18 @@ void moveWOLFs(sworld world_from, sworld world_to, sworld animalAux,
 		}
 	}
 }
-void moveSQRLs(sworld world_from, sworld world_to, sworld animalAux,
-		sworld animalAuxTo) {
+void moveSQRLs(sworld world_from, sworld world_to, sworld animalAuxFrom,
+		sworld animalAuxTo, int x_from, int y_from, int x_to, int y_to) {
 	if (animalAuxTo->type == WOLF || WES) { /*Animal to is in world_to*/
 		/* Le Suicide Squirrel*/
 		if (animalAuxTo->type == WES) {
-			setPosition(world_to, x_to, y_to, WES, aux->breeding_period,
+			setPosition(world_to, x_to, y_to, WES, animalAuxTo->breeding_period,
 					wolfStarvP);
 		} else {
-			setPosition(world_to, x_to, y_to, WES, aux->breeding_period,
-					aux->starvation_period);
+			setPosition(world_to, x_to, y_to, WES, animalAuxTo->breeding_period,
+					animalAuxTo->starvation_period);
 		}
-		//cleanPos(world_from, x_to, y_to); /*o esquilo é comido e limpa a posição*/
+		/*cleanPos(world_from, x_to, y_to);*/ /*o esquilo é comido e limpa a posição*/
 		cleanPos(world_from, x_from, y_from);
 	} else {
 		if (animalAuxTo->type == SQRL || animalAuxTo->type == SONT) {
@@ -161,13 +161,13 @@ void moveSQRLs(sworld world_from, sworld world_to, sworld animalAux,
 		}
 	}
 }
-void checkBabies(sworld world_from, sworld, world_to, sworld animalAux) {
+void checkBabies(sworld world_from, sworld world_to, sworld animalAux, int x_from, int y_from) {
 	/*AnimalAux ja está na nova posiçao*/
 	/*se sim cria o bebe*/
 	if (animalAux->breeding_period == 0) {
 		sworld newAnimal = getPositionStructure(world_from, x_from, y_from);
 		/*ver se é SQRL WOLF e WES */
-		if (animalAux->type == WOLF || aux->type == WES) {
+		if (animalAux->type == WOLF || animalAux->type == WES) {
 			newAnimal->breeding_period = wolfBP;
 			newAnimal->starvation_period = wolfStarvP;
 			if (animalAux->type == WES) {
@@ -195,57 +195,49 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 	 If a squirrel/wolf completes a breeding period if he moves it breeds
 	 Handle colissions
 	 */
-	int fromAnimalType, toAnimalType, starFrom, breedFrom, starTo, breedTo,
-			toMatrix;
+	int fromAnimalType;
 	sworld fromAuxPos = getPositionStructure(world_from, x_from, y_from);
 	sworld toAuxPos = getPositionStructure(world_from, x_to, y_to);
 	sworld toPos = getPositionStructure(world_to, x_to, y_to);
+	sworld toAnimal;
 
 	/* Ve qual é o tipo de animal para qual se está a mover,
 	 * ve primeiro no mapa  (possivelmente) actualizado e so depois no antigo*/
 	if (isAnimal(toPos->type)) {
-		toAnimalType = toPos->type;
-		breedTo = toPos->breeding_period;
-		starTo = toPos->starvation_period;
-		toMatrix = 1;
+		toAnimal = getPositionStructure(world_to, x_to, y_to);
 	} else {
 		if (isAnimal(toAuxPos->type)) {
-			toAnimalType = toAuxPos->type;
-			breedTo = toAuxPos->breeding_period;
-			starTo = toAuxPos->starvation_period;
-			toMatrix = 0;
+			toAnimal = getPositionStructure(world_from, x_to, y_to);
 		} else {
 			/*Não há animal na casa de destino*/
 			/*check type and then move*/
 			if (fromAuxPos->type == WES)
-				setPosition(world_to, x_to, y_to, WOLF, aux->breedingPeriod,
+				setPosition(world_to, x_to, y_to, WOLF, fromAuxPos->breeding_period,
 						wolfStarvP);
 			else {
-				setPosition(world_to, x_to, y_to, aux->type,
-						aux->breeding_period, aux->starvation_period);
+				setPosition(world_to, x_to, y_to, fromAuxPos->type,
+						fromAuxPos->breeding_period, fromAuxPos->starvation_period);
 			}
 
 			/*check if they have babies*/
-			checkBabies(world_from, world_to, fromAuxPos);
+			checkBabies(world_from, world_to, toAuxPos, x_from, y_from);
 			return;
-
 		}
 	}
-
 	/*Ha animal na casa de destino*/
 	/* WOLFS vs WOLFS*/
 	/* WOLFS vs SQRLS*/
 	fromAnimalType = fromAuxPos->type;
 	if (fromAnimalType == WOLF || fromAnimalType == WES) {
-		moveWOLFs();
-		checkBabies();
+		moveWOLFs(world_from, world_to,fromAuxPos, toAnimal, x_from, y_from, x_to, y_to);
+		checkBabies(world_from, world_to, toAuxPos, x_from, y_from);
 	}
 	/*SQRLs vs SQRLs*/
 	/*SQRLs vs WOLFS*/
 	else {
 		if (fromAnimalType == SQRL || fromAnimalType == SONT) {
-			moveSQRLs();
-			checkBabies();
+			moveSQRLs(world_from, world_to,fromAuxPos, toAnimal, x_from, y_from, x_to, y_to);
+			checkBabies(world_from, world_to, toAuxPos, x_from, y_from);
 		} else {
 			printf(
 					"[BUG] We have am huge Error we have gosths in our MAP RUN RUN");
@@ -254,6 +246,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 		/*Trata do breeding period: Ve se há filhotes! se não limpa o tabuleiro pois o animal mexeu-se*/
 
 	}
+}
 
 	void calcCords(int pos, int* x, int* y) {
 		int aux1 = 0, aux2 = 0;

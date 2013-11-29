@@ -6,7 +6,8 @@ DISTRIBUTED_CFLAGS=-g -Wall -ansi -pedantic -fopenmp
 DISTRIBUTED&PARALLEL_CFLAGS=-g -Wall -ansi -pedantic -fopenmp
 
 make all: parallel serial distributed
-
+teste:
+	gcc $(PARALLEL_CFLAGS) -o parallel_proj $(SRC)ProjParallel.c $(SRC)MoverNew.c
 parallel:
 	gcc $(PARALLEL_CFLAGS) -o parallel_proj $(SRC)ProjParallel.c $(SRC)Mover.c
 serial:
