@@ -131,12 +131,16 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, 
 					if(isAnimal(finalPos->type)){
 					  if(finalPos->type == WES)
 						  setPosition(world_to, x_to, y_to, WES, finalPos->breeding_period,wolfStarvP);
+					  else{
 					  setPosition(world_to, x_to, y_to, WES, finalPos->breeding_period,finalPos->starvation_period);
+					  }
 					}
 					else{
 					if(finalAuxPos->type == WES)
 						setPosition(world_to, x_to, y_to, WES, finalAuxPos->breeding_period,wolfStarvP);
-					setPosition(world_to, x_to, y_to, WES, finalAuxPos->breeding_period,finalAuxPos->starvation_period);
+					else{
+						setPosition(world_to, x_to, y_to, WES, finalAuxPos->breeding_period,finalAuxPos->starvation_period);
+					}
 					}
 					
 
