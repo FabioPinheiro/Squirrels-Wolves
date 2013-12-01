@@ -6,16 +6,22 @@ int main (int argc, char *argv[]) {
 	double elapsed_time;
 	MPI_Status status;
 	MPI_Comm cart_comm;
-	int id, p;
+	int id, p, rank; /*id geral, p numb PRocessors, rank checkerboard*/
 	MPI_Init (&argc, &argv);
 	MPI_Comm_rank (MPI_COMM_WORLD, &id);/*id dos Processos*/
 	MPI_Comm_size (MPI_COMM_WORLD, &p); /*numero de processos*/
 	int size[2], periods[2], coords[2];
 
+	/*TODO algoritmo
+	 * Ler num Linhas,
+	 * fazer divisao cartesiana
+	 *
+	 * */
+
 	/*Distribution dynamically*/
 	size[0]=size[1]=0;
 	/* CheckBoard decomposition creation
-	 * Use MPI_DIMS_CREATE(int nodes, int dims,int *size);  http://www.mpi-forum.org/docs/mpi-1.1/mpi-11-html/node134.html
+	 * Use MPI_DIMS_CREATE(int nodes, int ndims,int *dims);  http://www.mpi-forum.org/docs/mpi-1.1/mpi-11-html/node134.html
 	 *  MPI_CART_CREATE(MPI_Comm old_comm In - old communicator ,int dims In - grid dimensions,int *size In - # procs in each dim,
 	 *  int *periodic  In - 1 if dim i wraps around , int reorder In - 1 if process ranks can be reordered;0 otherwise ,
 	 *  MPI_Comm *cart_comm  Out - new communicator );
@@ -33,9 +39,14 @@ int main (int argc, char *argv[]) {
 	periods[0]=periods[1]=0; /*Não ha periodos*/
 
 	/*o 1 é dar premissoes para que reordene os processos para ser mais eficiente*/
-	MPI_Cart_create (MPI_COMM_WORLD, 2, size, periodic, 1, &cart_comm);
-	MPI_Cart_coords(cart_comm, id, 2, coords); /* Descobre as coordenadas do Processo*/
+	MPI_Cart_create (MPI_COMM_WORLD, 2, size, periods, 1, &cart_comm);
 
+
+	MPI_Comm_rank (cart_comm, &rank);/*get id after dividing*/
+	MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2, coords); /* Descobre as coordenadas do Processo*/
+	printf("Process ID: %d   Process coordinates %d, %d   Process Rank %d   \n", id, coords[0], coords[1], rank);
+	//fflush();
+	/*TODO Vale a pena fazer Split?*/
 
 	/*MPI Cart rank() given coordinates of a process in Cartesian communicator,
 	 *  returns process'rank*/
