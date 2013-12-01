@@ -15,7 +15,8 @@ int main (int argc, char *argv[]) {
 	/*TODO algoritmo
 	 * Ler num Linhas,
 	 * fazer divisao cartesiana
-	 *
+	 * Atribuir parte a processadores para trabalharem. (static load balancing) static num of tasks
+	 * TODO how to map?
 	 * */
 
 	/*Distribution dynamically*/
@@ -45,7 +46,7 @@ int main (int argc, char *argv[]) {
 	MPI_Comm_rank (cart_comm, &rank);/*get id after dividing*/
 	MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2, coords); /* Descobre as coordenadas do Processo*/
 	printf("Process ID: %d   Process coordinates %d, %d   Process Rank %d   \n", id, coords[0], coords[1], rank);
-	//fflush();
+	fflush(stdout);
 	/*TODO Vale a pena fazer Split?*/
 
 	/*MPI Cart rank() given coordinates of a process in Cartesian communicator,
