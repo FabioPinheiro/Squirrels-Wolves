@@ -1,20 +1,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
+#include "ProjSerial.h"
+#include "Mover.h"
+#include <string.h>
+
+int  wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
 
-
-
+void mapping(){
+/* */
+}
 
 int main (int argc, char *argv[]) {
-	double elapsed_time;
+
+	int teste, worldsize=0;
+	FILE * inputFile;
+	int teste, i;
+	int ret = 3, x, y;
+	char chr;
+	double elapsed_time, game_time;
 	MPI_Status status;
 	MPI_Comm cart_comm;
 	int id, p, rank; /*id geral, p numb PRocessors, rank checkerboard*/
 	MPI_Init (&argc, &argv);
 	MPI_Comm_rank (MPI_COMM_WORLD, &id);/*id dos Processos*/
 	MPI_Comm_size (MPI_COMM_WORLD, &p); /*numero de processos*/
-	int size[2], periods[2], coords[2];
+	int size[2], periods[2], coords[2], auxMap[p];
 
 	/*TODO algoritmo
 	 * Ler num Linhas,
@@ -60,6 +72,57 @@ int main (int argc, char *argv[]) {
 	/*MPI Cart coords()	given rank of a process in Cartesian communicator,
 	 * returns process'coordinates*/
 
+	/*
+	 * wolfBP = atoi(argv[2]);
+	 * sqrlBP = atoi(argv[3]);
+	 * wolfStarvP = atoi(argv[4]);
+	 * genNum = atoi(argv[5]);
+	 * inputFile = fopen(argv[1], "r");
+	 * */
+
+	/*			TIME		*/
+    MPI_Barrier (MPI_COMM_WORLD);
+    elapsed_time = - MPI_Wtime();
+    /*			TIME		*/
+
+
+	/*Read Arguments*/
+    if(argc != 6){
+	if (!id) printf ("Command line: %s <inputFile, wolfBP, sqrlBP, wolfStarvP,IterationsNum >\n", argv[0]);
+	MPI_Finalize();worldsize
+	exit (1);
+    }
+    wolfBP = atoi(argv[2]);
+    sqrlBP = atoi(argv[3]);
+    wolfStarvP = atoi(argv[4]);
+    genNum = atoi(argv[5]);
+
+
+
+    /*Master Read The file*/
+    if(id == 0){
+		inputFile = fopen(argv[1], "r");
+		teste = fscanf(inputFile, "%d", &worldsize);
+		if(teste != 1){
+			printf("Input error!\n");
+			exit(-1);
+		}
+    }
+
+	/*Mapping*/
+    if(id == 0){
+    	for(i=0;i<p;i++){
+    		/*Arranja coordenadas e disposiçao do Mundo*/
+    		/*auxMap[i] = MPI Cart rank();*/
+    	}
+    }
+	/*Read & distribute the Matrix*/
+
+    /*		GAME TIME		*/
+    game_time = - MPI_Wtime();
+    /*Run game*/
+    game_time += MPI_Wtime();
+    /*		GAME TIME		*/
 
 	/*Ending the Program*/
 	elapsed_time += MPI_Wtime(); /*Calcula o tempo*/
