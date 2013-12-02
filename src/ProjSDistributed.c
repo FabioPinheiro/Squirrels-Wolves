@@ -26,7 +26,7 @@ int main (int argc, char *argv[]) {
 	MPI_Init (&argc, &argv);
 	MPI_Comm_rank (MPI_COMM_WORLD, &id);/*id dos Processos*/
 	MPI_Comm_size (MPI_COMM_WORLD, &p); /*numero de processos*/
-	int size[DIM], periods[DIM], coords[DIM], auxMap[p][DIM], divideX, divideY;
+	int size[DIM], periods[DIM], coords[DIM], auxMap[DIM], divideX, divideY;
 
 	/*algoritmo
 	 * Ler num Linhas,
@@ -114,13 +114,40 @@ int main (int argc, char *argv[]) {
 
 	/*Mapping*/
     if(id == 0){
-    	for(i=0;i<p;i++){
-    		/*Arranja coordenadas e disposiçao do Mundo*/
-    		/*auxMap[i] = MPI Cart rank();*/
-    	}
+    	/*Arranja coordenadas da disposiçao do Mundo*/
+    	MPI_Cart_coords(cart_comm, p, DIM,auxMap);
+    	divideX = auxMap[0] + 1;/*TODO check This!*/
+    	divideY = auxMap[1] + 1;
+    	/*Check floor and ceiling*/
+    	/*0 vai de 0 até N/x e 0 até N/Y*/
+    	/*1 vao de N/x até 2N/X e N/Y até 2N/Y*/
+    	/*P vai de PN/X N e de PN/Y ate N*/
+
     }
 	/*Read & distribute the Matrix*/
+    if(id == 0){
+    	while(ret != 3){
+    		for(;;){
+    			/*guarda num buffer*/
+    			if(/*Testa limites da coisa*/){
+    				rank++;
+    				/*Envia o buffer*/
+    			}
+    		}
+    	}
+    }
+    else{
+    	/*Le com a tag certa e afins*/
 
+    }
+    /*So o 0 Le
+     * LE para o 0;
+     * Le e guarda num buffer para o 1;
+     * Ve quando passa a divisão;
+     * envia par ao 1;
+     * faz rank++
+     * Repeat
+     * */
     /*		GAME TIME		*/
     game_time = - MPI_Wtime();
     /*Run game*/
