@@ -4,7 +4,7 @@
 #include "ProjSerial.h"
 #include "Mover.h"
 #include <string.h>
-
+#define DIM 2
 int  wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
 
@@ -26,15 +26,18 @@ int main (int argc, char *argv[]) {
 	MPI_Init (&argc, &argv);
 	MPI_Comm_rank (MPI_COMM_WORLD, &id);/*id dos Processos*/
 	MPI_Comm_size (MPI_COMM_WORLD, &p); /*numero de processos*/
-	int size[2], periods[2], coords[2], auxMap[p];
+	int size[DIM], periods[DIM], coords[DIM], auxMap[p][DIM], divideX, divideY;
 
-	/*TODO algoritmo
+	/*algoritmo
 	 * Ler num Linhas,
 	 * fazer divisao cartesiana
 	 * Atribuir parte a processadores para trabalharem. (static load balancing) static num of tasks
-	 * TODO how to map?
-	 *
-	 *
+	 * TODO Map (deadline 23h59 2/12/13)
+	 * TODO Send (Send matrix dimensions, Send the Data) (deadline 23h59 2/12/13)
+	 * TODO create Row Wise (Use split?) (deadline 20h00 3/12/13)
+	 * TODO ghosts lines (test with 1/2/3/4 ?) (deadline 23h59 3/12/13)
+	 * TODO checkerboard (test then apply ghosts lines) (deadline 23h59 4/12/13)
+	 * TODO Add Parallel (apply to checkerboard+ghosts lines ) (deadline 23h59 5/12/13)
 	 * */
 
 	/*Distribution dynamically*/
