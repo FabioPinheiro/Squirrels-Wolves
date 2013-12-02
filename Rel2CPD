@@ -1,0 +1,14 @@
+TODO
+Qual foi a abordagem para parelizar a coisa (1 paragra + boneco/imagem)
+Resultados mais interessantes
+Explicar os testes(tipo maquina,onde (borg), tipo de matrix (cabe ou nao em memboria), etc)
+Dizer se é media/melhor/repetiçoes
+rotular graficos (escala, explicar o x e o y)
+fazer graficos na mesma hora.
+tirar tempo global, e tempo de jogo.
+
+
+Possb. Testes:
+Row/checkerboard
+Nº ghosts lines
+MPI + OMP

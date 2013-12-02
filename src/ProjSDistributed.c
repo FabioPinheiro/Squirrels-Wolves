@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <mpi.h>
 
+
+
+
+
 int main (int argc, char *argv[]) {
 	double elapsed_time;
 	MPI_Status status;
@@ -17,6 +21,8 @@ int main (int argc, char *argv[]) {
 	 * fazer divisao cartesiana
 	 * Atribuir parte a processadores para trabalharem. (static load balancing) static num of tasks
 	 * TODO how to map?
+	 *
+	 *
 	 * */
 
 	/*Distribution dynamically*/
@@ -28,7 +34,6 @@ int main (int argc, char *argv[]) {
 	 *  MPI_Comm *cart_comm  Out - new communicator );
 	 *  -> creates a comunicator  http://www.open-mpi.org/doc/v1.4/man3/MPI_Cart_create.3.php
 	 * */
-
 
 	/*p processors, 2 dimensions (2D), size=distribution of Processors 0 for dinamicaly*/
 	MPI_Dims_create(p,2, size);
