@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 	int id, p, rank; /*id geral, p numb PRocessors, rank checkerboard*/
 	int coords[DIM], auxMap[DIM], divideX, divideY;
 
-	int size[2] = { p, 0 };
+
 
 
 	/*Cria canais de comunicação*/
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);/*id dos Processos*/
 	MPI_Comm_size(MPI_COMM_WORLD, &p); /*numero de processos*/
-
+	int size[2] = { p, 0 };
 	/*			TIME		*/
 	MPI_Barrier(MPI_COMM_WORLD);
 	elapsed_time = -MPI_Wtime();
