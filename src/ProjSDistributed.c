@@ -76,13 +76,13 @@ int main(int argc, char *argv[]) {
 	/*p pr
 	 *
 	 * ocessors, 2 dimensions (2D), size=tamanho da matriz*/
-	printf("[BEFORE DIMS CREATE] Processors %d size0 %d size1 %d  \n", p, size[0], size[1]);
+	printf("[BEFORE DIMS CREATE] Processor %d size0 %d size1 %d  \n", id, size[0], size[1]);
 	fflush(stdout);
 		MPI_Dims_create(p, 2, size);
 
 
 		/*o 1 é dar premissoes para que reordene os processos para ser mais eficiente*/
-		printf("[AFTER]  Processors %d size0 %d size1 %d \n", p, size[0], size[1]);
+		printf("[AFTER]  Processor %d size0 %d size1 %d \n", id, size[0], size[1]);
 		fflush(stdout);
 		MPI_Cart_create(MPI_COMM_WORLD, 2, size, periods, 1, &cart_comm);
 
