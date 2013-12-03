@@ -76,25 +76,25 @@ int main(int argc, char *argv[]) {
 	/*p pr
 	 *
 	 * ocessors, 2 dimensions (2D), size=tamanho da matriz*/
-	printf("Processors %d size0 %d size1 %d  \n", p, size[0], size[1]);
+	printf("[BEFORE DIMS CREATE] Processors %d size0 %d size1 %d  \n", p, size[0], size[1]);
 	fflush(stdout);
 		MPI_Dims_create(p, 2, size);
 
 
 		/*o 1 é dar premissoes para que reordene os processos para ser mais eficiente*/
-		printf("Processors %d size0 %d size1 %d", p, size[0], size[1]);
+		printf("[AFTER]  Processors %d size0 %d size1 %d \n", p, size[0], size[1]);
 		fflush(stdout);
 		MPI_Cart_create(MPI_COMM_WORLD, 2, size, periods, 1, &cart_comm);
 
-		/*    Testing   */
-			MPI_Comm_rank(cart_comm, &rank);/*get id after dividing*/
-			MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2,
-					coords); /* Descobre as coordenadas do Processo*/
-
-
-			printf("Process ID: %d   Process coordinates %d, %d   Process Rank %d   \n",
-					id, coords[0], coords[1], rank);
-			fflush(stdout);
+//		/*    Testing   */
+//			MPI_Comm_rank(cart_comm, &rank);/*get id after dividing*/
+//			MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2,
+//					coords); /* Descobre as coordenadas do Processo*/
+//
+//
+//			printf("Process ID: %d   Process coordinates %d, %d   Process Rank %d   \n",
+//					id, coords[0], coords[1], rank);
+//			fflush(stdout);
 
 			/*    Testing   */
 
