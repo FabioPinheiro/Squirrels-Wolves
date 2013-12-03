@@ -18,11 +18,14 @@ int main(int argc, char *argv[]) {
 	MPI_Status status;
 	MPI_Comm cart_comm;
 	int id, p, rank; /*id geral, p numb PRocessors, rank checkerboard*/
-	int size[DIM], periods[DIM], coords[DIM], auxMap[DIM], divideX, divideY;
-	size[0]=size[1]=0;
-	int size2[DIM];
-	size2[0]=3;
-	size2[1]=2;
+	int coords[DIM], auxMap[DIM], divideX, divideY;
+
+	int size[2] = { p, 0 };
+
+
+	/*Cria canais de comunicação*/
+	/*Nota [Periodos] as Col e as Row podem ser periodicas, ou seja aceder ao -1 significa o mesmo que aceder a 1 (no array) AKA wrapped*/
+	int periods[2] = { 0, 0 };
 	/* Definitions:
 	 * wolfBP = atoi(argv[2]);
 	 * sqrlBP = atoi(argv[3]);
@@ -73,18 +76,15 @@ int main(int argc, char *argv[]) {
 	/*p pr
 	 *
 	 * ocessors, 2 dimensions (2D), size=tamanho da matriz*/
-	printf("Processors %d size20 %d size21 %d\n", p, size2[0], size2[1]);
+	printf("Processors %d size0 %d size1 %d  \n", p, size[0], size[1]);
 	fflush(stdout);
-//		MPI_Dims_create(p, 2, size2);
+		MPI_Dims_create(p, 2, size);
 
-		/*Cria canais de comunicação*/
-		/*Nota [Periodos] as Col e as Row podem ser periodicas, ou seja aceder ao -1 significa o mesmo que aceder a 1 (no array) AKA wrapped*/
-		periods[0] = periods[1] = 0; /*Não ha periodos*/
 
 		/*o 1 é dar premissoes para que reordene os processos para ser mais eficiente*/
-		printf("Processors %d size20 %d size21 %d", p, size2[0], size2[1]);
+		printf("Processors %d size0 %d size1 %d", p, size[0], size[1]);
 		fflush(stdout);
-		MPI_Cart_create(MPI_COMM_WORLD, 2, size2, periods, 1, &cart_comm);
+		MPI_Cart_create(MPI_COMM_WORLD, 2, size, periods, 1, &cart_comm);
 
 		/*    Testing   */
 			MPI_Comm_rank(cart_comm, &rank);/*get id after dividing*/
