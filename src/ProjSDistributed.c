@@ -61,18 +61,18 @@ int main(int argc, char *argv[]) {
 	genNum = atoi(argv[5]);
 
 	/*Master Read The file*/
-	if (id == 0) {
-		inputFile = fopen(argv[1], "r");
-		teste = fscanf(inputFile, "%d", &worldsize);
-		if (teste != 1) {
-			MPI_Finalize();
-			printf("Input error!\n");
-			exit(-1);
-		}
-		/*Define o tamanho da matrix para dividir*/
-		printf("worldsize %d \n", worldsize);
-		//size[0] = size[1] = worldsize;
-	}
+//	if (id == 0) {
+//		inputFile = fopen(argv[1], "r");
+//		teste = fscanf(inputFile, "%d", &worldsize);
+//		if (teste != 1) {
+//			MPI_Finalize();
+//			printf("Input error!\n");
+//			exit(-1);
+//		}
+//		/*Define o tamanho da matrix para dividir*/
+//		printf("worldsize %d \n", worldsize);
+//		//size[0] = size[1] = worldsize;
+//	}
 	/*p pr
 	 *
 	 * ocessors, 2 dimensions (2D), size=tamanho da matriz*/
@@ -86,15 +86,15 @@ int main(int argc, char *argv[]) {
 		fflush(stdout);
 		MPI_Cart_create(MPI_COMM_WORLD, 2, size, periods, 1, &cart_comm);
 
-//		/*    Testing   */
-//			MPI_Comm_rank(cart_comm, &rank);/*get id after dividing*/
-//			MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2,
-//					coords); /* Descobre as coordenadas do Processo*/
-//
-//
-//			printf("Process ID: %d   Process coordinates %d, %d   Process Rank %d   \n",
-//					id, coords[0], coords[1], rank);
-//			fflush(stdout);
+		/*    Testing   */
+			MPI_Comm_rank(cart_comm, &rank);/*get id after dividing*/
+			MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2,
+					coords); /* Descobre as coordenadas do Processo*/
+
+
+			printf("Process ID: %d   Process coordinates %d, %d   Process Rank %d   \n",
+					id, coords[0], coords[1], rank);
+			fflush(stdout);
 
 			/*    Testing   */
 
