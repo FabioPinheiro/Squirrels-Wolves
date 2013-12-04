@@ -114,17 +114,12 @@ int main(int argc, char *argv[]) {
 	}
 	/*TODO change this*/
 	MPI_Bcast(&worldsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
-//	MPI_Barrier(MPI_COMM_WORLD);
 
-//	int size[2] = { (int) sqrt( (double) p), (int) sqrt( (double) p) };
 	int size[2] = { p, 1};
 	printf("[BEFORE DIMS CREATE]\n");
-	//printf("[BEFORE DIMS CREATE] Processor %d size0:  %d size1:  %d  \n", id,	size[0], size[1]);
 	fflush(stdout);
 
 	//MPI_Dims_create(p, 2, size);
-
-	//MPI_Barrier(MPI_COMM_WORLD);
 	/*o 1 é dar premissoes para que reordene os processos para ser mais eficiente*/
 	printf("[AFTER]  Processor %d size0 %d size1 %d \n", id, size[0], size[1]);
 	fflush(stdout);
@@ -193,7 +188,6 @@ int main(int argc, char *argv[]) {
 			}
 
 		}
-
 		if(auxBreak){
 			for(i=1; i < p; i++){
 				/*TODO Escreve no Buffer de i*/
