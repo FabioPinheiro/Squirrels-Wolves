@@ -130,22 +130,20 @@ int main(int argc, char *argv[]) {
 		}
 		/*ID 0 envia tamanho para alocar */
 	}
-//TODO stuff
-
-
 
 	if(id != 0){
 		/*Recebe de 0 o seu tamanho.*/
+		MPI_Recv(&Personalworld, sizeToAlloc, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
 	}
 	if(id == 0){
-		while(){
+		while(1){
 			ret = fscanf(inputFile, "%d %d %c \n", &x, &y, &chr);
 			if (ret != 3)
 				break;
 			/*printf("x: %d  y: %d chr: %c\n", x, y, chr);*/
-			setType(my_world1, x, y, chr);
+			/*setType(my_world1, x, y, chr);*/
 
-			//send the size to alocate
+			/*send the size to alocate*/
 
 		}
 	}
