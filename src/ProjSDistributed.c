@@ -208,13 +208,32 @@ int main(int argc, char *argv[]) {
 
 	}
 
+
+
 	/*		GAME TIME		*/
+	MPI_Barrier(MPI_COMM_WORLD);
 	game_time = -MPI_Wtime();
 	/*Run game*/
+
+	//my_world1 = processGen(my_world1, my_world2);
+	/*TODO for each IT exchange Lines*/
+
+
+	MPI_Barrier(MPI_COMM_WORLD);
 	game_time += MPI_Wtime();
 	/*		GAME TIME		*/
 
+	/*		END GAME		*/
+
+	/* Print Matrix while receiving from Processes */
+
+
+
+	/*		END GAME		*/
+
+
 	/*Ending the Program*/
+	MPI_Barrier(MPI_COMM_WORLD);
 	elapsed_time += MPI_Wtime(); /*Calcula o tempo*/
 	MPI_Finalize();
 	return 0;
