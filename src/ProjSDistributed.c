@@ -49,7 +49,8 @@ int main(int argc, char *argv[]) {
 	/*Nota [Periodos] as Col e as Row podem ser periodicas, ou seja aceder ao -1 significa o mesmo que aceder a 1 (no array) AKA wrapped*/
 	int periods[2] = { 0, 0 };
 	int sizeToAlloc, computedSize;
-	sworld myWorld = (sworld) calloc(worldsize * worldsize, sizeof(struct world));
+	sworld personalWorld1;
+	sworld personalWorld2;
     int i, j, myrank;
     MPI_Status status;
     MPI_Datatype worldType;
@@ -129,6 +130,7 @@ int main(int argc, char *argv[]) {
 	fflush(stdout);
 	MPI_Cart_create(MPI_COMM_WORLD, 2, size, periods, 1, &cart_comm);
 //	MPI_Barrier(MPI_COMM_WORLD);
+
 	/*    Testing   */
 	MPI_Comm_rank(cart_comm, &rank);/*get id after dividing*/
 	MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2, coords); /* Descobre as coordenadas do Processo*/
@@ -170,8 +172,8 @@ int main(int argc, char *argv[]) {
 
 	if(id != 0){
 		/*Recebe de 0 o seu tamanho.*/
-		MPI_Recv(&Personalworld, sizeToAlloc, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
-		sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO*/
+		MPI_Recv(&Personalworld, sizeToAlloc*worldsize, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
+		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO*/
 	}
 
 
@@ -182,12 +184,22 @@ int main(int argc, char *argv[]) {
 			ret = fscanf(inputFile, "%d %d %c \n", &x, &y, &chr);
 			if (ret != 3)
 				break;
+
+
+			//for(i=0;i<cenas; i++){}
+			/*Guarda no buffer vector a enviar
+			 * chega ao limite, envia vector
+			 *
+			 * */
+			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
 			/*printf("x: %d  y: %d chr: %c\n", x, y, chr);*/
 			/*setType(my_world1, x, y, chr);*/
 
 			/*send the size to alocate*/
 
 		}
+
+		//while()
 	}
 
 	/*		GAME TIME		*/
