@@ -188,6 +188,7 @@ int main(int argc, char *argv[]) {
 		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion based on Parallel function*/
 	}
 
+	/*XXX Tem que estar depois dos mallocs*/
     disp[0] = &personalWorld1[0].x - &personalWorld1[0];
     disp[1] = &personalWorld1[0].y - &personalWorld1[0];
     disp[2] = &personalWorld1[0].type - &personalWorld1[0];
