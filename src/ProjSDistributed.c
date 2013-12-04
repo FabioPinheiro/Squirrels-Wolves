@@ -33,6 +33,29 @@ void computedSize(int numP, int worldSize, int pId, int *result){
 		*result += 1;
 	}
 }
+void setType(sworld my_world, int x_cord, int y_cord, char chr){
+	int type;
+	if(x_cord > worldsize - 1 || y_cord > worldsize - 1 || x_cord < 0
+			|| y_cord < 0){
+		printf("Invalid Input!\n");
+		exit(2);
+	}
+	type = addSpecial(chr);
+	my_world[calcPos(x_cord, y_cord, worldsize)].type = type;
+	switch(type){
+	case WOLF:
+		my_world[calcPos(x_cord, y_cord, worldsize)].breeding_period = wolfBP;
+		my_world[calcPos(x_cord, y_cord, worldsize)].starvation_period =
+				wolfStarvP;
+		break;
+	case SQRL:
+		my_world[calcPos(x_cord, y_cord, worldsize)].breeding_period = sqrlBP;
+		break;
+	default:
+		break;
+	}
+
+}
 
 int main(int argc, char *argv[]) {
 
@@ -60,11 +83,6 @@ int main(int argc, char *argv[]) {
     int blocklen[5] = { 1, 1, 1, 1, 1 };
     MPI_Aint disp[5];
 
-    disp[0] = &myWorld[0].x - &myWorld[0];
-    disp[1] = &myWorld[0].y - &myWorld[0];
-    disp[2] = &myWorld[0].type - &myWorld[0];
-    disp[4] = &myWorld[0].breeding_period - &myWorld[0];
-    disp[5] = &myWorld[0].starvation_period - &myWorld[0];
 
 	/* Definitions:
 	 * wolfBP = atoi(argv[2]);
@@ -77,8 +95,7 @@ int main(int argc, char *argv[]) {
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);/*id dos Processos*/
 	MPI_Comm_size(MPI_COMM_WORLD, &p); /*numero de processos*/
-    MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
-    MPI_Type_commit(&worldType);
+
 	/*			TIME		*/
 	MPI_Barrier(MPI_COMM_WORLD);
 	elapsed_time = -MPI_Wtime();
@@ -171,7 +188,13 @@ int main(int argc, char *argv[]) {
 		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion based on Parallel function*/
 	}
 
-
+    disp[0] = &personalWorld1[0].x - &personalWorld1[0];
+    disp[1] = &personalWorld1[0].y - &personalWorld1[0];
+    disp[2] = &personalWorld1[0].type - &personalWorld1[0];
+    disp[4] = &personalWorld1[0].breeding_period - &personalWorld1[0];
+    disp[5] = &personalWorld1[0].starvation_period - &personalWorld1[0];
+    MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
+    MPI_Type_commit(&worldType);
 
 
 	if(id == 0){
@@ -179,13 +202,16 @@ int main(int argc, char *argv[]) {
 		int xAux=0, yAux, charAux, auxBreak=1;
 		computedSize(p,worldsize, 0, &computedSize);
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+		/*XXX Read Input 0 */setType(personalWorld1, xAux, yAux, charAux);
 		while(xAux<computedSize){
-			/*TODO Escreve no Buffer de 0*/
+
+
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 			if (ret != 3){
 				auxBreak=0; /*Assim nao entra no for pois ja nao ha mais nada para ler*/
 				break;
 			}
+			/*XXX Read Input 0 */setType(personalWorld1, xAux, yAux, charAux);
 
 		}
 		if(auxBreak){
@@ -204,8 +230,6 @@ int main(int argc, char *argv[]) {
 				MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD);/*TODO CORRECT Envia para o ultimo gajo a receber aka envia para o "i"*/
 			}
 		}
-
-
 	}
 
 
