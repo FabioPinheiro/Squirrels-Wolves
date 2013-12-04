@@ -184,30 +184,29 @@ int main(int argc, char *argv[]) {
 		int xAux=0, yAux, charAux, auxBreak=1;
 		computedSize(p,worldsize, 0, &computedSize);
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
-		i=0; /*A ser usado no For em baixo, defenido aqui devido aos breaks*/
 		while(xAux<computedSize){
-			/*Escreve no Buffer de 0*/
+			/*TODO Escreve no Buffer de 0*/
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 			if (ret != 3){
-				auxBreak=0; /*Assim nao entra no for pois ja nao ha mais nada para ler*/
+				auxBreak=0; /*TODO Assim nao entra no for pois ja nao ha mais nada para ler*/
 				break;
 			}
 
 		}
+
 		if(auxBreak){
 			for(i=1; i < p; i++){
-				/**/
-				/*Escreve no Buffer de i*/
+				/*TODO Escreve no Buffer de i*/
 				computedSize(p,worldsize, 0, &computedSize);
 				while(xAux<computedSize){
-							/*Escreve no Buffer de i*/
+							/*TODO Escreve no Buffer de i*/
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
 						auxBreak=1; /*Assim sai do for pois ja nao ha mais nada para ler*/
 						break;
 					}
 				}
-				/*Envia para o ultimo gajo a receber aka envia para o "i"*/
+				/*TODO Envia para o ultimo gajo a receber aka envia para o "i"*/
 			}
 		}
 
