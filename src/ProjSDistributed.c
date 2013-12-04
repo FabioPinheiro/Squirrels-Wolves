@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);/*id dos Processos*/
 	MPI_Comm_size(MPI_COMM_WORLD, &p); /*numero de processos*/
-	int size[2] = { p, 0 };
+
 	/*			TIME		*/
 	MPI_Barrier(MPI_COMM_WORLD);
 	elapsed_time = -MPI_Wtime();
@@ -75,9 +75,10 @@ int main(int argc, char *argv[]) {
 		//size[0] = size[1] = worldsize;
 	}
 	MPI_Bcast( &worldsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	/*p pr
-	 *
-	 * ocessors, 2 dimensions (2D), size=tamanho da matriz*/
+
+	int size[2] = { worldsize, worldsize };
+
+
 	printf("[BEFORE DIMS CREATE] Processor %d size0 %d size1 %d  \n", id, size[0], size[1]);
 	fflush(stdout);
 		MPI_Dims_create(p, 2, size);
