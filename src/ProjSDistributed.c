@@ -1,12 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
+#include <math.h>
 #include "ProjSerial.h"
 #include "Mover.h"
 #include <string.h>
 #define DIM 2
-int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
+#define BLOCK_LOW(id,p,n) ((id)*(n)/(p))
+#define BLOCK_HIGH(id,p,n) (BLOCK_LOW((id)+1,p,n)-1)
+#define BLOCK_SIZE(id,p,n) (BLOCK_HIGH(id,p,n)-BLOCK_LOW(id,p,n)+1)
+#define BLOCK_OWNER(index,p,n) (((p)*((index)+1)-1)/(n))
+
+int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
 int main(int argc, char *argv[]) {
 
@@ -19,13 +25,10 @@ int main(int argc, char *argv[]) {
 	MPI_Comm cart_comm;
 	int id, p, rank; /*id geral, p numb PRocessors, rank checkerboard*/
 	int coords[DIM], auxMap[DIM], divideX, divideY;
-
-
-
-
 	/*Cria canais de comunicação*/
 	/*Nota [Periodos] as Col e as Row podem ser periodicas, ou seja aceder ao -1 significa o mesmo que aceder a 1 (no array) AKA wrapped*/
 	int periods[2] = { 0, 0 };
+	int sizeToAlloc, computedSize;
 	/* Definitions:
 	 * wolfBP = atoi(argv[2]);
 	 * sqrlBP = atoi(argv[3]);
@@ -33,8 +36,6 @@ int main(int argc, char *argv[]) {
 	 * genNum = atoi(argv[5]);
 	 * inputFile = fopen(argv[1], "r");
 	 * */
-
-
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);/*id dos Processos*/
@@ -74,32 +75,36 @@ int main(int argc, char *argv[]) {
 
 		//size[0] = size[1] = worldsize;
 	}
-	MPI_Bcast( &worldsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	/*TODO change this*/
+	MPI_Bcast(&worldsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
+//	MPI_Barrier(MPI_COMM_WORLD);
 
-	int size[2] = { worldsize, worldsize };
-
-
-	printf("[BEFORE DIMS CREATE] Processor %d size0 %d size1 %d  \n", id, size[0], size[1]);
+//	int size[2] = { (int) sqrt( (double) p), (int) sqrt( (double) p) };
+	int size[2] = { p, 1};
+	printf("[BEFORE DIMS CREATE]\n");
+	//printf("[BEFORE DIMS CREATE] Processor %d size0:  %d size1:  %d  \n", id,	size[0], size[1]);
 	fflush(stdout);
-		MPI_Dims_create(p, 2, size);
+
+	//MPI_Dims_create(p, 2, size);
+
+	//MPI_Barrier(MPI_COMM_WORLD);
+	/*o 1 é dar premissoes para que reordene os processos para ser mais eficiente*/
+	printf("[AFTER]  Processor %d size0 %d size1 %d \n", id, size[0], size[1]);
+	fflush(stdout);
+	MPI_Cart_create(MPI_COMM_WORLD, 2, size, periods, 1, &cart_comm);
+//	MPI_Barrier(MPI_COMM_WORLD);
+	/*    Testing   */
+	MPI_Comm_rank(cart_comm, &rank);/*get id after dividing*/
+	MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2, coords); /* Descobre as coordenadas do Processo*/
+
+	printf(
+			"[LAST] Process ID: %d   Process coordinates %d, %d   Process Rank %d WORLDSIZE %d  \n",
+			id, coords[0], coords[1], rank, worldsize);
+	fflush(stdout);
+	/*    Testing   */
 
 
-		/*o 1 é dar premissoes para que reordene os processos para ser mais eficiente*/
-		printf("[AFTER]  Processor %d size0 %d size1 %d \n", id, size[0], size[1]);
-		fflush(stdout);
-		MPI_Cart_create(MPI_COMM_WORLD, 2, size, periods, 1, &cart_comm);
 
-		/*    Testing   */
-			MPI_Comm_rank(cart_comm, &rank);/*get id after dividing*/
-			MPI_Cart_coords(cart_comm, rank/*we should not use the ID here*/, 2,
-					coords); /* Descobre as coordenadas do Processo*/
-
-
-			printf("[LAST] Process ID: %d   Process coordinates %d, %d   Process Rank %d WORLDSIZE %d  \n",
-					id, coords[0], coords[1], rank, worldsize);
-			fflush(stdout);
-
-			/*    Testing   */
 
 
 	/*algoritmo
@@ -112,36 +117,38 @@ int main(int argc, char *argv[]) {
 	 * TODO checkerboard (test then apply ghosts lines) (deadline 23h59 4/12/13)
 	 * TODO Add Parallel (apply to checkerboard+ghosts lines ) (deadline 23h59 5/12/13)
 	 * */
+	if(id != 0){
+		/*receive tam*/
+		MPI_Recv(&sizeToAlloc, 1, MPI_INT, 0, TAG, MPI COMM WORLD, &status); /*Buff, numPos, type, From, TAG, comm*/
+
+	}
+	else{
+		for(i=0;i<p;i++){
+			/*ComputeSize*/
+			computedSize = BLOCK_SIZE(i, p, worldsize); /*TODO do*/
+			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
+		}
+		/*ID 0 envia tamanho para alocar */
+	}
+//TODO stuff
 
 
 
+	if(id != 0){
+		/*Recebe de 0 o seu tamanho.*/
+	}
+	if(id == 0){
+		while(){
+			ret = fscanf(inputFile, "%d %d %c \n", &x, &y, &chr);
+			if (ret != 3)
+				break;
+			/*printf("x: %d  y: %d chr: %c\n", x, y, chr);*/
+			setType(my_world1, x, y, chr);
 
-//	/*Mapping*/
-//	if (id == 0) {
-//		/*Arranja coordenadas da disposiçao do Mundo*/
-//		MPI_Cart_coords(cart_comm, p, DIM, auxMap);
-//		divideX = auxMap[0] + 1; /*TODO check This!*/
-//		divideY = auxMap[1] + 1;
-//		/*Check floor and ceiling*/
-//		/*0 vai de 0 até N/x e 0 até N/Y*/
-//		/*1 vao de N/x até 2N/X e N/Y até 2N/Y*/
-//		/*P vai de PN/X N e de PN/Y ate N*/
-//
-//		/*Read & distribute the Matrix*/
-//		while (ret != 3) {
-//			for (;;) { /*TODO*/
-//				/*guarda num buffer*/
-//				if (/*Testa limites da coisa*/) {
-//					rank++;
-//					/*Envia o buffer*/
-//				}
-//			}
-//		}
-//	} else {
-//		/*Le com a tag certa e afins*/
-//
-//	}
+			//send the size to alocate
 
+		}
+	}
 
 	/*		GAME TIME		*/
 	game_time = -MPI_Wtime();
