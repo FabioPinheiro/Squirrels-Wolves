@@ -180,26 +180,6 @@ int main(int argc, char *argv[]) {
 
 
 	if(id == 0){
-		while(1){
-			ret = fscanf(inputFile, "%d %d %c \n", &x, &y, &chr);
-			if (ret != 3)
-				break;
-
-
-			//for(i=0;i<cenas; i++){}
-			/*Guarda no buffer vector a enviar
-			 * chega ao limite, envia vector
-			 *
-			 * */
-			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
-			/*printf("x: %d  y: %d chr: %c\n", x, y, chr);*/
-			/*setType(my_world1, x, y, chr);*/
-
-			/*send the size to alocate*/
-
-		}
-
-
 		/*READ*/
 		int xAux=0, yAux, charAux;
 		computedSize(p,worldsize, 0, &computedSize);
@@ -227,9 +207,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		for()
 
-		//while()
 	}
 
 	/*		GAME TIME		*/
