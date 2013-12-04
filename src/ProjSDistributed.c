@@ -127,7 +127,8 @@ int main(int argc, char *argv[]) {
 	if(id != 0){
 		/*receive tam*/
 		MPI_Recv(&sizeToAlloc, 1, MPI_INT, 0, TAG, MPI COMM WORLD, &status); /*Buff, numPos, type, From, TAG, comm*/
-
+		personalWorld1 = calloc(worldsize * sizeToAlloc, sizeof(struct world));/*TODO*/
+		personalWorld2 = calloc(worldsize * sizeToAlloc, sizeof(struct world));/*TODO*/
 	}
 	else{
 		for(i=0;i<p;i++){
@@ -141,6 +142,7 @@ int main(int argc, char *argv[]) {
 	if(id != 0){
 		/*Recebe de 0 o seu tamanho.*/
 		MPI_Recv(&Personalworld, sizeToAlloc, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
+		sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO*/
 	}
 	if(id == 0){
 		while(1){
