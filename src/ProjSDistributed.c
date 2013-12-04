@@ -71,8 +71,10 @@ int main(int argc, char *argv[]) {
 		}
 		/*Define o tamanho da matrix para dividir*/
 		printf("worldsize %d \n", worldsize);
+
 		//size[0] = size[1] = worldsize;
 	}
+	MPI_Bcast( &worldsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	/*p pr
 	 *
 	 * ocessors, 2 dimensions (2D), size=tamanho da matriz*/
@@ -92,8 +94,8 @@ int main(int argc, char *argv[]) {
 					coords); /* Descobre as coordenadas do Processo*/
 
 
-			printf("Process ID: %d   Process coordinates %d, %d   Process Rank %d   \n",
-					id, coords[0], coords[1], rank);
+			printf("[LAST] Process ID: %d   Process coordinates %d, %d   Process Rank %d WORLDSIZE %d  \n",
+					id, coords[0], coords[1], rank, worldsize);
 			fflush(stdout);
 
 			/*    Testing   */
