@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
 	else{
 		for(i=0;i<p;i++){
 			/*ComputeSize*/
-			computedSize = BLOCK_SIZE(i, p, worldsize); /*TODO do*/
+			computedSize(p,worldsize, i, &computedSize);
 			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
 		}
 		/*ID 0 envia tamanho para alocar */
