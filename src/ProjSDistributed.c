@@ -174,11 +174,14 @@ int main(int argc, char *argv[]) {
 		personalWorld2 = calloc(worldsize * sizeToAlloc, sizeof(struct world));
 	}
 	else{
-		for(i=0;i<p;i++){
+		/*XXX Deve Começar em 1, ele nao manda para si mesmo 0 */
+		for(i=1;i<p;i++){
 			/*ComputeSize*/
 			computedSize(p,worldsize, i, &computedSize);
 			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
 		}
+		/*XXX make space 0 */personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
+		/*XXX make space 0 */personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
 		/*ID 0 envia tamanho para alocar */
 	}
 
