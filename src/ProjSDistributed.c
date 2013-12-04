@@ -27,7 +27,7 @@ struct world {
 typedef struct world *sworld;
 
 
-void computedSize(int numP, int worldSize, int pId, int *result){
+void computeSize(int numP, int worldSize, int pId, int *result){
 	*result = (int) worldSize/numP;
 	if(worldSize%numP - pId > 0){
 		*result += 1;
@@ -174,15 +174,19 @@ int main(int argc, char *argv[]) {
 		personalWorld2 = calloc(worldsize * sizeToAlloc, sizeof(struct world));
 	}
 	else{
+		/*
+		 * ID 0 envia tamanho para alocar
+		 * */
+
 		/*XXX Deve Começar em 1, ele nao manda para si mesmo 0 */
 		for(i=1;i<p;i++){
 			/*ComputeSize*/
-			computedSize(p,worldsize, i, &computedSize);
+			computeSize(p,worldsize, i, &computedSize);
 			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
 		}
 		/*XXX make space 0 */personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
 		/*XXX make space 0 */personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
-		/*ID 0 envia tamanho para alocar */
+
 	}
 
 	if(id != 0){
@@ -204,24 +208,24 @@ int main(int argc, char *argv[]) {
 	if(id == 0){
 		/*READ*/
 		int xAux=0, yAux, charAux, auxBreak=1;
-		computedSize(p,worldsize, 0, &computedSize);
+		computeSize(p,worldsize, 0, &computedSize);
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
-		/*XXX Read Input 0 */setType(personalWorld1, xAux, yAux, charAux);
+		/*XXX Read Input 0 */
+		setType(personalWorld1, xAux, yAux, charAux);
 		while(xAux<computedSize){
-
 
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 			if (ret != 3){
 				auxBreak=0; /*Assim nao entra no for pois ja nao ha mais nada para ler*/
 				break;
 			}
-			/*XXX Read Input 0 */setType(personalWorld1, xAux, yAux, charAux);
-
+			/*XXX Read Input 0 */
+			setType(personalWorld1, xAux, yAux, charAux);
 		}
 		if(auxBreak){
 			for(i=1; i < p; i++){
 				/*TODO Escreve no Buffer de i*/
-				computedSize(p,worldsize, 0, &computedSize);
+				computeSize(p,worldsize, i, &computedSize);
 				while(xAux<computedSize){
 					/*TODO Escreve no Buffer de i*/
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
@@ -230,8 +234,7 @@ int main(int argc, char *argv[]) {
 						break;
 					}
 				}
-
-				MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD);/*TODO CORRECT Envia para o ultimo gajo a receber aka envia para o "i"*/
+				MPI_Send(&computedSize, 1, worldType, i, TAG, MPI COMM WORLD);/*TODO CORRECT Envia para o ultimo gajo a receber aka envia para o "i"*/
 			}
 		}
 	}
