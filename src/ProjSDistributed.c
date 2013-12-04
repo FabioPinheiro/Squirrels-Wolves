@@ -199,6 +199,36 @@ int main(int argc, char *argv[]) {
 
 		}
 
+
+		/*READ*/
+		int xAux=0, yAux, charAux;
+		computedSize(p,worldsize, 0, &computedSize);
+		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+		i=1; /*A ser usado no For em baixo, defenido aqui devido aos breaks*/
+		while(xAux<computedSize){
+			/*Escreve no Buffer de 0*/
+			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+			if (ret != 3){
+				i=p; /*Assim nao entra no for pois ja nao ha mais nada para ler*/
+				break;
+			}
+
+		}
+
+		for(; i < p; i++){
+			/*Escreve no Buffer de 0*/
+			while(xAux<computedSize){
+						/*Escreve no Buffer de 0*/
+				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+				if (ret != 3){
+					i=p; /*Assim sai do for pois ja nao ha mais nada para ler*/
+					break;
+				}
+			}
+		}
+
+		for()
+
 		//while()
 	}
 
