@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
 	if(id != 0){
 		/*Recebe de 0 o seu tamanho.*/
 		MPI_Recv(&Personalworld, sizeToAlloc*worldsize, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
-		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion*/
+		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion based on Parallel function*/
 	}
 
 
