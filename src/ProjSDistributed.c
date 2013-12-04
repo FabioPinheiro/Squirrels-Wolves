@@ -12,7 +12,20 @@
 #define BLOCK_SIZE(id,p,n) (BLOCK_HIGH(id,p,n)-BLOCK_LOW(id,p,n)+1)
 #define BLOCK_OWNER(index,p,n) (((p)*((index)+1)-1)/(n))
 
+
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
+
+struct world {
+	int x;
+	int y;
+	int type; /* Wolf, Squirrel, etc. */
+ 	int breeding_period;
+ 	int starvation_period;
+ };
+
+
+typedef struct world *sworld;
+
 
 void computedSize(int numP, int worldSize, int pId, int *result){
 	*result = (int) worldSize/numP;
@@ -36,6 +49,21 @@ int main(int argc, char *argv[]) {
 	/*Nota [Periodos] as Col e as Row podem ser periodicas, ou seja aceder ao -1 significa o mesmo que aceder a 1 (no array) AKA wrapped*/
 	int periods[2] = { 0, 0 };
 	int sizeToAlloc, computedSize;
+	sworld myWorld = (sworld) calloc(worldsize * worldsize, sizeof(struct world));
+    int i, j, myrank;
+    MPI_Status status;
+    MPI_Datatype worldType;
+
+    MPI_Datatype type[5] = { MPI_INT, MPI_INT, MPI_INT, MPI_INT, MPI_INT};
+    int blocklen[5] = { 1, 1, 1, 1, 1 };
+    MPI_Aint disp[5];
+
+    disp[0] = &myWorld[0].x - &myWorld[0];
+    disp[1] = &myWorld[0].y - &myWorld[0];
+    disp[2] = &myWorld[0].type - &myWorld[0];
+    disp[4] = &myWorld[0].breeding_period - &myWorld[0];
+    disp[5] = &myWorld[0].starvation_period - &myWorld[0];
+
 	/* Definitions:
 	 * wolfBP = atoi(argv[2]);
 	 * sqrlBP = atoi(argv[3]);
@@ -47,7 +75,8 @@ int main(int argc, char *argv[]) {
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);/*id dos Processos*/
 	MPI_Comm_size(MPI_COMM_WORLD, &p); /*numero de processos*/
-
+    MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
+    MPI_Type_commit(&worldType);
 	/*			TIME		*/
 	MPI_Barrier(MPI_COMM_WORLD);
 	elapsed_time = -MPI_Wtime();
@@ -121,7 +150,7 @@ int main(int argc, char *argv[]) {
 	 * TODO Send (Send matrix dimensions, Send the Data) (deadline 23h59 2/12/13)
 	 * TODO create Row Wise (Use split?) (deadline 20h00 3/12/13)
 	 * TODO ghosts lines (test with 1/2/3/4 ?) (deadline 23h59 3/12/13)
-	 * TODO checkerboard (test then apply ghosts lines) (deadline 23h59 4/12/13)
+	 * TODO checkerboard (test then apply ghostsAchas que funciona lines) (deadline 23h59 4/12/13)
 	 * TODO Add Parallel (apply to checkerboard+ghosts lines ) (deadline 23h59 5/12/13)
 	 * */
 	if(id != 0){
@@ -144,6 +173,10 @@ int main(int argc, char *argv[]) {
 		MPI_Recv(&Personalworld, sizeToAlloc, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
 		sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO*/
 	}
+
+
+
+
 	if(id == 0){
 		while(1){
 			ret = fscanf(inputFile, "%d %d %c \n", &x, &y, &chr);
