@@ -144,17 +144,16 @@ int main(int argc, char *argv[]) {
 	 * Ler num Linhas,
 	 * fazer divisao cartesiana
 	 * Atribuir parte a processadores para trabalharem. (static load balancing) static num of tasks
-	 * TODO Send (Send matrix dimensions, Send the Data) (deadline 23h59 2/12/13)
-	 * TODO create Row Wise (Use split?) (deadline 20h00 3/12/13)
-	 * TODO ghosts lines (test with 1/2/3/4 ?) (deadline 23h59 3/12/13)
-	 * TODO checkerboard (test then apply ghostsAchas que funciona lines) (deadline 23h59 4/12/13)
+	 * TODO programa Working ROW WISE (deadline 23h59 4/12/13)
+	 * TODO ghosts lines (test with 1/2/3/4 ?) (deadline 13h00 5/12/13)
+	 * TODO checkerboard (test then apply ghostsAchas que funciona lines) (deadline 23h59 5/12/13)
 	 * TODO Add Parallel (apply to checkerboard+ghosts lines ) (deadline 23h59 5/12/13)
 	 * */
 	if(id != 0){
 		/*receive tam*/
 		MPI_Recv(&sizeToAlloc, 1, MPI_INT, 0, TAG, MPI COMM WORLD, &status); /*Buff, numPos, type, From, TAG, comm*/
-		personalWorld1 = calloc(worldsize * sizeToAlloc, sizeof(struct world));/*TODO*/
-		personalWorld2 = calloc(worldsize * sizeToAlloc, sizeof(struct world));/*TODO*/
+		personalWorld1 = calloc(worldsize * sizeToAlloc, sizeof(struct world));
+		personalWorld2 = calloc(worldsize * sizeToAlloc, sizeof(struct world));
 	}
 	else{
 		for(i=0;i<p;i++){
@@ -168,7 +167,7 @@ int main(int argc, char *argv[]) {
 	if(id != 0){
 		/*Recebe de 0 o seu tamanho.*/
 		MPI_Recv(&Personalworld, sizeToAlloc*worldsize, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
-		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO*/
+		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion*/
 	}
 
 
@@ -183,7 +182,7 @@ int main(int argc, char *argv[]) {
 			/*TODO Escreve no Buffer de 0*/
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 			if (ret != 3){
-				auxBreak=0; /*TODO Assim nao entra no for pois ja nao ha mais nada para ler*/
+				auxBreak=0; /*Assim nao entra no for pois ja nao ha mais nada para ler*/
 				break;
 			}
 
@@ -193,14 +192,15 @@ int main(int argc, char *argv[]) {
 				/*TODO Escreve no Buffer de i*/
 				computedSize(p,worldsize, 0, &computedSize);
 				while(xAux<computedSize){
-							/*TODO Escreve no Buffer de i*/
+					/*TODO Escreve no Buffer de i*/
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
 						auxBreak=1; /*Assim sai do for pois ja nao ha mais nada para ler*/
 						break;
 					}
 				}
-				/*TODO Envia para o ultimo gajo a receber aka envia para o "i"*/
+
+				MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD);/*TODO CORRECT Envia para o ultimo gajo a receber aka envia para o "i"*/
 			}
 		}
 
