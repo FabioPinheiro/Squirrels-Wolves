@@ -14,6 +14,13 @@
 
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
+void computedSize(int numP, int worldSize, int pId, int *result){
+	*result = (int) worldSize/numP;
+	if(worldSize%numP - pId > 0){
+		*result += 1;
+	}
+}
+
 int main(int argc, char *argv[]) {
 
 	int teste, worldsize = 0, i;
