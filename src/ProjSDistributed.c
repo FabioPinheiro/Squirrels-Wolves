@@ -53,6 +53,82 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 }
 
+
+
+void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
+	int l, index;
+	#pragma omp parallel for private(index)
+	for(l = 0; l < worldsize*worldsize; l += 2 * worldsize){
+		for(index = l; index < l + worldsize; index += 2){
+			if(isAnimal(worldRead[index].type)){
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+			}
+		}
+	  
+		if(l + 2 * worldsize <= worldsize*worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+			for(index = 1 + l + worldsize; index < l + 2 * worldsize; index += 2){
+				if(isAnimal(worldRead[index].type)){
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+				}
+			}
+		}
+	}
+}
+
+void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
+	int l, index;
+	#pragma omp parallel for private(index)
+	for(l = 0; l < worldsize*worldsize; l += 2 * worldsize){
+		for(index = 1 + l; index < l + worldsize; index += 2){
+			if(isAnimal(worldRead[index].type)){
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+			}
+		}
+
+		if(l + 2 * worldsize <= worldsize * worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+			for(index = l + worldsize; index < l + 2 * worldsize; index += 2){
+				if(isAnimal(worldRead[index].type)){
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+				}
+			}
+		}
+	}
+}
+
+sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
+	
+	/*TODO troca as linhas! :D*/
+	int i, j;
+	sworld my_worldAUX;
+	for(i = 0; i < genNum; i++){
+		my_worldAUX = my_world1;
+		my_world1 = my_world2;
+		my_world2 = my_worldAUX;
+		#pragma omp parallel for
+		for(j = 0; j < worldsize * worldsize; j++){
+			if(isAnimal(my_world1[j].type)){
+				my_world1[j].breeding_period--;
+				if(my_world1[j].type == WOLF){
+					my_world1[j].starvation_period--;
+					if(my_world1[j].starvation_period == 0){
+						my_world1[j].type = EPTY;
+						my_world1[j].breeding_period = 0;
+						my_world1[j].starvation_period = 0;
+					}
+				}
+				if(my_world1[j].type == WES){
+					my_world1[j].type = WOLF;
+					my_world1[j].starvation_period = wolfStarvP - 1;
+				}
+			}
+		}
+		processReds(my_world1, my_world2);
+		processBlacks(my_world1, my_world2);
+	}
+	return my_world2;
+}
+
+
 int main(int argc, char *argv[]) {
 
 	int teste, worldsize = 0, i;
@@ -186,16 +262,6 @@ int main(int argc, char *argv[]) {
 		 * ID 0 envia tamanho para alocar
 		 * */
 
-		/*XXX Deve Começar em 1, ele nao manda para si mesmo 0 */
-		for(i=1;i<p;i++){
-			/*ComputeSize*/
-			computeSize(p,worldsize, i, &computedSize);
-			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
-		}
-		personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
-		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
-
-	}
 
 	if(id != 0){
 		/*Recebe de 0 o seu tamanho.*/
@@ -214,6 +280,10 @@ int main(int argc, char *argv[]) {
 		/*LE para ele (0) e guarda*/
 		int xAux=0, yAux, charAux;
 		computeSize(p,worldsize, 0, &computedSize);
+
+		personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
+		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
+
 		acumulatedSize += computedSize;
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
@@ -259,7 +329,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	else{
-		/*TODO Check*/
+		/*XXX Checked*/
 		MPI_Status status;
 		int auxN;
 		 // Wait for a message from rank 0 with tag 0
@@ -268,6 +338,7 @@ int main(int argc, char *argv[]) {
 		MPI_Get_count(&status, worldType, &auxN);
 		// Allocate memory
 		personalWorld1 = malloc(auxN*sizeof(struct world));
+		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
 		// Receive the message. ignore the status
 		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 	}
@@ -277,10 +348,9 @@ int main(int argc, char *argv[]) {
 	MPI_Barrier(MPI_COMM_WORLD);
 	game_time = -MPI_Wtime();
 	/*Run game*/
-
-	//my_world1 = processGen(my_world1, my_world2);
+	
 	/*TODO for each IT exchange Lines*/
-
+	personalWorld1 = processGen(personalWorld1, personalWorld2);
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	game_time += MPI_Wtime();
