@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
 	/*			TIME		*/
 
 
-	/*TODO-REVER*/
+	/* XXX - COMPILA e nao tem Conflitos do GIT!! */
 	MPI_Aint str_add, x_add, y_add, type_add, bp_add, sp_add;
 
 	MPI_Get_address(&aux, &str_add);
