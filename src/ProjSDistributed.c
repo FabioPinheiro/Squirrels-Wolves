@@ -221,6 +221,7 @@ int main(int argc, char *argv[]) {
 			setType(personalWorld1, xAux, yAux, charAux);
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 			if (ret != 3){
+				/*Chegou ao fim do ficheiro*/
 				auxBreak=0;
 				break;
 			}
@@ -237,7 +238,9 @@ int main(int argc, char *argv[]) {
 
 				while(xAux< acumulatedSize){
 					setType(bufferSend, xAux-acumulatedSize+computedSize, yAux, charAux);/*TODO conferir hack*/
+					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
+						/*Chegou ao fim do ficheiro*/
 						auxBreak=0;
 						break;
 					}
@@ -255,7 +258,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-
 	else{
 		/*TODO Check*/
 		MPI_Status status;
@@ -268,7 +270,6 @@ int main(int argc, char *argv[]) {
 		personalWorld1 = malloc(auxN*sizeof(struct world));
 		// Receive the message. ignore the status
 		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
 	}
 
 
