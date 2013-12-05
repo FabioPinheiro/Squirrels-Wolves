@@ -7,11 +7,6 @@
 #include <string.h>
 #define DIM 2
 
-#define BLOCK_LOW(id,p,n) ((id)*(n)/(p))
-#define BLOCK_HIGH(id,p,n) (BLOCK_LOW((id)+1,p,n)-1)
-#define BLOCK_SIZE(id,p,n) (BLOCK_HIGH(id,p,n)-BLOCK_LOW(id,p,n)+1)
-#define BLOCK_OWNER(index,p,n) (((p)*((index)+1)-1)/(n))
-
 
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
@@ -71,7 +66,7 @@ int main(int argc, char *argv[]) {
 	/*Cria canais de comunicação*/
 	/*Nota [Periodos] as Col e as Row podem ser periodicas, ou seja aceder ao -1 significa o mesmo que aceder a 1 (no array) AKA wrapped*/
 	int periods[2] = { 0, 0 };
-	int sizeToAlloc, computedSize;
+	int sizeToAlloc;
 	sworld personalWorld1;
 	sworld personalWorld2;
 	int personalWorldSize;
@@ -82,6 +77,8 @@ int main(int argc, char *argv[]) {
     MPI_Datatype type[5] = { MPI_INT, MPI_INT, MPI_INT, MPI_INT, MPI_INT};
     int blocklen[5] = { 1, 1, 1, 1, 1 };
     MPI_Aint disp[5];
+
+    struct world aux;
 
 
 	/* Definitions:
@@ -100,6 +97,16 @@ int main(int argc, char *argv[]) {
 	MPI_Barrier(MPI_COMM_WORLD);
 	elapsed_time = -MPI_Wtime();
 	/*			TIME		*/
+
+
+	/*TODO-REVER*/
+    disp[0] = &aux.x - &aux;
+    disp[1] = &aux.y - &aux;
+    disp[2] = &aux.type - &aux;
+    disp[4] = &aux.breeding_period - &aux;
+    disp[5] = &aux.starvation_period - &aux;
+    MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
+    MPI_Type_commit(&worldType);
 
 	/*Read Arguments*/
 	if (argc != 6) {
@@ -130,7 +137,7 @@ int main(int argc, char *argv[]) {
 
 		//size[0] = size[1] = worldsize;
 	}
-	/*TODO change this*/
+	/*TODO Rever se compensa fazer isto*/
 	MPI_Bcast(&worldsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
 	int size[2] = { p, 1};
@@ -184,8 +191,8 @@ int main(int argc, char *argv[]) {
 			computeSize(p,worldsize, i, &computedSize);
 			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
 		}
-		/*XXX make space 0 */personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
-		/*XXX make space 0 */personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
+		personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
+		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
 
 	}
 
@@ -195,14 +202,7 @@ int main(int argc, char *argv[]) {
 		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion based on Parallel function*/
 	}
 
-	/*XXX Tem que estar depois dos mallocs CORRIGIR */
-    disp[0] = &personalWorld1[0].x - &personalWorld1[0];
-    disp[1] = &personalWorld1[0].y - &personalWorld1[0];
-    disp[2] = &personalWorld1[0].type - &personalWorld1[0];
-    disp[4] = &personalWorld1[0].breeding_period - &personalWorld1[0];
-    disp[5] = &personalWorld1[0].starvation_period - &personalWorld1[0];
-    MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
-    MPI_Type_commit(&worldType);
+
 
 /*
 	if(id == 0){
@@ -240,19 +240,61 @@ int main(int argc, char *argv[]) {
 	}*/
 
 	/*TODO New read/send optimized and better one*/
-	MPI_Request *req;
-	req = (MPI_Request *) malloc(p, sizeof(MPI_Request));
+
 
 	if(id == 0){
+		MPI_Request *req;
+		req = (MPI_Request *) malloc(p, sizeof(MPI_Request));
+		sworld bufferSend;
+		int computedSize, auxBreak, acumulatedSize=0;
 
-		/*TODO correct this*/
+		/*LE para ele (0) e guarda*/
+		int xAux=0, yAux, charAux;
+		computeSize(p,worldsize, 0, &computedSize);
+		acumulatedSize += computedSize;
+		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+
+		while(xAux< computedSize){
+			setType(personalWorld1, xAux, yAux, charAux);
+			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+			if (ret != 3){
+				auxBreak=0;
+				break;
+			}
+		}
+		//TODO tratar de quando nao começa em 0 nem em 1(apesar de ser bue weird em termos de load balancing...)
 		for(i=1; i<p; i++){
-			MPI_Isend(/*Array*/ ,/*tamanho*/ , worldType ,i , TAG ,MPI_COMM_WORLD ,&req[i]);
-		    //TODO CHECK this -> Do not forget to complete the request!
-			MPI_Wait(&req[i], MPI_STATUS_IGNORE);
+			/*Calc size&createBuffer*/
+			computeSize(p,worldsize, i, &computedSize);
+			acumulatedSize += computedSize;
+			int sizeToSend = computedSize*worldsize;
+			bufferSend = calloc(sizeToSend*sizeof(struct world));
+			if(auxBreak){
+				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+
+				while(xAux< acumulatedSize){
+					setType(bufferSend, xAux-acumulatedSize+computedSize, yAux, charAux);/*TODO conferir hack*/
+					if (ret != 3){
+						auxBreak=0;
+						break;
+					}
+				}
+				/*envia a Linha*/
+				MPI_Isend(/*Array*/ , /*tamanho*/ , worldType ,i , TAG ,MPI_COMM_WORLD ,&req[i]);
+				//TODO CHECK this -> Do not forget to complete the request!
+				MPI_Wait(&req[i], MPI_STATUS_IGNORE);
+			}
+			else{
+				/*envia a Linha(s)*/
+				MPI_Isend(/*Array*/ , /*tamanho*/ , worldType ,i , TAG ,MPI_COMM_WORLD ,&req[i]);
+				//TODO CHECK this -> Do not forget to complete the request!
+				MPI_Wait(&req[i], MPI_STATUS_IGNORE);
+			}
 		}
 	}
+
 	else{
+		/*TODO Check and Correct TAGS!!!*/
 		MPI_Status status;
 		int auxN;
 		 // Wait for a message from rank 0 with tag 0
@@ -260,9 +302,9 @@ int main(int argc, char *argv[]) {
 		// Find out the number of elements in the message -> size goes to "n"
 		MPI_Get_count(&status, worldType, &auxN);
 		// Allocate memory
-		arr1 = malloc(auxN*sizeof(double));
+		personalWorld1 = malloc(auxN*sizeof(struct world));
 		// Receive the message. ignore the status
-		MPI_Recv(arr1, n, worldType, 0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 	}
 
