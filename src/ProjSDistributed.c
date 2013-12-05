@@ -3,7 +3,7 @@
 #include <mpi.h>
 #include <math.h>
 #include "ProjSerial.h"
-/*#include "Mover.h"*/
+#include "Mover.h"
 #include <string.h>
 #define DIM 2
 #define TAG_STARTUP 9780
@@ -114,8 +114,8 @@ sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
 				}
 			}
 		}
-		processReds(my_world1, my_world2);
-		processBlacks(my_world1, my_world2);
+		processReds(my_world1, my_world2, xSize, ySize);
+		processBlacks(my_world1, my_world2, xSize, ySize);
 	}
 	return my_world2;
 }
@@ -353,7 +353,8 @@ int main(int argc, char *argv[]) {
 
 
 	/*Ending the Program*/
-	MPI_Barrier(Mlapsed_time += MPI_Wtime(); /*Calcula o tempo*/
+	MPI_Barrier(MPI_COMM_WORLD);
+	elapsed_time += MPI_Wtime(); /*Calcula o tempo*/
 	MPI_Finalize();
 	return 0;
 }
