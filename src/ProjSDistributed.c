@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include <math.h>
-/*#include "ProjSerial.h"*/
-#include "Mover.h"
+#include "ProjSerial.h"
+/*#include "Mover.h"*/
 #include <string.h>
 #define DIM 2
 #define TAG_STARTUP 9780
@@ -11,16 +11,6 @@
 
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
-struct world {
-	int x;
-	int y;
-	int type; /* Wolf, Squirrel, etc. */
- 	int breeding_period;
- 	int starvation_period;
- };
-
-
-typedef struct world *sworld;
 
 
 void computeSize(int numP, int worldSize, int pId, int *result){
