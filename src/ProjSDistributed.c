@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
 		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion based on Parallel function*/
 	}
 
-	/*XXX Tem que estar depois dos mallocs*/
+	/*XXX Tem que estar depois dos mallocs CORRIGIR */
     disp[0] = &personalWorld1[0].x - &personalWorld1[0];
     disp[1] = &personalWorld1[0].y - &personalWorld1[0];
     disp[2] = &personalWorld1[0].type - &personalWorld1[0];
@@ -204,45 +204,50 @@ int main(int argc, char *argv[]) {
     MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
     MPI_Type_commit(&worldType);
 
-
+/*
 	if(id == 0){
-		/*READ*/
+		/*READ
 		int xAux=0, yAux, charAux, auxBreak=1;
 		computeSize(p,worldsize, 0, &computedSize);
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
-		/*XXX Read Input 0 */
+		/*XXX Read Input 0
 		setType(personalWorld1, xAux, yAux, charAux);
 		while(xAux<computedSize){
 
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 			if (ret != 3){
-				auxBreak=0; /*Assim nao entra no for pois ja nao ha mais nada para ler*/
+				auxBreak=0; /*Assim nao entra no for pois ja nao ha mais nada para ler
 				break;
 			}
-			/*XXX Read Input 0 */
+			/*XXX Read Input 0
 			setType(personalWorld1, xAux, yAux, charAux);
 		}
 		if(auxBreak){
 			for(i=1; i < p; i++){
-				/*TODO Escreve no Buffer de i*/
+				/*TODO Escreve no Buffer de i
 				computeSize(p,worldsize, i, &computedSize);
 				while(xAux<computedSize){
-					/*TODO Escreve no Buffer de i*/
+					/*TODO Escreve no Buffer de i
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
-						auxBreak=1; /*Assim sai do for pois ja nao ha mais nada para ler*/
+						auxBreak=1; /*Assim sai do for pois ja nao ha mais nada para ler
 						break;
 					}
 				}
-				MPI_Send(&computedSize, 1, worldType, i, TAG, MPI COMM WORLD);/*TODO CORRECT Envia para o ultimo gajo a receber aka envia para o "i"*/
+				MPI_Send(&computedSize, 1, worldType, i, TAG, MPI COMM WORLD);/*TODO CORRECT Envia para o ultimo gajo a receber aka envia para o "i"
 			}
 		}
-	}
+	}*/
+
+	/*TODO New read/send optimized and better one*/
 	MPI_Request *req;
 	req = (MPI_Request *) malloc(p, sizeof(MPI_Request));
+
 	if(id == 0){
+
+		/*TODO correct this*/
 		for(i=1; i<p; i++){
-			MPI_Isend(/*Array*/ ,/*tamanho*/ ,MPI_ ,i , TAG ,MPI_COMM_WORLD ,&req[i]);
+			MPI_Isend(/*Array*/ ,/*tamanho*/ , worldType ,i , TAG ,MPI_COMM_WORLD ,&req[i]);
 		    //TODO CHECK this -> Do not forget to complete the request!
 			MPI_Wait(&req[i], MPI_STATUS_IGNORE);
 		}
@@ -253,11 +258,11 @@ int main(int argc, char *argv[]) {
 		 // Wait for a message from rank 0 with tag 0
 		MPI_Probe(0, TAG, MPI_COMM_WORLD, &status);
 		// Find out the number of elements in the message -> size goes to "n"
-		MPI_Get_count(&status, MPI_DOUBLE, &auxN);
+		MPI_Get_count(&status, worldType, &auxN);
 		// Allocate memory
 		arr1 = malloc(auxN*sizeof(double));
 		// Receive the message. ignore the status
-		MPI_Recv(arr1, n, MPI_DOUBLE, 0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		MPI_Recv(arr1, n, worldType, 0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 	}
 
