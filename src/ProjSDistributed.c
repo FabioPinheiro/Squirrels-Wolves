@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include <math.h>
-#include "ProjSerial.h"
+/*#include "ProjSerial.h"*/
 #include "Mover.h"
 #include <string.h>
 #define DIM 2
@@ -131,12 +131,11 @@ sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
 
 int main(int argc, char *argv[]) {
 
-	int teste, worldsize = 0, i;
+	int teste, worldsize = 0;
 	FILE * inputFile;
 	int ret = 3;
 	char chr;
 	double elapsed_time, game_time;
-	MPI_Status status;
 	MPI_Comm cart_comm;
 	int id, p, rank; /*id geral, p numb PRocessors, rank checkerboard*/
 	int coords[DIM], auxMap[DIM], divideX, divideY;
@@ -157,7 +156,6 @@ int main(int argc, char *argv[]) {
 
     struct world aux;
 
-
 	/* Definitions:
 	 * wolfBP = atoi(argv[2]);
 	 * sqrlBP = atoi(argv[3]);
@@ -177,11 +175,20 @@ int main(int argc, char *argv[]) {
 
 
 	/*TODO-REVER*/
-    disp[0] = &aux.x - &aux;
-    disp[1] = &aux.y - &aux;
-    disp[2] = &aux.type - &aux;
-    disp[4] = &aux.breeding_period - &aux;
-    disp[5] = &aux.starvation_period - &aux;
+	MPI_Aint str_add, x_add, y_add, type_add, bp_add, sp_add;
+
+	MPI_Get_address(&aux, &str_add);
+	MPI_Get_address(&aux.x, &x_add);
+	MPI_Get_address(&aux.y, &y_add);
+	MPI_Get_address(&aux.type, &type_add);
+	MPI_Get_address(&aux.breeding_period, &bp_add);
+	MPI_Get_address(&aux.starvation_period, &sp_add);
+
+    disp[0] = x_add - str_add;
+    disp[1] = y_add - str_add;
+    disp[2] = type_add - str_add;
+    disp[4] = bp_add - str_add;
+    disp[5] = sp_add - str_add;
     MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
     MPI_Type_commit(&worldType);
 
@@ -251,29 +258,12 @@ int main(int argc, char *argv[]) {
 	 * TODO checkerboard (test then apply ghostsAchas que funciona lines) (deadline 23h59 5/12/13)
 	 * TODO Add Parallel (apply to checkerboard+ghosts lines ) (deadline 23h59 5/12/13)
 	 * */
-	if(id != 0){
-		/*receive tam*/
-		MPI_Recv(&sizeToAlloc, 1, MPI_INT, 0, TAG, MPI COMM WORLD, &status); /*Buff, numPos, type, From, TAG, comm*/
-		personalWorld1 = calloc(worldsize * sizeToAlloc, sizeof(struct world));
-		personalWorld2 = calloc(worldsize * sizeToAlloc, sizeof(struct world));
-	}
-	else{
-		/*
-		 * ID 0 envia tamanho para alocar
-		 * */
-
-
-	if(id != 0){
-		/*Recebe de 0 o seu tamanho.*/
-		MPI_Recv(&personalWorldSize, sizeToAlloc*worldsize, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
-		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion based on Parallel function*/
-	}
 
 
 	/*				READ INPUT FILE AND DISTRIBUT THEN*/
 	if(id == 0){
 		MPI_Request *req;
-		req = (MPI_Request *) malloc(p, sizeof(MPI_Request));
+		req = (MPI_Request *) malloc(p* sizeof(MPI_Request));
 		sworld bufferSend;
 		int computedSize, auxBreak, acumulatedSize=0;
 
@@ -302,7 +292,7 @@ int main(int argc, char *argv[]) {
 			computeSize(p,worldsize, i, &computedSize);
 			acumulatedSize += computedSize;
 			int sizeToSend = computedSize*worldsize;
-			bufferSend = calloc(sizeToSend*sizeof(struct world));
+			bufferSend = calloc(sizeToSend,sizeof(struct world));
 			if(auxBreak){
 				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
@@ -329,18 +319,20 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	else{
+		int computedSize;
+		computeSize(p,worldsize, i, &computedSize);
 		/*XXX Checked*/
 		MPI_Status status;
 		int auxN;
 		 // Wait for a message from rank 0 with tag 0
-		MPI_Probe(0, TAG, MPI_COMM_WORLD, &status);
+		MPI_Probe(0, TAG_STARTUP, MPI_COMM_WORLD, &status);
 		// Find out the number of elements in the message -> size goes to "n"
 		MPI_Get_count(&status, worldType, &auxN);
 		// Allocate memory
 		personalWorld1 = malloc(auxN*sizeof(struct world));
 		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
 		// Receive the message. ignore the status
-		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 	}
 
 
