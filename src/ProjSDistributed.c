@@ -50,14 +50,14 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	int l, index;
 	#pragma omp parallel for private(index)
-	for(l = 0; l < worldsize*worldsize; l += 2 * worldsize){
+	for(l = 0; l < xSize*ySize; l += 2 * worldsize){
 		for(index = l; index < l + worldsize; index += 2){
 			if(isAnimal(worldRead[index].type)){
 				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 			}
 		}
 	  
-		if(l + 2 * worldsize <= worldsize*worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+		if(l + 2 * worldsize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = 1 + l + worldsize; index < l + 2 * worldsize; index += 2){
 				if(isAnimal(worldRead[index].type)){
 					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
@@ -70,14 +70,14 @@ void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	int l, index;
 	#pragma omp parallel for private(index)
-	for(l = 0; l < worldsize*worldsize; l += 2 * worldsize){
+	for(l = 0; l < xSize*ySize; l += 2 * worldsize){
 		for(index = 1 + l; index < l + worldsize; index += 2){
 			if(isAnimal(worldRead[index].type)){
 				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 			}
 		}
 
-		if(l + 2 * worldsize <= worldsize * worldsize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+		if(l + 2 * worldsize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = l + worldsize; index < l + 2 * worldsize; index += 2){
 				if(isAnimal(worldRead[index].type)){
 					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
@@ -97,7 +97,7 @@ sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
 		my_world1 = my_world2;
 		my_world2 = my_worldAUX;
 		#pragma omp parallel for
-		for(j = 0; j < worldsize * worldsize; j++){
+		for(j = 0; j < xSize * ySize; j++){
 			if(isAnimal(my_world1[j].type)){
 				my_world1[j].breeding_period--;
 				if(my_world1[j].type == WOLF){
@@ -335,7 +335,8 @@ int main(int argc, char *argv[]) {
 	/*       RUN game       */
 	
 	/*TODO for each IT exchange Lines*/
-	personalWorld1 = processGen(personalWorld1, personalWorld2);
+	/*       RUN game       */
+	personalWorld1 = processGen(personalWorld1, personalWorld2, computedGameSize , worldsize ); //XXX hack change worldsize in checkerboard
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	game_time += MPI_Wtime();
@@ -350,8 +351,7 @@ int main(int argc, char *argv[]) {
 
 
 	/*Ending the Program*/
-	MPI_Barrier(MPI_COMM_WORLD);
-	elapsed_time += MPI_Wtime(); /*Calcula o tempo*/
+	MPI_Barrier(Mlapsed_time += MPI_Wtime(); /*Calcula o tempo*/
 	MPI_Finalize();
 	return 0;
 }
