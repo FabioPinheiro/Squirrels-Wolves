@@ -27,6 +27,8 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 		exit(2);
 	}
 	type = addSpecial(chr);
+	my_world[calcPos(x_cord, y_cord, worldsize)].x = x_cord;
+	my_world[calcPos(x_cord, y_cord, worldsize)].y = y_cord;
 	my_world[calcPos(x_cord, y_cord, worldsize)].type = type;
 	switch(type){
 	case WOLF:
@@ -329,7 +331,8 @@ int main(int argc, char *argv[]) {
 	/*		GAME TIME		*/
 	MPI_Barrier(MPI_COMM_WORLD);
 	game_time = -MPI_Wtime();
-	/*Run game*/
+
+	/*       RUN game       */
 	
 	/*TODO for each IT exchange Lines*/
 	personalWorld1 = processGen(personalWorld1, personalWorld2);
@@ -338,7 +341,6 @@ int main(int argc, char *argv[]) {
 	game_time += MPI_Wtime();
 	/*		GAME TIME		*/
 
-	/*		END GAME		*/
 
 	/* Print Matrix while receiving from Processes */
 

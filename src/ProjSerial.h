@@ -1,6 +1,7 @@
 #ifndef PROJ_SERIAL_H
 #define PROJ_SERIAL_H
 
+#define MASTER 0
 #define EPTY 0
 #define WOLF 1
 #define SQRL 2
