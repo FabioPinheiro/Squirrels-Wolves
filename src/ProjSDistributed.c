@@ -336,6 +336,8 @@ int main(int argc, char *argv[]) {
 	
 	/*TODO for each IT exchange Lines*/
 	/*       RUN game       */
+	int computedGameSize;
+	computeSize(p,worldsize, i, &computedGameSize);
 	personalWorld1 = processGen(personalWorld1, personalWorld2, computedGameSize , worldsize ); //XXX hack change worldsize in checkerboard
 
 	MPI_Barrier(MPI_COMM_WORLD);
