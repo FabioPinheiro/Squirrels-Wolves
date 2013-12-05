@@ -245,10 +245,8 @@ int main(int argc, char *argv[]) {
 	 * Ler num Linhas,
 	 * fazer divisao cartesiana
 	 * Atribuir parte a processadores para trabalharem. (static load balancing) static num of tasks
-	 * TODO programa Working ROW WISE (deadline 23h59 4/12/13)
-	 * TODO ghosts lines (test with 1/2/3/4 ?) (deadline 13h00 5/12/13)
-	 * TODO checkerboard (test then apply ghostsAchas que funciona lines) (deadline 23h59 5/12/13)
-	 * TODO Add Parallel (apply to checkerboard+ghosts lines ) (deadline 23h59 5/12/13)
+	 * TODO checkerboard (test then apply ghostsAchas que funciona lines) (deadline 12h00 6/12/13)
+	 * TODO Add Parallel (apply to checkerboard+ghosts lines ) (deadline 12h00 6/12/13)
 	 * */
 
 
