@@ -6,7 +6,8 @@
 #include "Mover.h"
 #include <string.h>
 #define DIM 2
-
+#define TAG_STARTUP 9780
+#define TAG_CHANGE 6548
 
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
@@ -203,45 +204,7 @@ int main(int argc, char *argv[]) {
 	}
 
 
-
-/*
-	if(id == 0){
-		/*READ
-		int xAux=0, yAux, charAux, auxBreak=1;
-		computeSize(p,worldsize, 0, &computedSize);
-		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
-		/*XXX Read Input 0
-		setType(personalWorld1, xAux, yAux, charAux);
-		while(xAux<computedSize){
-
-			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
-			if (ret != 3){
-				auxBreak=0; /*Assim nao entra no for pois ja nao ha mais nada para ler
-				break;
-			}
-			/*XXX Read Input 0
-			setType(personalWorld1, xAux, yAux, charAux);
-		}
-		if(auxBreak){
-			for(i=1; i < p; i++){
-				/*TODO Escreve no Buffer de i
-				computeSize(p,worldsize, i, &computedSize);
-				while(xAux<computedSize){
-					/*TODO Escreve no Buffer de i
-					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
-					if (ret != 3){
-						auxBreak=1; /*Assim sai do for pois ja nao ha mais nada para ler
-						break;
-					}
-				}
-				MPI_Send(&computedSize, 1, worldType, i, TAG, MPI COMM WORLD);/*TODO CORRECT Envia para o ultimo gajo a receber aka envia para o "i"
-			}
-		}
-	}*/
-
-	/*TODO New read/send optimized and better one*/
-
-
+	/*				READ INPUT FILE AND DISTRIBUT THEN*/
 	if(id == 0){
 		MPI_Request *req;
 		req = (MPI_Request *) malloc(p, sizeof(MPI_Request));
@@ -280,13 +243,13 @@ int main(int argc, char *argv[]) {
 					}
 				}
 				/*envia a Linha*/
-				MPI_Isend(/*Array*/ , /*tamanho*/ , worldType ,i , TAG ,MPI_COMM_WORLD ,&req[i]);
+				MPI_Isend( bufferSend, sizeToSend , worldType ,i , TAG_STARTUP ,MPI_COMM_WORLD ,&req[i]);
 				//TODO CHECK this -> Do not forget to complete the request!
 				MPI_Wait(&req[i], MPI_STATUS_IGNORE);
 			}
 			else{
 				/*envia a Linha(s)*/
-				MPI_Isend(/*Array*/ , /*tamanho*/ , worldType ,i , TAG ,MPI_COMM_WORLD ,&req[i]);
+				MPI_Isend(bufferSend , sizeToSend , worldType ,i , TAG_STARTUP ,MPI_COMM_WORLD ,&req[i]);
 				//TODO CHECK this -> Do not forget to complete the request!
 				MPI_Wait(&req[i], MPI_STATUS_IGNORE);
 			}
@@ -294,7 +257,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	else{
-		/*TODO Check and Correct TAGS!!!*/
+		/*TODO Check*/
 		MPI_Status status;
 		int auxN;
 		 // Wait for a message from rank 0 with tag 0
