@@ -55,7 +55,7 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 
 
-void processReds(sworld worldRead, sworld worldWrite){
+void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	int l, index;
 	#pragma omp parallel for private(index)
 	for(l = 0; l < worldsize*worldsize; l += 2 * worldsize){
@@ -75,7 +75,7 @@ void processReds(sworld worldRead, sworld worldWrite){
 	}
 }
 
-void processBlacks(sworld worldRead, sworld worldWrite){
+void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	int l, index;
 	#pragma omp parallel for private(index)
 	for(l = 0; l < worldsize*worldsize; l += 2 * worldsize){
@@ -95,7 +95,7 @@ void processBlacks(sworld worldRead, sworld worldWrite){
 	}
 }
 
-sworld processGen(sworld my_world1, sworld my_world2){
+sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
 	
 	/*TODO troca as linhas! :D*/
 	int i, j;
