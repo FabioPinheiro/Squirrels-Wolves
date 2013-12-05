@@ -238,7 +238,28 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+	MPI_Request *req;
+	req = (MPI_Request *) malloc(p, sizeof(MPI_Request));
+	if(id == 0){
+		for(i=1; i<p; i++){
+			MPI_Isend(/*Array*/ ,/*tamanho*/ ,MPI_ ,i , TAG ,MPI_COMM_WORLD ,&req[i]);
+		    //TODO CHECK this -> Do not forget to complete the request!
+			MPI_Wait(&req[i], MPI_STATUS_IGNORE);
+		}
+	}
+	else{
+		MPI_Status status;
+		int auxN;
+		 // Wait for a message from rank 0 with tag 0
+		MPI_Probe(0, TAG, MPI_COMM_WORLD, &status);
+		// Find out the number of elements in the message -> size goes to "n"
+		MPI_Get_count(&status, MPI_DOUBLE, &auxN);
+		// Allocate memory
+		arr1 = malloc(auxN*sizeof(double));
+		// Receive the message. ignore the status
+		MPI_Recv(arr1, n, MPI_DOUBLE, 0, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
+	}
 
 
 	/*		GAME TIME		*/
