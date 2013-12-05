@@ -6,25 +6,11 @@
 #include "Mover.h"
 #include <string.h>
 #define DIM 2
-
-#define BLOCK_LOW(id,p,n) ((id)*(n)/(p))
-#define BLOCK_HIGH(id,p,n) (BLOCK_LOW((id)+1,p,n)-1)
-#define BLOCK_SIZE(id,p,n) (BLOCK_HIGH(id,p,n)-BLOCK_LOW(id,p,n)+1)
-#define BLOCK_OWNER(index,p,n) (((p)*((index)+1)-1)/(n))
-
+#define TAG_STARTUP 9780
+#define TAG_CHANGE 6548
 
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
-struct world {
-	int x;
-	int y;
-	int type; /* Wolf, Squirrel, etc. */
- 	int breeding_period;
- 	int starvation_period;
- };
-
-
-typedef struct world *sworld;
 
 
 void computeSize(int numP, int worldSize, int pId, int *result){
@@ -41,6 +27,8 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 		exit(2);
 	}
 	type = addSpecial(chr);
+	my_world[calcPos(x_cord, y_cord, worldsize)].x = x_cord;
+	my_world[calcPos(x_cord, y_cord, worldsize)].y = y_cord;
 	my_world[calcPos(x_cord, y_cord, worldsize)].type = type;
 	switch(type){
 	case WOLF:
@@ -57,21 +45,96 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 }
 
+
+
+void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
+	int l, index;
+	#pragma omp parallel for private(index)
+	for(l = 0; l < xSize*ySize; l += 2 * worldsize){
+		for(index = l; index < l + worldsize; index += 2){
+			if(isAnimal(worldRead[index].type)){
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+			}
+		}
+	  
+		if(l + 2 * worldsize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+			for(index = 1 + l + worldsize; index < l + 2 * worldsize; index += 2){
+				if(isAnimal(worldRead[index].type)){
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+				}
+			}
+		}
+	}
+}
+
+void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
+	int l, index;
+	#pragma omp parallel for private(index)
+	for(l = 0; l < xSize*ySize; l += 2 * worldsize){
+		for(index = 1 + l; index < l + worldsize; index += 2){
+			if(isAnimal(worldRead[index].type)){
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+			}
+		}
+
+		if(l + 2 * worldsize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+			for(index = l + worldsize; index < l + 2 * worldsize; index += 2){
+				if(isAnimal(worldRead[index].type)){
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+				}
+			}
+		}
+	}
+}
+
+sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
+	
+	/*TODO troca as linhas! :D*/
+	int i, j;
+	sworld my_worldAUX;
+	for(i = 0; i < genNum; i++){
+		my_worldAUX = my_world1;
+		my_world1 = my_world2;
+		my_world2 = my_worldAUX;
+		#pragma omp parallel for
+		for(j = 0; j < xSize * ySize; j++){
+			if(isAnimal(my_world1[j].type)){
+				my_world1[j].breeding_period--;
+				if(my_world1[j].type == WOLF){
+					my_world1[j].starvation_period--;
+					if(my_world1[j].starvation_period == 0){
+						my_world1[j].type = EPTY;
+						my_world1[j].breeding_period = 0;
+						my_world1[j].starvation_period = 0;
+					}
+				}
+				if(my_world1[j].type == WES){
+					my_world1[j].type = WOLF;
+					my_world1[j].starvation_period = wolfStarvP - 1;
+				}
+			}
+		}
+		processReds(my_world1, my_world2, xSize, ySize);
+		processBlacks(my_world1, my_world2, xSize, ySize);
+	}
+	return my_world2;
+}
+
+
 int main(int argc, char *argv[]) {
 
-	int teste, worldsize = 0, i;
+	int teste, worldsize = 0;
 	FILE * inputFile;
 	int ret = 3;
 	char chr;
 	double elapsed_time, game_time;
-	MPI_Status status;
 	MPI_Comm cart_comm;
 	int id, p, rank; /*id geral, p numb PRocessors, rank checkerboard*/
 	int coords[DIM], auxMap[DIM], divideX, divideY;
 	/*Cria canais de comunicação*/
 	/*Nota [Periodos] as Col e as Row podem ser periodicas, ou seja aceder ao -1 significa o mesmo que aceder a 1 (no array) AKA wrapped*/
 	int periods[2] = { 0, 0 };
-	int sizeToAlloc, computedSize;
+	int sizeToAlloc;
 	sworld personalWorld1;
 	sworld personalWorld2;
 	int personalWorldSize;
@@ -83,6 +146,7 @@ int main(int argc, char *argv[]) {
     int blocklen[5] = { 1, 1, 1, 1, 1 };
     MPI_Aint disp[5];
 
+    struct world aux;
 
 	/* Definitions:
 	 * wolfBP = atoi(argv[2]);
@@ -100,6 +164,25 @@ int main(int argc, char *argv[]) {
 	MPI_Barrier(MPI_COMM_WORLD);
 	elapsed_time = -MPI_Wtime();
 	/*			TIME		*/
+
+
+	/* XXX - COMPILA e nao tem Conflitos do GIT!! */
+	MPI_Aint str_add, x_add, y_add, type_add, bp_add, sp_add;
+
+	MPI_Get_address(&aux, &str_add);
+	MPI_Get_address(&aux.x, &x_add);
+	MPI_Get_address(&aux.y, &y_add);
+	MPI_Get_address(&aux.type, &type_add);
+	MPI_Get_address(&aux.breeding_period, &bp_add);
+	MPI_Get_address(&aux.starvation_period, &sp_add);
+
+    disp[0] = x_add - str_add;
+    disp[1] = y_add - str_add;
+    disp[2] = type_add - str_add;
+    disp[4] = bp_add - str_add;
+    disp[5] = sp_add - str_add;
+    MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
+    MPI_Type_commit(&worldType);
 
 	/*Read Arguments*/
 	if (argc != 6) {
@@ -130,7 +213,7 @@ int main(int argc, char *argv[]) {
 
 		//size[0] = size[1] = worldsize;
 	}
-	/*TODO change this*/
+	/*TODO Rever se compensa fazer isto*/
 	MPI_Bcast(&worldsize, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
 	int size[2] = { p, 1};
@@ -167,94 +250,100 @@ int main(int argc, char *argv[]) {
 	 * TODO checkerboard (test then apply ghostsAchas que funciona lines) (deadline 23h59 5/12/13)
 	 * TODO Add Parallel (apply to checkerboard+ghosts lines ) (deadline 23h59 5/12/13)
 	 * */
-	if(id != 0){
-		/*receive tam*/
-		MPI_Recv(&sizeToAlloc, 1, MPI_INT, 0, TAG, MPI COMM WORLD, &status); /*Buff, numPos, type, From, TAG, comm*/
-		personalWorld1 = calloc(worldsize * sizeToAlloc, sizeof(struct world));
-		personalWorld2 = calloc(worldsize * sizeToAlloc, sizeof(struct world));
-	}
-	else{
-		/*
-		 * ID 0 envia tamanho para alocar
-		 * */
-
-		/*XXX Deve Começar em 1, ele nao manda para si mesmo 0 */
-		for(i=1;i<p;i++){
-			/*ComputeSize*/
-			computeSize(p,worldsize, i, &computedSize);
-			MPI_Send(&computedSize, 1, MPI_INT, i, TAG, MPI COMM WORLD); /*Buff, numPos, type, To, TAG, comm*/
-		}
-		/*XXX make space 0 */personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
-		/*XXX make space 0 */personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
-
-	}
-
-	if(id != 0){
-		/*Recebe de 0 o seu tamanho.*/
-		MPI_Recv(&personalWorldSize, sizeToAlloc*worldsize, MPI_INT, 0, TAG, MPI COMM WORLD, &status);/*TODO recheck*/
-		//sworldTreeIceCpy(my_world2, my_world1, worldsize);/*TODO create new funtion based on Parallel function*/
-	}
-
-	/*XXX Tem que estar depois dos mallocs*/
-    disp[0] = &personalWorld1[0].x - &personalWorld1[0];
-    disp[1] = &personalWorld1[0].y - &personalWorld1[0];
-    disp[2] = &personalWorld1[0].type - &personalWorld1[0];
-    disp[4] = &personalWorld1[0].breeding_period - &personalWorld1[0];
-    disp[5] = &personalWorld1[0].starvation_period - &personalWorld1[0];
-    MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
-    MPI_Type_commit(&worldType);
 
 
+	/*				READ INPUT FILE AND DISTRIBUT THEN*/
 	if(id == 0){
-		/*READ*/
-		int xAux=0, yAux, charAux, auxBreak=1;
-		computeSize(p,worldsize, 0, &computedSize);
-		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
-		/*XXX Read Input 0 */
-		setType(personalWorld1, xAux, yAux, charAux);
-		while(xAux<computedSize){
+		MPI_Request *req;
+		req = (MPI_Request *) malloc(p* sizeof(MPI_Request));
+		sworld bufferSend;
+		int computedSize, auxBreak, acumulatedSize=0;
 
+		/*LE para ele (0) e guarda*/
+		int xAux=0, yAux, charAux;
+		computeSize(p,worldsize, 0, &computedSize);
+
+		personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
+		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
+
+		acumulatedSize += computedSize;
+		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+
+		while(xAux< computedSize){
+			setType(personalWorld1, xAux, yAux, charAux);
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 			if (ret != 3){
-				auxBreak=0; /*Assim nao entra no for pois ja nao ha mais nada para ler*/
+				/*Chegou ao fim do ficheiro*/
+				auxBreak=0;
 				break;
 			}
-			/*XXX Read Input 0 */
-			setType(personalWorld1, xAux, yAux, charAux);
 		}
-		if(auxBreak){
-			for(i=1; i < p; i++){
-				/*TODO Escreve no Buffer de i*/
-				computeSize(p,worldsize, i, &computedSize);
-				while(xAux<computedSize){
-					/*TODO Escreve no Buffer de i*/
+		//TODO tratar de quando nao começa em 0 nem em 1(apesar de ser bue weird em termos de load balancing...)
+		for(i=1; i<p; i++){
+			/*Calc size&createBuffer*/
+			computeSize(p,worldsize, i, &computedSize);
+			acumulatedSize += computedSize;
+			int sizeToSend = computedSize*worldsize;
+			bufferSend = calloc(sizeToSend,sizeof(struct world));
+			if(auxBreak){
+				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+
+				while(xAux< acumulatedSize){
+					setType(bufferSend, xAux-acumulatedSize+computedSize, yAux, charAux);/*TODO conferir hack*/
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
-						auxBreak=1; /*Assim sai do for pois ja nao ha mais nada para ler*/
+						/*Chegou ao fim do ficheiro*/
+						auxBreak=0;
 						break;
 					}
 				}
-				MPI_Send(&computedSize, 1, worldType, i, TAG, MPI COMM WORLD);/*TODO CORRECT Envia para o ultimo gajo a receber aka envia para o "i"*/
+				/*envia a Linha*/
+				MPI_Isend( bufferSend, sizeToSend , worldType ,i , TAG_STARTUP ,MPI_COMM_WORLD ,&req[i]);
+				//TODO CHECK this -> Do not forget to complete the request!
+				MPI_Wait(&req[i], MPI_STATUS_IGNORE);
+			}
+			else{
+				/*envia a Linha(s)*/
+				MPI_Isend(bufferSend , sizeToSend , worldType ,i , TAG_STARTUP ,MPI_COMM_WORLD ,&req[i]);
+				//TODO CHECK this -> Do not forget to complete the request!
+				MPI_Wait(&req[i], MPI_STATUS_IGNORE);
 			}
 		}
 	}
-
+	else{
+		int computedSize;
+		computeSize(p,worldsize, i, &computedSize);
+		/*XXX Checked*/
+		MPI_Status status;
+		int auxN;
+		 // Wait for a message from rank 0 with tag 0
+		MPI_Probe(0, TAG_STARTUP, MPI_COMM_WORLD, &status);
+		// Find out the number of elements in the message -> size goes to "n"
+		MPI_Get_count(&status, worldType, &auxN);
+		// Allocate memory
+		personalWorld1 = malloc(auxN*sizeof(struct world));
+		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
+		// Receive the message. ignore the status
+		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	}
 
 
 	/*		GAME TIME		*/
 	MPI_Barrier(MPI_COMM_WORLD);
 	game_time = -MPI_Wtime();
-	/*Run game*/
 
-	//my_world1 = processGen(my_world1, my_world2);
+	/*       RUN game       */
+	
 	/*TODO for each IT exchange Lines*/
-
+	/*       RUN game       */
+	int computedGameSize;
+	computeSize(p,worldsize, i, &computedGameSize);
+	personalWorld1 = processGen(personalWorld1, personalWorld2, computedGameSize , worldsize ); //XXX hack change worldsize in checkerboard
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	game_time += MPI_Wtime();
 	/*		GAME TIME		*/
 
-	/*		END GAME		*/
 
 	/* Print Matrix while receiving from Processes */
 

@@ -12,6 +12,8 @@
 #define calcPos(x, y, worldsize) y + x*worldsize
 
 struct world {
+	int x;
+	int y;
 	int type; /* Wolf, Squirrel, etc. */
  	int breeding_period;
  	int starvation_period;
