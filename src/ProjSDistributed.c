@@ -53,7 +53,7 @@ void sworldTreeIceCpy(sworld worldCpyTo, sworld worldCpyFrom, int xSize, int ySi
 
 void printMatrixOutFile(sworld world, char* name, int xSize,int ySize, int realShiftSize){ /*output para Avaliacao*/
 	FILE *out;
-	int i, aux = genNum == 1? 0: 1;
+	int i, aux = (genNum == 1? 0: 1);
 	out = fopen(name, "a");
 	//TODO
 	for(i=0;i< xSize*ySize;i++){
