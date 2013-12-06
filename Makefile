@@ -17,7 +17,7 @@ parallel:
 serial:
 	gcc $(SERIAL_CFLAGS) -o serial_proj $(SRC)ProjSerial.c $(SRC)Mover.c
 distributed:
-	mpicc  -g -o distributed_proj $(SRC)ProjSDistributed.c $(SRC)MoverNewMPI.c
+	mpicc -g -o distributed_proj $(SRC)ProjSDistributed.c $(SRC)MoverNewMPI.c
 distributed&parallel:
 	mpicc  $(SERIAL_CFLAGS) -o distributed&parallel_proj $(SRC)ProjDistributedParallel.c $(SRC)Mover.c
 
