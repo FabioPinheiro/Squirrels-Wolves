@@ -53,12 +53,12 @@ void sworldTreeIceCpy(sworld worldCpyTo, sworld worldCpyFrom, int xSize, int ySi
 
 void printMatrixOutFile(sworld world, char* name, int xSize,int ySize, int realShiftSize){ /*output para Avaliacao*/
 	FILE *out;
-	int i, j;
+	int i, aux = genNum == 1? 0: 1;
 	out = fopen(name, "w");
 	//TODO
 	for(i=0;i< xSize*ySize;i++){
 		if(world[i].type > EPTY	&& world[i].type <= SONT)
-			fprintf(out, "%d %d %c\n",world[i].x+realShiftSize , world[i].y, printValues(world[i].type));
+			fprintf(out, "%d %d %c\n",world[i].x+realShiftSize*aux , world[i].y, printValues(world[i].type));
 	}
 
 
