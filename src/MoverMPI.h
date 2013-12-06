@@ -5,7 +5,7 @@
 
 #ifndef MOVER_H_
 #define MOVER_H_
-#include "ProjSerial.h"
+#include "headersMPI.h"
 #include <stdio.h>
 #include <stdlib.h>
 #define POSSIBLE_POS 4

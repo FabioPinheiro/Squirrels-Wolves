@@ -28,7 +28,7 @@ sWorld myWorld
 
 extern int worldsize, wolfBP, sqrlBP, wolfStarvP, genNum, day = 0;
 
-void printMatrixOutPut(){} //TODO
+void printMatrixOutPut(){}
 #endif FABIO_INTERFACE_H
 /*************************************************************************/
 #ifndef FABIO_FILE_IO_H

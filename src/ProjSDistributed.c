@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include <math.h>
-#include "ProjSerial.h"
-#include "Mover.h"
+#include "headersMPI.h"
+#include "MoverMPI.h"
 #include <string.h>
 #define DIM 2
 #define TAG_STARTUP 9780
@@ -13,6 +13,9 @@
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
 
+void sentGhostLines(){
+
+}
 
 void computeSize(int numP, int worldSize, int pId, int *result){
 	*result = (int) worldSize/numP;
@@ -51,15 +54,15 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	int l, index;
 	#pragma omp parallel for private(index)
-	for(l = 0; l < xSize*ySize; l += 2 * worldsize){
-		for(index = l; index < l + worldsize; index += 2){
+	for(l = 0; l < xSize*ySize; l += 2 * ySize){
+		for(index = l; index < l + ySize; index += 2){
 			if(isAnimal(worldRead[index].type)){
 				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 			}
 		}
 	  
-		if(l + 2 * worldsize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
-			for(index = 1 + l + worldsize; index < l + 2 * worldsize; index += 2){
+		if(l + 2 * ySize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+			for(index = 1 + l + ySize; index < l + 2 * ySize; index += 2){
 				if(isAnimal(worldRead[index].type)){
 					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 				}
@@ -71,15 +74,15 @@ void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	int l, index;
 	#pragma omp parallel for private(index)
-	for(l = 0; l < xSize*ySize; l += 2 * worldsize){
-		for(index = 1 + l; index < l + worldsize; index += 2){
+	for(l = 0; l < xSize*ySize; l += 2 * ySize){
+		for(index = 1 + l; index < l + ySize; index += 2){
 			if(isAnimal(worldRead[index].type)){
 				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 			}
 		}
 
-		if(l + 2 * worldsize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
-			for(index = l + worldsize; index < l + 2 * worldsize; index += 2){
+		if(l + 2 * ySize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
+			for(index = l + ySize; index < l + 2 * ySize; index += 2){
 				if(isAnimal(worldRead[index].type)){
 					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
 				}
@@ -90,7 +93,7 @@ void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 
 sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
 	
-	/*TODO troca as linhas! :D*/
+	/*TODO! troca as linhas! :D*/
 	int i, j;
 	sworld my_worldAUX;
 	for(i = 0; i < genNum; i++){
@@ -268,7 +271,7 @@ int main(int argc, char *argv[]) {
 		acumulatedSize += computedSize;
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
-		while(xAux< computedSize+GHOST_NUM){/*TODO Tentativa de enviar GhostLines*/
+		while(xAux< computedSize){
 			setType(personalWorld1, xAux, yAux, charAux);
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
@@ -283,14 +286,14 @@ int main(int argc, char *argv[]) {
 			/*Calc size&createBuffer*/
 			computeSize(p,worldsize, i, &computedSize);
 			acumulatedSize += computedSize;
-			int somaGhost = (id == p-1? 2 : 4);/*TODO Tentativa de enviar GhostLines*/
-			int sizeToSend = (computedSize+somaGhost)*worldsize;
+			//int somaGhost = (id == p-1? 2 : 4);/*XXX Tentativa de enviar GhostLines*/
+			int sizeToSend = computedSize*worldsize;
 			bufferSend = calloc(sizeToSend,sizeof(struct world));
 			if(auxBreak){
 				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
-				while(xAux< acumulatedSize+GHOST_NUM){/*TODO Tentativa de enviar GhostLines*/
-					setType(bufferSend, xAux-acumulatedSize+computedSize, yAux, charAux);/*TODO conferir hack*/
+				while(xAux< acumulatedSize){
+					setType(bufferSend, xAux-acumulatedSize+computedSize, yAux, charAux);
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
 						/*Chegou ao fim do ficheiro*/
@@ -328,23 +331,16 @@ int main(int argc, char *argv[]) {
 		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 	}
 
-	if(id > 0){/*TODO Tentativa de enviar GhostLines*/
-		sworld personalWorld1;
-		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-	}
-
 	/*		GAME TIME		*/
 	MPI_Barrier(MPI_COMM_WORLD);
 	game_time = -MPI_Wtime();
 
 	/*       RUN game       */
-	
-	/*TODO for each IT exchange Lines*/
-	/*       RUN game       */
 	int computedGameSize;
-	computeSize(p,worldsize, i, &computedGameSize);
-	personalWorld1 = processGen(personalWorld1, personalWorld2, computedGameSize , worldsize ); //XXX hack change worldsize in checkerboard
+		computeSize(p,worldsize, i, &computedGameSize);
+		personalWorld1 = processGen(personalWorld1, personalWorld2, computedGameSize , worldsize ); //XXX hack change worldsize in checkerboard
+
+	/*       RUN game       */
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	game_time += MPI_Wtime();

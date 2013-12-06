@@ -51,7 +51,7 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 	/*0 não se pode mexer
 	1 pode-se mexer
 	 */
-	/*TODO ver se está dentro do quadrado*/
+	/*XXX ver se está dentro do quadrado*/
 	int positionType;
 	
 	if(x_pos < 0 || y_pos < 0 || x_pos >= worldsize || y_pos >= worldsize){
@@ -77,7 +77,7 @@ int isAble(sworld world, int x_pos, int y_pos, int type) {
 	return 0; 
 }
 void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to, int y_to){
-	/*TODO be careful with   SONT*/
+	/*XXX be careful with   SONT*/
 	/*
 	If a squirrel/wolf completes a breeding period if he moves it breeds
 	Handle colissions
@@ -235,7 +235,7 @@ int calcMovePos(sworld world, int x, int y, int type){ /*calc the Next pos*/
 		up from the current cell, if it is 1 then select down, and if it is 2 then select left.
 	*/
 
-		/*TODO numerar posições*/
+		/* numerar posições*/
 		int i, nPos;
 		int numbPossible=0;
 		int theChoosenOne;
