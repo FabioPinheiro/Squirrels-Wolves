@@ -418,9 +418,9 @@ int main(int argc, char *argv[]) {
 			computeSize(p,worldsize, i, &computedSize);
 			acumulatedSize += computedSize;
 			//int somaGhost = (id == p-1? 2 : 4);/*XXX Tentativa de enviar GhostLines*/
-			int sizeToSend = computedSize*worldsize;
+			int sizeToSend = (2*GHOST_NUM+computedSize)*worldsize;
 			if(i == p-1){
-				sizeToSend = computedSize*worldsize;
+				sizeToSend = (GHOST_NUM+computedSize)*worldsize;
 				bufferSend = calloc(sizeToSend,sizeof(struct world));//add ghost lines
 			}
 			else{
