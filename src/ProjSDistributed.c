@@ -8,6 +8,7 @@
 #define DIM 2
 #define TAG_STARTUP 9780
 #define TAG_CHANGE 6548
+#define GHOST_NUM 2
 
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
@@ -267,9 +268,10 @@ int main(int argc, char *argv[]) {
 		acumulatedSize += computedSize;
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
-		while(xAux< computedSize){
+		while(xAux< computedSize+GHOST_NUM){/*TODO Tentativa de enviar GhostLines*/
 			setType(personalWorld1, xAux, yAux, charAux);
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+
 			if (ret != 3){
 				/*Chegou ao fim do ficheiro*/
 				auxBreak=0;
@@ -281,12 +283,13 @@ int main(int argc, char *argv[]) {
 			/*Calc size&createBuffer*/
 			computeSize(p,worldsize, i, &computedSize);
 			acumulatedSize += computedSize;
-			int sizeToSend = computedSize*worldsize;
+			int somaGhost = (id == p-1? 2 : 4);/*TODO Tentativa de enviar GhostLines*/
+			int sizeToSend = (computedSize+somaGhost)*worldsize;
 			bufferSend = calloc(sizeToSend,sizeof(struct world));
 			if(auxBreak){
 				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
-				while(xAux< acumulatedSize){
+				while(xAux< acumulatedSize+GHOST_NUM){/*TODO Tentativa de enviar GhostLines*/
 					setType(bufferSend, xAux-acumulatedSize+computedSize, yAux, charAux);/*TODO conferir hack*/
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
@@ -325,6 +328,11 @@ int main(int argc, char *argv[]) {
 		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 	}
 
+	if(id > 0){/*TODO Tentativa de enviar GhostLines*/
+		sworld personalWorld1;
+		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+	}
 
 	/*		GAME TIME		*/
 	MPI_Barrier(MPI_COMM_WORLD);
