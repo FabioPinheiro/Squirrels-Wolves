@@ -41,18 +41,35 @@ char printValues(int x){
 	return ' ';
 }
 
-void printMatrixOutFile(sworld world, char* name, int worldsize){ /*output para Avaliacao*/
+void sworldTreeIceCpy(sworld worldCpyTo, sworld worldCpyFrom, int xSize, int ySize){
+	int i;
+	for(i = 0; i < xSize * ySize; i++){
+		if(worldCpyFrom[i].type == TREE)
+			worldCpyTo[i].type = TREE;
+		if(worldCpyFrom[i].type == ICE)
+			worldCpyTo[i].type = ICE;
+	}
+}
+
+void printMatrixOutFile(sworld world, char* name, int xSize,int ySize, int realShiftSize){ /*output para Avaliacao*/
 	FILE *out;
 	int i, j;
 	out = fopen(name, "w");
-	for(i = 0; i < worldsize; i++){
+	//TODO
+	for(i=0;i< xSize*ySize;i++){
+		if(world[i].type > EPTY	&& world[i].type <= SONT)
+			fprintf(out, "%d %d %c\n",world[i].x+realShiftSize , world[i].y, printValues(world[i].type));
+	}
+
+
+	/*for(i = 0; i < worldsize; i++){
 		for(j = 0; j < worldsize; j++){
 			if(world[i + j * worldsize].type > EPTY
 					&& world[i + j * worldsize].type <= SONT)
 				fprintf(out, "%d %d %c\n", j, i,
 						printValues(world[i + j * worldsize].type));
 		}
-	}
+	}*/
 	fclose(out);
 }
 
@@ -90,9 +107,9 @@ void exchangeGhostLines(int rank, int p, MPI_Comm cart_comm,  MPI_Datatype world
 
 	}
 	else{
-		if(rank == p){
-			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, p-1, TAG_CHANGE, cart_comm, &req);
-			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, p-1, TAG_CHANGE, cart_comm);
+		if(rank == p-1){
+			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm, &req);
+			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm);
 			MPI_Wait(&req, &status);
 		}
 		else{
@@ -269,8 +286,8 @@ int main(int argc, char *argv[]) {
     disp[0] = x_add - str_add;
     disp[1] = y_add - str_add;
     disp[2] = type_add - str_add;
-    disp[4] = bp_add - str_add;
-    disp[5] = sp_add - str_add;
+    disp[3] = bp_add - str_add;
+    disp[4] = sp_add - str_add;
     MPI_Type_create_struct(5, blocklen, disp, type, &worldType);
     MPI_Type_commit(&worldType);
 
@@ -348,7 +365,7 @@ int main(int argc, char *argv[]) {
 		int computedSize, auxBreak=1, acumulatedSize=0;
 
 		/*LE para ele (0) e guarda*/
-		int xAux=0, yAux, charAux;
+		int xAux=0, yAux, charAux, lastX;
 		computeSize(p,worldsize, 0, &computedSize);
 
 		personalWorld1 = calloc(worldsize * (computedSize+ GHOST_NUM), sizeof(struct world)); //add ghost lines
@@ -356,10 +373,15 @@ int main(int argc, char *argv[]) {
 
 		acumulatedSize += computedSize;
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
-
-		while(xAux< computedSize){
+		while(xAux < computedSize){
 			setType(personalWorld1, xAux, yAux, charAux, xAux, yAux, worldsize); //neste caso o real e o virtual sao os mesmos
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+
+			if(lastX > xAux){
+				printerr("Input nao está ordenado!");
+				MPI_Finalize();
+				exit(-1);
+			}
 
 			if (ret != 3){
 				/*Chegou ao fim do ficheiro*/
@@ -374,7 +396,7 @@ int main(int argc, char *argv[]) {
 			acumulatedSize += computedSize;
 			//int somaGhost = (id == p-1? 2 : 4);/*XXX Tentativa de enviar GhostLines*/
 			int sizeToSend = (computedSize+ 2*GHOST_NUM)*worldsize;
-			if(i==p-1){
+			if(i == p-1){
 				sizeToSend = (computedSize+ GHOST_NUM)*worldsize;
 				bufferSend = calloc(sizeToSend,sizeof(struct world));//add ghost lines
 			}
@@ -383,7 +405,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			if(auxBreak){
-				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+	//			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
 				while(xAux< acumulatedSize){
 					setType(bufferSend, xAux, yAux, charAux,xAux-acumulatedSize+computedSize+GHOST_NUM, yAux, worldsize );
@@ -418,10 +440,12 @@ int main(int argc, char *argv[]) {
 		MPI_Get_count(&status, worldType, &auxN);
 		personalWorldSize = auxN/worldsize; /*aka computedsize xD*/
 		// Allocate memory
-		personalWorld1 = malloc(auxN*sizeof(struct world));
+		personalWorld1 = calloc(auxN, sizeof(struct world));
 		personalWorld2 = calloc(auxN, sizeof(struct world));
 		// Receive the message. ignore the status
 		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		sworldTreeIceCpy(personalWorld1, personalWorld2, personalWorldSize, worldsize);
+
 	}
 
 	/*		GAME TIME		*/
@@ -440,16 +464,19 @@ int main(int argc, char *argv[]) {
 
 	//receiving stuff to print
 	if(id == 0){
-		int receive, computedSize;
+		int receive, computedSize, realShiftSize=0;
 		//print personalWorld1;
-		 printMatrixOutFile(personalWorld1, "Distributed.out", worldsize);
+		computeSize(p,worldsize, 0, &computedSize);
+
+		 printMatrixOutFile(personalWorld1, "Distributed.out", computedSize,worldsize, realShiftSize);
 		for(i=1; i<p;i++){
+			computeSize(p,worldsize, i, &computedSize);
+			realShiftSize += computedSize;
 			//no need to clean world because we are receiving, unless dims are different...
 			//use computedSize to work it out when printing
-			computeSize(p,worldsize, 0, &computedSize);
 			receive = computedSize*worldsize;
 			MPI_Recv(personalWorld1, receive, worldType, i, TAG_END, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			printMatrixOutFile(personalWorld1, "Distributed.out", worldsize);
+			printMatrixOutFile(personalWorld1, "Distributed.out", computedSize ,worldsize, realShiftSize);
 		}
 	}
 	else{

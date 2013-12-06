@@ -26,6 +26,8 @@ sworld getPositionStructure(sworld world, int x, int y, int worldsize) {
 
 void setPosition(sworld world, int x, int y, int type, int breedingPeriod,
 		int starvationPeriod, int worldsize) {
+	world[calcPos(x,y,worldsize)].x = x;
+	world[calcPos(x,y,worldsize)].y = y;
 	world[calcPos(x,y,worldsize)].type = type;
 	world[calcPos(x,y,worldsize)].breeding_period = breedingPeriod;
 	world[calcPos(x,y,worldsize)].starvation_period = starvationPeriod;

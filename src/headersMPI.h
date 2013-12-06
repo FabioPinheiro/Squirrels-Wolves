@@ -26,5 +26,5 @@ typedef struct world *sworld;
 
 extern int worldsize, wolfBP, sqrlBP, wolfStarvP, genNum;
 void printMatrixOutPut(sworld world);
-void sworldTreeIceCpy(sworld worldCpyTo, sworld worldCpyFrom, int worldsize);
+void sworldTreeIceCpy(sworld worldCpyTo, sworld worldCpyFrom, int xSize, int ySize);
 #endif /* HEADERSMPI_H */
