@@ -373,12 +373,13 @@ int main(int argc, char *argv[]) {
 
 		acumulatedSize += computedSize;
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
+		lastX = xAux;
 		while(xAux < computedSize){
 			setType(personalWorld1, xAux, yAux, charAux, xAux, yAux, worldsize); //neste caso o real e o virtual sao os mesmos
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
 			if(lastX > xAux){
-				printerr("Input nao está ordenado!");
+				printf("Input nao está ordenado!");
 				MPI_Finalize();
 				exit(-1);
 			}
