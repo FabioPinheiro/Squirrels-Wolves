@@ -35,6 +35,20 @@ void computeSize(int numP, int worldSize, int pId, int *result){
 	}
 }
 
+int addSpecial(char string){
+	switch(string){
+	case 'w':
+		return WOLF;
+	case 's':
+		return SQRL;
+	case 'i':
+		return ICE;
+	case 't':
+		return TREE;
+	}
+	return EPTY;
+}
+
 void exchangeGhostLines(int rank, int p, MPI_Comm cart_comm,  MPI_Datatype worldType, sworld my_world2, int worldSize){
 	//XXX worldtype hacked neste momento ano funca para checkerboard
 	 MPI_Status status;
@@ -65,7 +79,7 @@ void exchangeGhostLines(int rank, int p, MPI_Comm cart_comm,  MPI_Datatype world
 }
 
 
-void setType(sworld my_world, int x_cord, int y_cord, char chr, int xVirt, int yVirt){
+void setType(sworld my_world, int x_cord, int y_cord, char chr, int xVirt, int yVirt, int worldsize){
 	//XXX check if it is correct
 	int type;
 	if(x_cord > worldsize - 1 || y_cord > worldsize - 1 || x_cord < 0
@@ -316,7 +330,7 @@ int main(int argc, char *argv[]) {
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
 		while(xAux< computedSize){
-			setType(personalWorld1, xAux, yAux, charAux, xAux, yAux); //neste caso o real e o virtual sao os mesmos
+			setType(personalWorld1, xAux, yAux, charAux, xAux, yAux, worldsize); //neste caso o real e o virtual sao os mesmos
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
 			if (ret != 3){
@@ -343,7 +357,7 @@ int main(int argc, char *argv[]) {
 				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
 				while(xAux< acumulatedSize){
-					setType(bufferSend, xAux, yAux, charAux,xAux-acumulatedSize+computedSize+GHOST_NUM, yAux );
+					setType(bufferSend, xAux, yAux, charAux,xAux-acumulatedSize+computedSize+GHOST_NUM, yAux, worldsize );
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
 						/*Chegou ao fim do ficheiro*/
