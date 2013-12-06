@@ -8,13 +8,52 @@
 #define DIM 2
 #define TAG_STARTUP 9780
 #define TAG_CHANGE 6548
+#define TAG_END 5648
 #define GHOST_NUM 2
 
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
+void printMatrixOutFile(sworld world, char* name, int worldsize){ /*output para Avaliacao*/
+	FILE *out;
+	int i, j;
+	out = fopen(name, "w");
+	for(i = 0; i < worldsize; i++){
+		for(j = 0; j < worldsize; j++){
+			if(world[i + j * worldsize].type > EPTY
+					&& world[i + j * worldsize].type <= SONT)
+				fprintf(out, "%d %d %c\n", j, i,
+						printValues(world[i + j * worldsize].type));
+		}
+	}
+	fclose(out);
+}
 
-void sentGhostLines(){
-
+void exchangeGhostLines(int rank, int p, MPI_Comm cart_comm,  MPI_Datatype worldType, sworld my_world2, int worldSize){
+	//XXX worldtype hacked neste momento ano funca para checkerboard
+	 MPI_Status status;
+	 MPI_Request req;
+	 int computedsize;
+	 computeSize(p, worldSize, rank, &computedsize);
+	switch(rank){
+		case 0:/*1 send, 1 receive*/
+			MPI_Irecv((my_world2+computedsize*worldSize), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm, &req);
+			MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);
+			break;
+		case p:/*1 send, 1 receive*/
+			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, p-1, TAG_CHANGE, cart_comm, &req);
+			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, p-1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);
+			break;
+		default:/*2 send, 2 receive*/
+			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm, &req);
+			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);
+			MPI_Irecv((my_world2+computedsize*worldSize), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm, &req);
+			MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);
+			break;
+		}
 }
 
 void computeSize(int numP, int worldSize, int pId, int *result){
@@ -23,25 +62,27 @@ void computeSize(int numP, int worldSize, int pId, int *result){
 		*result += 1;
 	}
 }
-void setType(sworld my_world, int x_cord, int y_cord, char chr){
+void setType(sworld my_world, int x_cord, int y_cord, char chr, int xVirt, int yVirt){
+	//XXX check if it is correct
 	int type;
 	if(x_cord > worldsize - 1 || y_cord > worldsize - 1 || x_cord < 0
 			|| y_cord < 0){
 		printf("Invalid Input!\n");
 		exit(2);
 	}
+
 	type = addSpecial(chr);
-	my_world[calcPos(x_cord, y_cord, worldsize)].x = x_cord;
-	my_world[calcPos(x_cord, y_cord, worldsize)].y = y_cord;
-	my_world[calcPos(x_cord, y_cord, worldsize)].type = type;
+	my_world[calcPos(xVirt, yVirt, worldsize)].x = x_cord;
+	my_world[calcPos(xVirt, yVirt, worldsize)].y = y_cord;
+	my_world[calcPos(xVirt, yVirt, worldsize)].type = type;
 	switch(type){
 	case WOLF:
-		my_world[calcPos(x_cord, y_cord, worldsize)].breeding_period = wolfBP;
-		my_world[calcPos(x_cord, y_cord, worldsize)].starvation_period =
+		my_world[calcPos(xVirt, yVirt, worldsize)].breeding_period = wolfBP;
+		my_world[calcPos(xVirt, yVirt, worldsize)].starvation_period =
 				wolfStarvP;
 		break;
 	case SQRL:
-		my_world[calcPos(x_cord, y_cord, worldsize)].breeding_period = sqrlBP;
+		my_world[calcPos(xVirt, yVirt, worldsize)].breeding_period = sqrlBP;
 		break;
 	default:
 		break;
@@ -53,7 +94,7 @@ void setType(sworld my_world, int x_cord, int y_cord, char chr){
 
 void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	int l, index;
-	#pragma omp parallel for private(index)
+	//#pragma omp parallel for private(index)
 	for(l = 0; l < xSize*ySize; l += 2 * ySize){
 		for(index = l; index < l + ySize; index += 2){
 			if(isAnimal(worldRead[index].type)){
@@ -73,7 +114,7 @@ void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 
 void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	int l, index;
-	#pragma omp parallel for private(index)
+	//#pragma omp parallel for private(index)
 	for(l = 0; l < xSize*ySize; l += 2 * ySize){
 		for(index = 1 + l; index < l + ySize; index += 2){
 			if(isAnimal(worldRead[index].type)){
@@ -91,16 +132,15 @@ void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	}
 }
 
-sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
+sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize, int rank, int p, MPI_Comm cart_comm,  MPI_Datatype worldType){
 	
-	/*TODO! troca as linhas! :D*/
 	int i, j;
 	sworld my_worldAUX;
 	for(i = 0; i < genNum; i++){
 		my_worldAUX = my_world1;
 		my_world1 = my_world2;
 		my_world2 = my_worldAUX;
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for(j = 0; j < xSize * ySize; j++){
 			if(isAnimal(my_world1[j].type)){
 				my_world1[j].breeding_period--;
@@ -120,6 +160,7 @@ sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize){
 		}
 		processReds(my_world1, my_world2, xSize, ySize);
 		processBlacks(my_world1, my_world2, xSize, ySize);
+		exchangeGhostLines(rank, p, cart_comm, worldType, my_world2, ySize); //faz uma vez a mais... but is that really a big overhead?
 	}
 	return my_world2;
 }
@@ -265,14 +306,14 @@ int main(int argc, char *argv[]) {
 		int xAux=0, yAux, charAux;
 		computeSize(p,worldsize, 0, &computedSize);
 
-		personalWorld1 = calloc(worldsize * computedSize, sizeof(struct world));
-		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
+		personalWorld1 = calloc(worldsize * (computedSize+ GHOST_NUM), sizeof(struct world)); //add ghost lines
+		personalWorld2 = calloc(worldsize * (computedSize+ GHOST_NUM), sizeof(struct world)); //add ghost lines
 
 		acumulatedSize += computedSize;
 		ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
 		while(xAux< computedSize){
-			setType(personalWorld1, xAux, yAux, charAux);
+			setType(personalWorld1, xAux, yAux, charAux, xAux, yAux); //neste caso o real e o virtual sao os mesmos
 			ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
 			if (ret != 3){
@@ -287,13 +328,19 @@ int main(int argc, char *argv[]) {
 			computeSize(p,worldsize, i, &computedSize);
 			acumulatedSize += computedSize;
 			//int somaGhost = (id == p-1? 2 : 4);/*XXX Tentativa de enviar GhostLines*/
-			int sizeToSend = computedSize*worldsize;
-			bufferSend = calloc(sizeToSend,sizeof(struct world));
+			int sizeToSend = (computedSize+ 2*GHOST_NUM)*worldsize;
+			if(i==p-1){
+				sizeToSend = (computedSize+ GHOST_NUM)*worldsize;
+				bufferSend = calloc(sizeToSend,sizeof(struct world));//add ghost lines
+			}
+			else{
+				bufferSend = calloc(sizeToSend,sizeof(struct world));//add 2 * ghost lines
+			}
 			if(auxBreak){
 				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
 				while(xAux< acumulatedSize){
-					setType(bufferSend, xAux-acumulatedSize+computedSize, yAux, charAux);
+					setType(bufferSend, xAux, yAux, charAux,xAux-acumulatedSize+computedSize+GHOST_NUM, yAux );
 					ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 					if (ret != 3){
 						/*Chegou ao fim do ficheiro*/
@@ -315,8 +362,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	else{
-		int computedSize;
-		computeSize(p,worldsize, i, &computedSize);
 		/*XXX Checked*/
 		MPI_Status status;
 		int auxN;
@@ -324,9 +369,10 @@ int main(int argc, char *argv[]) {
 		MPI_Probe(0, TAG_STARTUP, MPI_COMM_WORLD, &status);
 		// Find out the number of elements in the message -> size goes to "n"
 		MPI_Get_count(&status, worldType, &auxN);
+		personalWorldSize = auxN/worldsize; /*aka computedsize xD*/
 		// Allocate memory
 		personalWorld1 = malloc(auxN*sizeof(struct world));
-		personalWorld2 = calloc(worldsize * computedSize, sizeof(struct world));
+		personalWorld2 = calloc(auxN, sizeof(struct world));
 		// Receive the message. ignore the status
 		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 	}
@@ -336,9 +382,8 @@ int main(int argc, char *argv[]) {
 	game_time = -MPI_Wtime();
 
 	/*       RUN game       */
-	int computedGameSize;
-		computeSize(p,worldsize, i, &computedGameSize);
-		personalWorld1 = processGen(personalWorld1, personalWorld2, computedGameSize , worldsize ); //XXX hack change worldsize in checkerboard
+	exchangeGhostLines(rank,p);
+	personalWorld1 = processGen(personalWorld1, personalWorld2, personalWorldSize , worldsize, rank, p, cart_comm, worldType); //XXX hack change worldsize in checkerboard
 
 	/*       RUN game       */
 
@@ -346,6 +391,27 @@ int main(int argc, char *argv[]) {
 	game_time += MPI_Wtime();
 	/*		GAME TIME		*/
 
+	//receiving stuff to print
+	if(id == 0){
+		int receive, computedSize;
+		//print personalWorld1;
+		 printMatrixOutFile(personalWorld1, "Distributed.out", worldsize);
+		for(i=1; i<p;i++){
+			//no need to clean world because we are receiving, unless dims are different...
+			//use computedSize to work it out when printing
+			computeSize(p,worldsize, 0, &computedSize);
+			receive = computedSize*worldsize;
+			MPI_Recv(personalWorld1, receive, worldType, i, TAG_END, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			printMatrixOutFile(personalWorld1, "Distributed.out", worldsize);
+		}
+	}
+	else{
+		int send, computedSize;
+		computeSize(p,worldsize, 0, &computedSize);
+		send = computedSize*worldsize;
+		MPI_Send((personalWorld1+GHOST_NUM*worldsize), send, worldType, 0, TAG_END, MPI_COMM_WORLD); //XXX THEM HACKS
+
+	}
 
 	/* Print Matrix while receiving from Processes */
 
