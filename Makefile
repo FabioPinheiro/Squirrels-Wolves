@@ -28,7 +28,7 @@ utils:
 runP:
 	./parallel_proj inputs/input1000 2 2 6 200 POutput.out
 runSmalP:
-	./parallel_proj inputs/smalInput 10 12 10 1 PSmalOutput.out
+	./parallel_proj inputs/smalInput 1 1 1 2 PSmalOutput.out
 runUP:
 	./utils POutput.out
 	

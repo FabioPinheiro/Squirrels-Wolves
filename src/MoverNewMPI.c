@@ -49,17 +49,17 @@ int isAnimal(int type) {
 
 	return ret;
 }
-int isAble(sworld world, int x_pos, int y_pos, int type, int worldsize) {
+int isAble(sworld world, int x_pos, int y_pos, int type, int worldX, int worldY) {
 	/*0 não se pode mexer
 	 1 pode-se mexer
 	 */
 	/*XXX ver se está dentro do quadrado*/
 	int positionType;
 
-	if (x_pos < 0 || y_pos < 0 || x_pos >= worldsize || y_pos >= worldsize) {
+	if (x_pos < 0 || y_pos < 0 || x_pos >= worldX || y_pos >= worldY) {
 		return 0; /*fora do quadrado*/
 	}
-	positionType = world[calcPos(x_pos, y_pos, worldsize)].type;
+	positionType = world[calcPos(x_pos, y_pos, worldY)].type;
 
 	/* check lobos */
 	if (type == WOLF || type == WES) {
@@ -262,7 +262,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 		(*y) = aux2;
 	}
 
-	int calcMovePos(sworld world, int x, int y, int type, int worldsize) { /*calc the Next pos*/
+	int calcMovePos(sworld world, int x, int y, int type, int worldX, int worldY) { /*calc the Next pos*/
 		/* trees and ice don't move
 		 • Number the possible choices starting from 0, clockwise starting from the 12:00
 		 position (i.e. up, right, down, left). Note that only cells that are unoccupied (for
@@ -287,74 +287,74 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 		/*Pos Left 0*/
 		/*x y-1*/
 
-		if (isAble(world, x, y - 1, type, worldsize)) {
+		if (isAble(world, x, y - 1, type,worldX ,worldY)) {
 			numbPossible++;
-			vec[0] = calcPos(x,y-1,worldsize);
+			vec[0] = calcPos(x,y-1,worldY);
 		}
 		/*Pos Up 0*/
 		/*(x-1)*worldsize y*/
-		if (isAble(world, (x + 1), y, type, worldsize)) {
+		if (isAble(world, (x + 1), y, type, worldX ,worldY)) {
 			numbPossible++;
-			vec[1] = calcPos((x+1) ,y,worldsize);
+			vec[1] = calcPos((x+1) ,y,worldY);
 		}
 		/*Pos Rigth 0*/
 		/*x y+1*/
 
-		if (isAble(world, x, y + 1, type, worldsize)) {
+		if (isAble(world, x, y + 1, type, worldX ,worldY)) {
 			numbPossible++;
-			vec[2] = calcPos(x,y+1,worldsize);
+			vec[2] = calcPos(x,y+1,worldY);
 		}
 		/*Pos Down 0*/
 		/*(x+1)*worldsize y*/
-		if (isAble(world, (x - 1), y, type, worldsize)) {
+		if (isAble(world, (x - 1), y, type, worldX ,worldY)) {
 
 			numbPossible++;
 
-			vec[3] = calcPos((x-1),y,worldsize);
+			vec[3] = calcPos((x-1),y,worldY);
 		}
 
 		if (type == WOLF || type == WES) {
-			if (isAble(world, x, y - 1, type, worldsize)) {
-				if (isAble(world, x, y - 1, type,worldsize) == 2) {
+			if (isAble(world, x, y - 1, type, worldX ,worldY)) {
+				if (isAble(world, x, y - 1, type,worldX ,worldY) == 2) {
 					numbPossibleWolf++;
 				}
 				numbPossible++;
-				vec[0] = calcPos(x,y-1,worldsize);
-				vecWolf[0] = calcPos(x,y-1,worldsize);
+				vec[0] = calcPos(x,y-1,worldY);
+				vecWolf[0] = calcPos(x,y-1,worldY);
 			}
 			/*Pos Up 0*/
 			/*(x-1)*worldsize y*/
-			if (isAble(world, (x + 1), y, type, worldsize)) {
-				if (isAble(world, (x + 1), y, type, worldsize) == 2) {
+			if (isAble(world, (x + 1), y, type, worldX ,worldY)) {
+				if (isAble(world, (x + 1), y, type, worldX ,worldY) == 2) {
 					numbPossibleWolf++;
 
 				}
 				numbPossible++;
-				vec[1] = calcPos((x+1) ,y,worldsize);
-				vecWolf[1] = calcPos((x+1) ,y,worldsize);
+				vec[1] = calcPos((x+1) ,y,worldY);
+				vecWolf[1] = calcPos((x+1) ,y,worldY);
 			}
 			/*Pos Rigth 0*/
 			/*x y+1*/
 
-			if (isAble(world, x, y + 1, type, worldsize)) {
-				if (isAble(world, x, y + 1, type, worldsize) == 2) {
+			if (isAble(world, x, y + 1, type, worldX ,worldY)) {
+				if (isAble(world, x, y + 1, type, worldX ,worldY) == 2) {
 					numbPossibleWolf++;
 				}
 				numbPossible++;
-				vec[2] = calcPos(x,y+1,worldsize);
-				vecWolf[2] = calcPos(x,y+1,worldsize);
+				vec[2] = calcPos(x,y+1,worldY);
+				vecWolf[2] = calcPos(x,y+1,worldY);
 			}
 			/*Pos Down 0*/
 			/*(x+1)*worldsize y*/
-			if (isAble(world, (x - 1), y, type, worldsize)) {
-				if (isAble(world, (x - 1), y, type, worldsize) == 2) {
+			if (isAble(world, (x - 1), y, type, worldX ,worldY)) {
+				if (isAble(world, (x - 1), y, type, worldX ,worldY) == 2) {
 					numbPossibleWolf++;
 
 				}
 				numbPossible++;
 
-				vec[3] = calcPos((x-1),y,worldsize);
-				vecWolf[3] = calcPos((x-1),y,worldsize);
+				vec[3] = calcPos((x-1),y,worldY);
+				vecWolf[3] = calcPos((x-1),y,worldY);
 			}
 		}
 
@@ -388,7 +388,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 		/*calculating C MOD numbPossible pag 2 enum*/
 		if (numbPossible == 0)
 			return -1;
-		nPos = calcPos(x,y,worldsize);
+		nPos = calcPos(x,y,worldY);
 		theChoosenOne = nPos % numbPossible;
 		/*printf("\n\ntheChoosenOne: %d calcPos:%d  numbPossible: %d calcPos(x,y,worldsize)MODnumbPossible: %d \n\n",theChoosenOne,calcPos(x,y,worldsize),numbPossible, calcPos(x,y,worldsize)%numbPossible);
 		 printf("[%d , %d , %d , %d]\n\n",vec[0],vec[1],vec[2],vec[3]);*/
@@ -431,17 +431,17 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 
 		return ret;
 	}
-	void goAnimal(sworld world_init, sworld world_final, int pos, int type, int worldsize) {
+	void goAnimal(sworld world_init, sworld world_final, int pos, int type, int worldX, int worldY) {
 		int y_init, x_init, y_final, x_final, posFinal;
-		calcCords(pos, &x_init, &y_init, worldsize);
+		calcCords(pos, &x_init, &y_init, worldY);
 
 		posFinal = /* (2 < rand()%5)?pos+1:pos+worldsize;*/calcMovePos(
-				world_init, x_init, y_init, type, worldsize);
+				world_init, x_init, y_init, type, worldX ,worldY);
 		/*posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);*/
 		if (posFinal < 0)
 			return;
 
 		/*	printf("posição: %d final: %d\n",pos, posFinal);*/
-		calcCords(posFinal, &x_final, &y_final, worldsize);
-		move(world_init, x_init, y_init, world_final, x_final, y_final, worldsize);
+		calcCords(posFinal, &x_final, &y_final, worldY);
+		move(world_init, x_init, y_init, world_final, x_final, y_final, worldY);
 	}

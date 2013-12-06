@@ -160,14 +160,14 @@ void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	for(l = 0; l < xSize*ySize; l += 2 * ySize){
 		for(index = l; index < l + ySize; index += 2){
 			if(isAnimal(worldRead[index].type)){
-				goAnimal(worldRead, worldWrite, index, worldRead[index].type, ySize);
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type, xSize ,ySize);
 			}
 		}
 	  
 		if(l + 2 * ySize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = 1 + l + ySize; index < l + 2 * ySize; index += 2){
 				if(isAnimal(worldRead[index].type)){
-					goAnimal(worldRead, worldWrite, index, worldRead[index].type, ySize);
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type, xSize ,ySize);
 				}
 			}
 		}
@@ -180,14 +180,14 @@ void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	for(l = 0; l < xSize*ySize; l += 2 * ySize){
 		for(index = 1 + l; index < l + ySize; index += 2){
 			if(isAnimal(worldRead[index].type)){
-				goAnimal(worldRead, worldWrite, index, worldRead[index].type, ySize);
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type, xSize ,ySize);
 			}
 		}
 
 		if(l + 2 * ySize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = l + ySize; index < l + 2 * ySize; index += 2){
 				if(isAnimal(worldRead[index].type)){
-					goAnimal(worldRead, worldWrite, index, worldRead[index].type, ySize);
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type, xSize ,ySize);
 				}
 			}
 		}
@@ -445,7 +445,7 @@ int main(int argc, char *argv[]) {
 		personalWorld2 = calloc(auxN, sizeof(struct world));
 		// Receive the message. ignore the status
 		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		sworldTreeIceCpy(personalWorld1, personalWorld2, personalWorldSize, worldsize);
+		sworldTreeIceCpy(personalWorld2, personalWorld1, personalWorldSize, worldsize);
 
 	}
 
@@ -455,7 +455,7 @@ int main(int argc, char *argv[]) {
 
 	/*       RUN game       */
 	exchangeGhostLines(rank,p, cart_comm, worldType, personalWorld1, worldsize);
-	personalWorld1 = processGen(personalWorld1, personalWorld2, personalWorldSize , worldsize, rank, p, cart_comm, worldType); //XXX hack change worldsize in checkerboard
+	personalWorld1 = processGen(personalWorld2, personalWorld1, personalWorldSize , worldsize, rank, p, cart_comm, worldType); //XXX hack change worldsize in checkerboard
 
 	/*       RUN game       */
 
