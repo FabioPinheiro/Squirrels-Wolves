@@ -98,14 +98,14 @@ void processReds(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	for(l = 0; l < xSize*ySize; l += 2 * ySize){
 		for(index = l; index < l + ySize; index += 2){
 			if(isAnimal(worldRead[index].type)){
-				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type, ySize);
 			}
 		}
 	  
 		if(l + 2 * ySize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = 1 + l + ySize; index < l + 2 * ySize; index += 2){
 				if(isAnimal(worldRead[index].type)){
-					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type, ySize);
 				}
 			}
 		}
@@ -118,14 +118,14 @@ void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 	for(l = 0; l < xSize*ySize; l += 2 * ySize){
 		for(index = 1 + l; index < l + ySize; index += 2){
 			if(isAnimal(worldRead[index].type)){
-				goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+				goAnimal(worldRead, worldWrite, index, worldRead[index].type, ySize);
 			}
 		}
 
 		if(l + 2 * ySize <= xSize*ySize){ /*a matiz tem o tamanho de lado impar e esta o ultimo congunto*/
 			for(index = l + ySize; index < l + 2 * ySize; index += 2){
 				if(isAnimal(worldRead[index].type)){
-					goAnimal(worldRead, worldWrite, index, worldRead[index].type);
+					goAnimal(worldRead, worldWrite, index, worldRead[index].type, ySize);
 				}
 			}
 		}
@@ -382,7 +382,7 @@ int main(int argc, char *argv[]) {
 	game_time = -MPI_Wtime();
 
 	/*       RUN game       */
-	exchangeGhostLines(rank,p);
+	exchangeGhostLines(rank,p, cart_comm, worldType, personalWorld1, worldsize);
 	personalWorld1 = processGen(personalWorld1, personalWorld2, personalWorldSize , worldsize, rank, p, cart_comm, worldType); //XXX hack change worldsize in checkerboard
 
 	/*       RUN game       */
