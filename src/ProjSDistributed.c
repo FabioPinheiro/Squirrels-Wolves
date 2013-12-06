@@ -105,23 +105,25 @@ void exchangeGhostLines(int rank, int p, MPI_Comm cart_comm,  MPI_Datatype world
 	 computeSize(p, worldSize, rank, &computedsize);
 	if(rank==0){
 		MPI_Irecv((my_world2+computedsize*worldSize), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm, &req);
-		MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm);
+		MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM*worldSize), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm);
 		MPI_Wait(&req, &status);
 
 	}
 	else{
 		if(rank == p-1){
 			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm, &req);
-			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm);
+			MPI_Send(my_world2+GHOST_NUM*worldSize, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm);
 			MPI_Wait(&req, &status);
 		}
 		else{
+			/*Recebe cima*/
 			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm, &req);
-			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm);
-			MPI_Wait(&req, &status);
+			MPI_Send(my_world2+GHOST_NUM*worldSize, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);//xxx check
+			/*Recebe baixo*/
 			MPI_Irecv((my_world2+computedsize*worldSize), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm, &req);
-			MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm);
-			MPI_Wait(&req, &status);
+			MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM*worldSize), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);//xxx check
 		}
 	}
 }
@@ -199,8 +201,14 @@ void processBlacks(sworld worldRead, sworld worldWrite, int xSize, int ySize){
 
 sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize, int rank, int p, MPI_Comm cart_comm,  MPI_Datatype worldType){
 	
-	int i, j;
+	int i, j, aux;
 	sworld my_worldAUX;
+	if(rank > 0 && rank < p-1){
+		xSize += 2*GHOST_NUM;
+	}
+	else{
+		xSize += GHOST_NUM;
+	}
 	for(i = 0; i < genNum; i++){
 		my_worldAUX = my_world1;
 		my_world1 = my_world2;
@@ -444,9 +452,10 @@ int main(int argc, char *argv[]) {
 		MPI_Get_count(&status, worldType, &auxN);
 		personalWorldSize = auxN/worldsize; /*aka computedsize xD*/
 		// Allocate memory
-		personalWorld1 = calloc(auxN, sizeof(struct world));
-		personalWorld2 = calloc(auxN, sizeof(struct world));
+		personalWorld1 = calloc(auxN+GHOST_NUM*worldsize, sizeof(struct world));
+		personalWorld2 = calloc(auxN+GHOST_NUM*worldsize, sizeof(struct world));
 		// Receive the message. ignore the status
+		printf("DEBUG1 !\n");
 		MPI_Recv(personalWorld1, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		sworldTreeIceCpy(personalWorld2, personalWorld1, personalWorldSize, worldsize);
 
@@ -458,6 +467,7 @@ int main(int argc, char *argv[]) {
 
 	/*       RUN game       */
 	exchangeGhostLines(rank,p, cart_comm, worldType, personalWorld1, worldsize);
+	printf("DEBUG-Maloc !\n");
 	personalWorld1 = processGen(personalWorld2, personalWorld1, personalWorldSize , worldsize, rank, p, cart_comm, worldType); //XXX hack change worldsize in checkerboard
 
 	/*       RUN game       */
@@ -479,14 +489,20 @@ int main(int argc, char *argv[]) {
 			//no need to clean world because we are receiving, unless dims are different...
 			//use computedSize to work it out when printing
 			receive = computedSize*worldsize;
+			//printf("Computed size %d \n", computedSize);
+			printf("rank: %d  size: %d  receiveSize: %d\n", rank, computedSize, receive);
+			printf("DEBUG2 !\n");
 			MPI_Recv(personalWorld1, receive, worldType, i, TAG_END, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			printf("DEBUG3 !\n");
 			printMatrixOutFile(personalWorld1, "Distributed.out", computedSize ,worldsize, realShiftSize);
 		}
 	}
 	else{
 		int send, computedSize;
-		computeSize(p,worldsize, 0, &computedSize);
+		computeSize(p,worldsize, rank, &computedSize);
 		send = computedSize*worldsize;
+		printf("rank: %d  size: %d  sendSize: %d\n", rank, computedSize, send);
+		printf("BEFORE 1 SEND\n");
 		MPI_Send((personalWorld1+GHOST_NUM*worldsize), send, worldType, 0, TAG_END, MPI_COMM_WORLD); //XXX THEM HACKS
 
 	}
