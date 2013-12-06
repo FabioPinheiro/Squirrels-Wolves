@@ -85,6 +85,7 @@ void checkBabies(sworld world_from, sworld world_to, sworld animalAux, int x_fro
 	/*AnimalAux ja está na nova posiçao*/
 	/*se sim cria o bebe*/
 	if (animalAux->breeding_period == 0) {
+		printf("entra?");
 		sworld newAnimal = getPositionStructure(world_from, x_from, y_from, worldsize);
 		/*ver se é SQRL WOLF e WES */
 		if (animalAux->type == WOLF || animalAux->type == WES) {

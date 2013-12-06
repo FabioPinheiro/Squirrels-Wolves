@@ -208,7 +208,9 @@ sworld processGen(sworld my_world1, sworld my_world2, int xSize, int ySize, int 
 	}
 	else{
 		xSize += GHOST_NUM;
+		printf("size %d\n", xSize);
 	}
+
 	for(i = 0; i < genNum; i++){
 		my_worldAUX = my_world1;
 		my_world1 = my_world2;
@@ -378,7 +380,7 @@ int main(int argc, char *argv[]) {
 		/*LE para ele (0) e guarda*/
 		int xAux=0, yAux, charAux, lastX;
 		computeSize(p,worldsize, 0, &computedSize);
-
+		personalWorldSize = computedSize;
 		personalWorld1 = calloc(worldsize * (computedSize+ GHOST_NUM), sizeof(struct world)); //add ghost lines
 		personalWorld2 = calloc(worldsize * (computedSize+ GHOST_NUM), sizeof(struct world)); //add ghost lines
 
