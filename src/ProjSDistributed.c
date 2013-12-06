@@ -394,6 +394,7 @@ int main(int argc, char *argv[]) {
 					}
 				}
 				/*envia a Linha*/
+				//TODO rebenta aqui
 				MPI_Isend( bufferSend, sizeToSend , worldType ,i , TAG_STARTUP ,MPI_COMM_WORLD ,&req[i]);
 				//TODO CHECK this -> Do not forget to complete the request!
 				MPI_Wait(&req[i], MPI_STATUS_IGNORE);
