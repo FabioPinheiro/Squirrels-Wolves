@@ -85,12 +85,12 @@ void checkBabies(sworld world_from, sworld world_to, sworld animalAux, int x_fro
 	/*AnimalAux ja está na nova posiçao*/
 	/*se sim cria o bebe*/
 	if (animalAux->breeding_period == 0) {
-		printf("entra?");
 		sworld newAnimal = getPositionStructure(world_from, x_from, y_from, worldsize);
 		/*ver se é SQRL WOLF e WES */
 		if (animalAux->type == WOLF || animalAux->type == WES) {
 			newAnimal->breeding_period = wolfBP;
 			newAnimal->starvation_period = wolfStarvP;
+			newAnimal->type = WOLF;
 			if (animalAux->type == WES) {
 				animalAux->breeding_period = wolfBP;
 				animalAux->starvation_period = wolfStarvP;
@@ -99,6 +99,7 @@ void checkBabies(sworld world_from, sworld world_to, sworld animalAux, int x_fro
 			}
 		} else {
 			newAnimal->breeding_period = sqrlBP;
+			newAnimal->type = animalAux->type;
 			animalAux->breeding_period = sqrlBP;
 		}
 	}
@@ -436,8 +437,7 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 		int y_init, x_init, y_final, x_final, posFinal;
 		calcCords(pos, &x_init, &y_init, worldY);
 
-		posFinal = /* (2 < rand()%5)?pos+1:pos+worldsize;*/calcMovePos(
-				world_init, x_init, y_init, type, worldX ,worldY);
+		posFinal = /* (2 < rand()%5)?pos+1:pos+worldsize;*/calcMovePos(world_init, x_init, y_init, type, worldX ,worldY);
 		/*posFinal = posFinal<(worldsize*worldsize)? posFinal: posFinal%(worldsize*worldsize);*/
 		if (posFinal < 0)
 			return;
