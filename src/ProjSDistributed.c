@@ -58,7 +58,10 @@ void printMatrixOutFile(sworld world, char* name, int xSize,int ySize, int realS
 	//TODO
 	for(i=0;i< xSize*ySize;i++){
 		if(world[i].type > EPTY	&& world[i].type <= SONT)
-			fprintf(out, "%d %d %c\n",world[i].x+realShiftSize*aux , world[i].y, printValues(world[i].type));
+			if(isAnimal(world[i].type))
+				fprintf(out, "%d %d %c\n",world[i].x+realShiftSize*aux , world[i].y, printValues(world[i].type));
+			else
+				fprintf(out, "%d %d %c\n",world[i].x , world[i].y, printValues(world[i].type));
 	}
 
 
