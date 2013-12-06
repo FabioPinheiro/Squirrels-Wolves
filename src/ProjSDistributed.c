@@ -53,13 +53,13 @@ void sworldTreeIceCpy(sworld worldCpyTo, sworld worldCpyFrom, int xSize, int ySi
 
 void printMatrixOutFile(sworld world, char* name, int xSize,int ySize, int realShiftSize){ /*output para Avaliacao*/
 	FILE *out;
-	int i, aux = (genNum == 1? 0: 1);
+	int i, aux = (genNum == 1 || realShiftSize == 0? 0: 1);
 	out = fopen(name, "a");
 	//TODO
 	for(i=0;i< xSize*ySize;i++){
 		if(world[i].type > EPTY	&& world[i].type <= SONT)
 			if(isAnimal(world[i].type))
-				fprintf(out, "%d %d %c\n",world[i].x+realShiftSize*aux , world[i].y, printValues(world[i].type));
+				fprintf(out, "%d %d %c\n",world[i].x+((realShiftSize-GHOST_NUM)*aux) , world[i].y, printValues(world[i].type));
 			else
 				fprintf(out, "%d %d %c\n",world[i].x , world[i].y, printValues(world[i].type));
 	}
@@ -486,8 +486,9 @@ int main(int argc, char *argv[]) {
 
 		 printMatrixOutFile(personalWorld1, "Distributed.out", computedSize,worldsize, realShiftSize);
 		for(i=1; i<p;i++){
-			computeSize(p,worldsize, i, &computedSize);
 			realShiftSize += computedSize;
+			computeSize(p,worldsize, i, &computedSize);
+
 			//no need to clean world because we are receiving, unless dims are different...
 			//use computedSize to work it out when printing
 			receive = computedSize*worldsize;
