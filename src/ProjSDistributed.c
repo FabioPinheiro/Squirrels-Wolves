@@ -345,7 +345,7 @@ int main(int argc, char *argv[]) {
 		MPI_Request *req;
 		req = (MPI_Request *) malloc(p* sizeof(MPI_Request));
 		sworld bufferSend;
-		int computedSize, auxBreak, acumulatedSize=0;
+		int computedSize, auxBreak=1, acumulatedSize=0;
 
 		/*LE para ele (0) e guarda*/
 		int xAux=0, yAux, charAux;
@@ -381,6 +381,7 @@ int main(int argc, char *argv[]) {
 			else{
 				bufferSend = calloc(sizeToSend,sizeof(struct world));//add 2 * ghost lines
 			}
+
 			if(auxBreak){
 				ret = fscanf(inputFile, "%d %d %c \n", &xAux, &yAux, &charAux);
 
