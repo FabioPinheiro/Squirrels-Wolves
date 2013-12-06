@@ -13,6 +13,34 @@
 
 int wolfBP = 0, sqrlBP = 0, wolfStarvP = 0, genNum = 0;
 
+char printValues(int x){
+	/*
+	 * Recives an int that is the internal representation of the types and returns char that is the
+	 * external representation of the same type
+	 */
+	char str[2];
+	sprintf(str, "%d", x);
+	switch(atoi(str)){
+	case WOLF:
+		return 'w';
+	case WES:
+		return 'w';
+	case SQRL:
+		return 's';
+	case ICE:
+		return 'i';
+	case TREE:
+		return 't';
+	case SONT:
+		return '$';
+	case EPTY:
+		return '-';
+	default:
+		return ' ';
+	}
+	return ' ';
+}
+
 void printMatrixOutFile(sworld world, char* name, int worldsize){ /*output para Avaliacao*/
 	FILE *out;
 	int i, j;
