@@ -285,26 +285,26 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 		/*Pos Left 0*/
 		/*x y-1*/
 
-		if (isAble(world, x, y - 1, type)) {
+		if (isAble(world, x, y - 1, type, worldsize)) {
 			numbPossible++;
 			vec[0] = calcPos(x,y-1,worldsize);
 		}
 		/*Pos Up 0*/
 		/*(x-1)*worldsize y*/
-		if (isAble(world, (x + 1), y, type)) {
+		if (isAble(world, (x + 1), y, type, worldsize)) {
 			numbPossible++;
 			vec[1] = calcPos((x+1) ,y,worldsize);
 		}
 		/*Pos Rigth 0*/
 		/*x y+1*/
 
-		if (isAble(world, x, y + 1, type)) {
+		if (isAble(world, x, y + 1, type, worldsize)) {
 			numbPossible++;
 			vec[2] = calcPos(x,y+1,worldsize);
 		}
 		/*Pos Down 0*/
 		/*(x+1)*worldsize y*/
-		if (isAble(world, (x - 1), y, type)) {
+		if (isAble(world, (x - 1), y, type, worldsize)) {
 
 			numbPossible++;
 
@@ -312,8 +312,8 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 		}
 
 		if (type == WOLF || type == WES) {
-			if (isAble(world, x, y - 1, type)) {
-				if (isAble(world, x, y - 1, type) == 2) {
+			if (isAble(world, x, y - 1, type, worldsize)) {
+				if (isAble(world, x, y - 1, type,worldsize) == 2) {
 					numbPossibleWolf++;
 				}
 				numbPossible++;
@@ -322,8 +322,8 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 			}
 			/*Pos Up 0*/
 			/*(x-1)*worldsize y*/
-			if (isAble(world, (x + 1), y, type)) {
-				if (isAble(world, (x + 1), y, type) == 2) {
+			if (isAble(world, (x + 1), y, type, worldsize)) {
+				if (isAble(world, (x + 1), y, type, worldsize) == 2) {
 					numbPossibleWolf++;
 
 				}
@@ -334,8 +334,8 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 			/*Pos Rigth 0*/
 			/*x y+1*/
 
-			if (isAble(world, x, y + 1, type)) {
-				if (isAble(world, x, y + 1, type) == 2) {
+			if (isAble(world, x, y + 1, type, worldsize)) {
+				if (isAble(world, x, y + 1, type, worldsize) == 2) {
 					numbPossibleWolf++;
 				}
 				numbPossible++;
@@ -344,8 +344,8 @@ void move(sworld world_from, int x_from, int y_from, sworld world_to, int x_to,
 			}
 			/*Pos Down 0*/
 			/*(x+1)*worldsize y*/
-			if (isAble(world, (x - 1), y, type)) {
-				if (isAble(world, (x - 1), y, type) == 2) {
+			if (isAble(world, (x - 1), y, type, worldsize)) {
+				if (isAble(world, (x - 1), y, type, worldsize) == 2) {
 					numbPossibleWolf++;
 
 				}

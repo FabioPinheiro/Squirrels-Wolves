@@ -28,40 +28,43 @@ void printMatrixOutFile(sworld world, char* name, int worldsize){ /*output para 
 	fclose(out);
 }
 
-void exchangeGhostLines(int rank, int p, MPI_Comm cart_comm,  MPI_Datatype worldType, sworld my_world2, int worldSize){
-	//XXX worldtype hacked neste momento ano funca para checkerboard
-	 MPI_Status status;
-	 MPI_Request req;
-	 int computedsize;
-	 computeSize(p, worldSize, rank, &computedsize);
-	switch(rank){
-		case 0:/*1 send, 1 receive*/
-			MPI_Irecv((my_world2+computedsize*worldSize), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm, &req);
-			MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm);
-			MPI_Wait(&req, &status);
-			break;
-		case p:/*1 send, 1 receive*/
-			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, p-1, TAG_CHANGE, cart_comm, &req);
-			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, p-1, TAG_CHANGE, cart_comm);
-			MPI_Wait(&req, &status);
-			break;
-		default:/*2 send, 2 receive*/
-			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm, &req);
-			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm);
-			MPI_Wait(&req, &status);
-			MPI_Irecv((my_world2+computedsize*worldSize), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm, &req);
-			MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm);
-			MPI_Wait(&req, &status);
-			break;
-		}
-}
-
 void computeSize(int numP, int worldSize, int pId, int *result){
 	*result = (int) worldSize/numP;
 	if(worldSize%numP - pId > 0){
 		*result += 1;
 	}
 }
+
+void exchangeGhostLines(int rank, int p, MPI_Comm cart_comm,  MPI_Datatype worldType, sworld my_world2, int worldSize){
+	//XXX worldtype hacked neste momento ano funca para checkerboard
+	 MPI_Status status;
+	 MPI_Request req;
+	 int computedsize;
+	 computeSize(p, worldSize, rank, &computedsize);
+	if(rank==0){
+		MPI_Irecv((my_world2+computedsize*worldSize), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm, &req);
+		MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM), GHOST_NUM*worldSize, worldType, 1, TAG_CHANGE, cart_comm);
+		MPI_Wait(&req, &status);
+
+	}
+	else{
+		if(rank == p){
+			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, p-1, TAG_CHANGE, cart_comm, &req);
+			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, p-1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);
+		}
+		else{
+			MPI_Irecv(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm, &req);
+			MPI_Send(my_world2, GHOST_NUM*worldSize, worldType, rank-1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);
+			MPI_Irecv((my_world2+computedsize*worldSize), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm, &req);
+			MPI_Send((my_world2+computedsize*worldSize-GHOST_NUM), GHOST_NUM*worldSize, worldType, rank+1, TAG_CHANGE, cart_comm);
+			MPI_Wait(&req, &status);
+		}
+	}
+}
+
+
 void setType(sworld my_world, int x_cord, int y_cord, char chr, int xVirt, int yVirt){
 	//XXX check if it is correct
 	int type;
