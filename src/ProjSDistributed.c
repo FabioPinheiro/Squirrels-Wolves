@@ -388,7 +388,7 @@ int main(int argc, char *argv[]) {
 		/*LE para ele (0) e guarda*/
 		int xAux=0, yAux, charAux, lastX;
 		computeSize(p,worldsize, 0, &computedSize);
-		personalWorldSize = computedSize+GHOST_NUM;
+		personalWorldSize = computedSize;
 		personalWorld1 = calloc(worldsize * (computedSize + GHOST_NUM), sizeof(struct world)); //add ghost lines
 		personalWorld2 = calloc(worldsize * (computedSize + GHOST_NUM), sizeof(struct world)); //add ghost lines
 
@@ -440,7 +440,6 @@ int main(int argc, char *argv[]) {
 					}
 				}
 				/*envia a Linha*/
-				//TODO rebenta aqui
 				MPI_Isend( bufferSend, sizeToSend , worldType ,i , TAG_STARTUP ,MPI_COMM_WORLD ,&req[i]);
 				//TODO CHECK this -> Do not forget to complete the request!
 				MPI_Wait(&req[i], MPI_STATUS_IGNORE);
@@ -457,6 +456,7 @@ int main(int argc, char *argv[]) {
 		/*XXX Checked*/
 		MPI_Status status;
 		int auxN;
+		int sizeToreceive;
 		 // Wait for a message from rank 0 with tag 0
 		MPI_Probe(0, TAG_STARTUP, MPI_COMM_WORLD, &status);
 		// Find out the number of elements in the message -> size goes to "n"
@@ -465,16 +465,18 @@ int main(int argc, char *argv[]) {
 		// Allocate memory
 		//xxx se for no meio tem de alocar 2*GHOST_NUM
 		if(rank != p-1){
-			personalWorld1 = calloc(auxN+GHOST_NUM*worldsize, sizeof(struct world));
-			personalWorld2 = calloc(auxN+GHOST_NUM*worldsize, sizeof(struct world));
+			personalWorld1 = calloc(auxN*worldsize, sizeof(struct world));
+			personalWorld2 = calloc(auxN*worldsize, sizeof(struct world));
+			sizeToreceive = (auxN-GHOST_NUM)*worldsize;
 		}
 		else{
-			personalWorld1 = calloc(auxN+2*GHOST_NUM*worldsize, sizeof(struct world));
-			personalWorld2 = calloc(auxN+2*GHOST_NUM*worldsize, sizeof(struct world));
+			personalWorld1 = calloc(auxN*worldsize, sizeof(struct world));
+			personalWorld2 = calloc(auxN*worldsize, sizeof(struct world));
+			sizeToreceive = (auxN-GHOST_NUM)*worldsize;
 		}
 		// Receive the message. ignore the status
 	//	printf("DEBUG1 !\n");
-		MPI_Recv(personalWorld1+GHOST_NUM*worldsize, auxN, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		MPI_Recv(personalWorld1+GHOST_NUM*worldsize, sizeToreceive, worldType, 0, TAG_STARTUP, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		sworldTreeIceCpy(personalWorld2, personalWorld1, personalWorldSize, worldsize);
 
 	}
